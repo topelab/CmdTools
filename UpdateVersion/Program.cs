@@ -1,8 +1,9 @@
 ﻿using CommandLine;
 using System;
-using UpdateVersion;
+using System.Linq;
+using Topelab.Core.Resolver.Microsoft;
 
-namespace SetVersion
+namespace UpdateVersion
 {
     internal class Program
     {
@@ -14,7 +15,10 @@ namespace SetVersion
 
         private static void Proceed(Options options)
         {
-            
+            var resolver = ResolverFactory.Create(SetupDI.Register());
+            var projectUpdater = resolver.Get<IProjectUpdater>();
+
+            projectUpdater.Run(AppContext.BaseDirectory, options.Versions.FirstOrDefault());
         }
     }
 }
