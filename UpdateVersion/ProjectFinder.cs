@@ -8,15 +8,20 @@ namespace UpdateVersion
     internal class ProjectFinder : IProjectFinder
     {
         private readonly IFileExecutor fileExecutor;
+        private readonly IProjectUpdater projectUpdater;
 
-        public ProjectFinder(IFileExecutor fileExecutor)
+        public ProjectFinder(IFileExecutor fileExecutor, IProjectUpdater projectUpdater)
         {
             this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
+            this.projectUpdater = projectUpdater ?? throw new ArgumentNullException(nameof(projectUpdater));
         }
 
-        public void Run(string basePath, IEnumerable<string> versions)
+        public void Run(Options options)
         {
-            var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath);
+            string basePath = options.BasePath ?? AppContext.BaseDirectory;
+            IEnumerable<string> versions = options.Versions;
+
+            var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile);
             fileExecutor.Initialize(basePath, "*.csproj");
             fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
         }
@@ -28,10 +33,10 @@ namespace UpdateVersion
             return versionsMap;
         }
 
-        private static Dictionary<string, string> TryGetVersions(string basePath)
+        private static Dictionary<string, string> TryGetVersions(string basePath, string versionsFileName)
         {
             var versionsMap = new Dictionary<string, string>();
-            var file = Path.Combine(basePath, "version.txt");
+            var file = Path.Combine(basePath, versionsFileName);
 
             if (File.Exists(file))
             {
@@ -76,12 +81,13 @@ namespace UpdateVersion
             }
         }
 
-        private static void TryUpdate(string file, Dictionary<string, string> versionsMap)
+        private void TryUpdate(string file, Dictionary<string, string> versionsMap)
         {
             string projectName = Path.GetFileNameWithoutExtension(file);
             var version = GetMatchVersion(projectName, versionsMap);
             if (version != null)
             {
+                projectUpdater.Update(file, version, false);
                 Console.WriteLine($"{file} to {GetMatchVersion(projectName, versionsMap)}");
             }
         }

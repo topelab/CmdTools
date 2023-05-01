@@ -21,6 +21,9 @@ namespace UpdateVersion
         [Option('u', "update", Required = false, HelpText = "Update version", SetName = "update")]
         public bool UpdateVersion { get; set; }
 
+        [Option('f', "versions-file", Required = false, Default = "version.txt", HelpText = "File where versions are defined")]
+        public string VersionsFile { get; set; }
+
 
         [Usage(ApplicationAlias = "UpdateVersion")]
         public static IEnumerable<Example> Examples

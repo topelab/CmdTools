@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace UpdateVersion
+﻿namespace UpdateVersion
 {
     internal interface IProjectFinder
     {
-        void Run(string basePath, IEnumerable<string> versions);
+        void Run(Options options);
     }
 }

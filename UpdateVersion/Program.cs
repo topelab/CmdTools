@@ -17,7 +17,7 @@ namespace UpdateVersion
             var resolver = ResolverFactory.Create(SetupDI.Register());
             var projectUpdater = resolver.Get<IProjectFinder>();
 
-            projectUpdater.Run(options.BasePath ?? AppContext.BaseDirectory, options.Versions);
+            projectUpdater.Run(options);
         }
     }
 }
