@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using System;
-using System.Linq;
 using Topelab.Core.Resolver.Microsoft;
 
 namespace UpdateVersion
@@ -16,9 +15,9 @@ namespace UpdateVersion
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var projectUpdater = resolver.Get<IProjectUpdater>();
+            var projectUpdater = resolver.Get<IProjectFinder>();
 
-            projectUpdater.Run(AppContext.BaseDirectory, options.Versions.FirstOrDefault());
+            projectUpdater.Run(options.BasePath ?? AppContext.BaseDirectory, options.Versions);
         }
     }
 }

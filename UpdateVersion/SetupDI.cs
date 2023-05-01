@@ -9,7 +9,7 @@ namespace UpdateVersion
         {
             return new ResolveInfoCollection()
                 .AddTransient<IFileExecutor, FileExecutor>()
-                .AddTransient<IProjectUpdater, ProjectUpdater>();
+                .AddTransient<IProjectFinder, ProjectFinder>();
         }
     }
 }

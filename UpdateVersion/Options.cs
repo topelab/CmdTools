@@ -9,18 +9,25 @@ namespace UpdateVersion
     /// </summary>
     internal class Options
     {
+        [Option('b', "base-path", Required = false, HelpText = "Set solution path")]
+        public string BasePath { get; set; }
+
         [Option('v', "versions", Required = false, HelpText = "Set versions numbers")]
         public IEnumerable<string> Versions{ get; set; }
 
-        [Option('p', "projects", Required = false, HelpText = "Set projects names to set versions")]
-        public IEnumerable<string> Projects { get; set; }
+        [Option('i', "increase", Default = true, Required = false, HelpText = "Increase version", SetName = "increase")]
+        public bool IncreaseVersion { get; set; }
+
+        [Option('u', "update", Required = false, HelpText = "Update version", SetName = "update")]
+        public bool UpdateVersion { get; set; }
+
 
         [Usage(ApplicationAlias = "UpdateVersion")]
         public static IEnumerable<Example> Examples
         {
             get
             {
-                yield return new Example("Normal scenario", new Options { Versions = new List<string>() { "1.0.0", "2.0.0"}, Projects = new List<string>() { "FirstProject", "SecondProject" } });
+                yield return new Example("Normal scenario", new Options { Versions = new List<string>() { "1.0.0", "SecondProject: 2.0.0" } });
             }
         }
     }
