@@ -2,7 +2,7 @@
   "profiles": {
     "UpdateVersion": {
       "commandName": "Project",
-      "commandLineArgs": "-b \"C:\\arc\\src\\tmp\\3.0-mysql\\Freelab.Geremu\" -f \"version-2.txt\""
+      "commandLineArgs": "-b C:\\arc\\src\\tmp\\3.0-mysql\\Freelab.Geremu -f \"version.txt\" -i \"*\""
     }
   }
 }

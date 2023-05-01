@@ -12,16 +12,14 @@ namespace UpdateVersion
         [Option('b', "base-path", Required = false, HelpText = "Set solution path")]
         public string BasePath { get; set; }
 
-        [Option('v', "versions", Required = false, HelpText = "Set versions numbers")]
+        [Option('v', "versions", Required = false, HelpText = "Set versions numbers", SetName = "cmdline")]
         public IEnumerable<string> Versions{ get; set; }
 
-        [Option('i', "increase", Default = true, Required = false, HelpText = "Increase version", SetName = "increase")]
-        public bool IncreaseVersion { get; set; }
+        [Option('i', "increase", Default = null, Required = false, HelpText = "Increase version", SetName = "file")]
+        public string IncreaseVersion { get; set; }
 
-        [Option('u', "update", Required = false, HelpText = "Update version", SetName = "update")]
-        public bool UpdateVersion { get; set; }
 
-        [Option('f', "versions-file", Required = false, Default = "version.txt", HelpText = "File where versions are defined")]
+        [Option('f', "versions-file", Required = false, Default = "version.txt", HelpText = "File where versions are defined", SetName = "file")]
         public string VersionsFile { get; set; }
 
 

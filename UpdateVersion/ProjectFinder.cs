@@ -49,7 +49,6 @@ namespace UpdateVersion
                 versionsMap.Add("*", "1.0.0");
             }
 
-
             return versionsMap;
         }
 
@@ -87,7 +86,7 @@ namespace UpdateVersion
             var version = GetMatchVersion(projectName, versionsMap);
             if (version != null)
             {
-                projectUpdater.Update(file, version, false);
+                projectUpdater.Update(file, version);
                 Console.WriteLine($"{file} to {GetMatchVersion(projectName, versionsMap)}");
             }
         }
