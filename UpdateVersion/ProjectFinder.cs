@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 
 namespace UpdateVersion
 {
     internal class ProjectFinder : IProjectFinder
     {
+        private const string AnyProjectSelector = "*";
+        private const string BumpAllProjects = "ALL";
+        private const string DefaultVersion = "1.0.0";
+        private const string FilePattern = "*.csproj";
+        private const char ProjectVersionSeparator = ':';
         private readonly IFileExecutor fileExecutor;
         private readonly IProjectUpdater projectUpdater;
 
@@ -21,8 +27,8 @@ namespace UpdateVersion
             string basePath = options.BasePath ?? AppContext.BaseDirectory;
             IEnumerable<string> versions = options.Versions;
 
-            var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile);
-            fileExecutor.Initialize(basePath, "*.csproj");
+            var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
+            fileExecutor.Initialize(basePath, FilePattern);
             fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
         }
 
@@ -33,7 +39,7 @@ namespace UpdateVersion
             return versionsMap;
         }
 
-        private static Dictionary<string, string> TryGetVersions(string basePath, string versionsFileName)
+        private static Dictionary<string, string> TryGetVersions(string basePath, string versionsFileName, IEnumerable<string> versionsToBump)
         {
             var versionsMap = new Dictionary<string, string>();
             var file = Path.Combine(basePath, versionsFileName);
@@ -43,13 +49,73 @@ namespace UpdateVersion
                 var versionContent = File.ReadAllText(file);
                 var lines = versionContent.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
                 UpdateVersionMap(versionsMap, lines);
+                BumpToVersion(file, versionsToBump, versionsMap);
             }
             else
             {
-                versionsMap.Add("*", "1.0.0");
+                versionsMap.Add(AnyProjectSelector, DefaultVersion);
             }
 
             return versionsMap;
+        }
+
+        private static void BumpToVersion(string file, IEnumerable<string> versionsToBump, Dictionary<string, string> versionsMap)
+        {
+            if (versionsToBump.Any())
+            {
+                bool modified = false;
+                string pattern;
+                string versionLevel;
+
+                var globalBump = versionsToBump.FirstOrDefault(v => !v.Contains(ProjectVersionSeparator) || v.StartsWith(BumpAllProjects));
+                if (globalBump != null)
+                {
+                    (pattern, versionLevel) = GetNameAndValue(globalBump, BumpAllProjects);
+                    foreach (var key in versionsMap.Keys)
+                    {
+                        modified = modified || BumpVersionMapWithPatern(versionsMap, key, versionLevel);
+                    }
+                }
+                else
+                {
+                    foreach (var item in versionsToBump)
+                    {
+                        (pattern, versionLevel) = GetNameAndValue(item, BumpAllProjects);
+                        modified = modified || BumpVersionMapWithPatern(versionsMap, pattern, versionLevel);
+                    }
+                }
+
+                if (modified)
+                {
+                    File.WriteAllLines(file, versionsMap.Select(d => $"{d.Key}: {d.Value}").ToArray());
+                }
+            }
+        }
+
+        private static bool BumpVersionMapWithPatern(Dictionary<string, string> versionsMap, string pattern, string versionLevel)
+        {
+            bool modified = false;
+
+            if (versionsMap.ContainsKey(pattern))
+            {
+                int level = int.Parse(versionLevel);
+                string version = GetBumpedVersion(versionsMap[pattern], level - 1);
+                versionsMap[pattern] = version;
+                modified = true;
+            }
+
+            return modified;
+        }
+
+        private static string GetBumpedVersion(string version, int level)
+        {
+            var versionsPart = version.Split('.');
+            if (level < versionsPart.Length)
+            {
+                versionsPart[level] = (int.Parse(versionsPart[level]) + 1).ToString();
+                version = string.Join('.', versionsPart);
+            }
+            return version;
         }
 
         private static void UpdateVersionMap(Dictionary<string, string> versionsMap, IEnumerable<string> versions)
@@ -60,24 +126,35 @@ namespace UpdateVersion
                 {
                     if (!string.IsNullOrWhiteSpace(line))
                     {
-                        if (line.Contains(':'))
-                        {
-                            var projectVersion = line.Split(':');
-                            var projectPattern = projectVersion[0].Trim();
-                            var version = projectVersion[1].Trim();
-                            versionsMap.Add(projectPattern, version);
-                        }
-                        else
-                        {
-                            versionsMap.Add("*", line.Trim());
-                        }
+                        var (projectPattern, version) = GetNameAndValue(line, AnyProjectSelector);
+                        versionsMap.Add(projectPattern, version);
                     }
                 }
             }
             else
             {
-                versionsMap.Add("*", "1.0.0");
+                versionsMap.Add(AnyProjectSelector, DefaultVersion);
             }
+        }
+
+        private static (string name, string value) GetNameAndValue(string item, string defaultName)
+        {
+            string name;
+            string value;
+
+            if (item.Contains(ProjectVersionSeparator))
+            {
+                var parts = item.Split(ProjectVersionSeparator);
+                name = parts[0].Trim();
+                value = parts[1].Trim();
+            }
+            else
+            {
+                name = defaultName;
+                value = item.Trim();
+            }
+
+            return (name, value);
         }
 
         private void TryUpdate(string file, Dictionary<string, string> versionsMap)
@@ -93,15 +170,15 @@ namespace UpdateVersion
 
         private static string GetMatchVersion(string file, Dictionary<string, string> versionsMap)
         {
-            var globalVersion = versionsMap.TryGetValue("*", out var value) ? value : null;
+            var globalVersion = versionsMap.TryGetValue(AnyProjectSelector, out var value) ? value : null;
             var version = globalVersion;
-            foreach(var projectPattern in versionsMap.Keys.Where(k => k != "*"))
+            foreach(var projectPattern in versionsMap.Keys.Where(k => k != AnyProjectSelector))
             {
                 var partialName = projectPattern.Trim('*');
                 bool matched = file.Equals(projectPattern, StringComparison.CurrentCultureIgnoreCase)
-                    || (projectPattern.StartsWith("*") && file.EndsWith(partialName, StringComparison.CurrentCultureIgnoreCase))
-                    || (projectPattern.EndsWith("*") && file.StartsWith(partialName, StringComparison.CurrentCultureIgnoreCase))
-                    || (projectPattern.StartsWith("*") && projectPattern.EndsWith("*") && file.Contains(partialName, StringComparison.CurrentCultureIgnoreCase));
+                    || (projectPattern.StartsWith(AnyProjectSelector) && file.EndsWith(partialName, StringComparison.CurrentCultureIgnoreCase))
+                    || (projectPattern.EndsWith(AnyProjectSelector) && file.StartsWith(partialName, StringComparison.CurrentCultureIgnoreCase))
+                    || (projectPattern.StartsWith(AnyProjectSelector) && projectPattern.EndsWith(AnyProjectSelector) && file.Contains(partialName, StringComparison.CurrentCultureIgnoreCase));
 
                 if (matched) 
                 { 

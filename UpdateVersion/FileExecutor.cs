@@ -15,12 +15,13 @@ namespace UpdateVersion
         /// Initialize root path
         /// </summary>
         /// <param name="rootPath">Root path</param>
-        /// <param name="filePattern">Optional pattern</param>
-        public void Initialize(string rootPath, string filePattern = "*.*")
+        /// <param name="filePattern">Optional file pattern</param>
+        /// <param name="pathPattern">Optional path pattern</param>
+        public void Initialize(string rootPath, string filePattern = "*.*", string pathPattern = "*.*")
         {
             rootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
             files = Directory.GetFiles(rootPath, filePattern, SearchOption.AllDirectories);
-            dirs = Directory.GetDirectories(rootPath, "*.*", SearchOption.AllDirectories);
+            dirs = Directory.GetDirectories(rootPath, pathPattern, SearchOption.AllDirectories);
         }
 
         /// <summary>

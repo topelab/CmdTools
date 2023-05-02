@@ -11,8 +11,10 @@ namespace UpdateVersion
         /// Initialize root path
         /// </summary>
         /// <param name="rootPath">Root path</param>
-        /// <param name="filePattern">Optional pattern</param>
-        void Initialize(string rootPath, string filePattern = "*.*");
+        /// <param name="filePattern">Optional file pattern</param>
+        /// <param name="pathPattern">Optional path pattern</param>
+        void Initialize(string rootPath, string filePattern = "*.*", string pathPattern = "*.*");
+
         /// <summary>
         /// Run action over files
         /// </summary>

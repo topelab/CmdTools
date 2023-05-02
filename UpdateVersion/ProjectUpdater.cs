@@ -6,19 +6,22 @@ namespace UpdateVersion
 {
     internal class ProjectUpdater : IProjectUpdater
     {
+        private const string VersionNodeName = "Version";
+        private const string PropertyGroupNodeName = "PropertyGroup";
+
         public void Update(string file, string version)
         {
             XDocument document = XDocument.Load(file);
 
-            var node = document.Descendants().Where(d => d.Name.LocalName == "Version").FirstOrDefault();
+            var node = document.Descendants().Where(d => d.Name.LocalName == VersionNodeName).FirstOrDefault();
             if (node != null)
             {
                 node.Value = version;
             }
             else
             {
-                var firstPropertyGroup = document.Descendants().Where(d => d.Name.LocalName == "PropertyGroup").First();
-                var versionElement = new XElement("Version", version);
+                var firstPropertyGroup = document.Descendants().Where(d => d.Name.LocalName == PropertyGroupNodeName).First();
+                var versionElement = new XElement(VersionNodeName, version);
                 firstPropertyGroup.Add(versionElement);
             }
 
