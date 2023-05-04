@@ -2,7 +2,7 @@
   "profiles": {
     "UpdateVersion": {
       "commandName": "Project",
-      "commandLineArgs": "-p ..\\..\\..\\.. -f \"version.txt\" -b \"3\""
+      "commandLineArgs": "-p ..\\..\\..\\.. -f \"version.txt\""
     }
   }
 }

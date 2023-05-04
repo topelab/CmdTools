@@ -73,7 +73,7 @@ namespace UpdateVersion
                     (pattern, versionLevel) = GetNameAndValue(globalBump, BumpAllProjects);
                     foreach (var key in versionsMap.Keys)
                     {
-                        modified = modified || BumpVersionMapWithPatern(versionsMap, key, versionLevel);
+                        modified = BumpVersionMapWithPatern(versionsMap, key, versionLevel) || modified;
                     }
                 }
                 else
@@ -81,7 +81,7 @@ namespace UpdateVersion
                     foreach (var item in versionsToBump)
                     {
                         (pattern, versionLevel) = GetNameAndValue(item, BumpAllProjects);
-                        modified = modified || BumpVersionMapWithPatern(versionsMap, pattern, versionLevel);
+                        modified = BumpVersionMapWithPatern(versionsMap, pattern, versionLevel) || modified;
                     }
                 }
 
