@@ -1,5 +1,4 @@
-﻿using System;
-using Topelab.Core.Resolver.Entities;
+﻿using Topelab.Core.Resolver.Entities;
 
 namespace UpdateVersion
 {
@@ -11,6 +10,9 @@ namespace UpdateVersion
                 .AddTransient<IFileExecutor, FileExecutor>()
                 .AddTransient<IProjectFinder, ProjectFinder>()
                 .AddTransient<IProjectUpdater, ProjectUpdater>()
+
+                .AddSingleton<IVersionSplitter, VersionSplitter>()
+                .AddSingleton<IVersionBumper, VersionBumper>()
                 ;
         }
     }
