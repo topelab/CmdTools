@@ -27,7 +27,10 @@ namespace UpdateVersion
 
             var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
             fileExecutor.Initialize(basePath, Constants.FilePattern);
-            fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
+            if (options?.Update ?? false)
+            {
+                fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
+            }
         }
 
         private Dictionary<string, string> TryGetVersions(IEnumerable<string> versions)

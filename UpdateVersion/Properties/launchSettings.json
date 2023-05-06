@@ -2,7 +2,7 @@
   "profiles": {
     "UpdateVersion": {
       "commandName": "Project",
-      "commandLineArgs": "-p .\\Sample -b 3"
+      "commandLineArgs": "-p .\\Sample\\ --bump-patch"
     }
   }
 }

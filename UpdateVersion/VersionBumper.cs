@@ -21,8 +21,9 @@ namespace UpdateVersion
                 bool modified = false;
                 string pattern;
                 string versionLevel;
+                string globalVersionPrefix = $"{Constants.BumpAllProjects}{Constants.ProjectVersionSeparator}";
 
-                var globalBump = versionsToBump.FirstOrDefault(v => !v.Contains(Constants.ProjectVersionSeparator) || v.StartsWith(Constants.BumpAllProjects));
+                var globalBump = versionsToBump.FirstOrDefault(v => v.StartsWith(globalVersionPrefix));
                 if (globalBump != null)
                 {
                     (pattern, versionLevel) = versionSplitter.Split(globalBump, Constants.BumpAllProjects);
@@ -35,14 +36,14 @@ namespace UpdateVersion
                 {
                     foreach (var item in versionsToBump)
                     {
-                        (pattern, versionLevel) = versionSplitter.Split(item, Constants.BumpAllProjects);
+                        (pattern, versionLevel) = versionSplitter.Split(item, Constants.AnyProjectSelector);
                         modified = BumpVersionMapWithPatern(versionsMap, pattern, versionLevel) || modified;
                     }
                 }
 
                 if (modified)
                 {
-                    File.WriteAllLines(file, versionsMap.Select(d => $"{d.Key}: {d.Value}").ToArray());
+                    File.WriteAllLines(file, versionsMap.Select(d => d.Key == Constants.AnyProjectSelector ? d.Value : $"{d.Key}{Constants.ProjectVersionSeparator} {d.Value}").ToArray());
                 }
             }
         }
@@ -68,6 +69,10 @@ namespace UpdateVersion
             if (level < versionsPart.Length)
             {
                 versionsPart[level] = (int.Parse(versionsPart[level]) + 1).ToString();
+                while (++level <  versionsPart.Length)
+                {
+                    versionsPart[level] = "0";
+                }
                 version = string.Join('.', versionsPart);
             }
             return version;
