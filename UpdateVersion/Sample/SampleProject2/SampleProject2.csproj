@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <UseMaui>true</UseMaui>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.5</Version>
+    <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
   </PropertyGroup>
 </Project>
