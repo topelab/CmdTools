@@ -48,7 +48,7 @@ namespace UpdateVersion
             if (BumpPatchVersion || BumpMinorVersion || BumpMajorVersion)
             {
                 var versionLevel = BumpPatchVersion ? 3 : BumpMinorVersion ? 2 : 1;
-                VersionsToBump = new List<string>() { $"{Constants.AnyProjectSelector}{Constants.ProjectVersionSeparator} {versionLevel}" };
+                VersionsToBump = new List<string>() { $"{Constants.BumpAllProjects}{Constants.ProjectVersionSeparator} {versionLevel}" };
             }
 
             return this;
