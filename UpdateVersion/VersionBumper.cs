@@ -65,7 +65,8 @@ namespace UpdateVersion
 
         private static string GetBumpedVersion(string version, int level)
         {
-            var versionsPart = version.Split('.');
+            var suffixParts = version.Split('-');
+            var versionsPart = suffixParts[0].Split('.');
             if (level < versionsPart.Length)
             {
                 versionsPart[level] = (int.Parse(versionsPart[level]) + 1).ToString();
@@ -74,6 +75,11 @@ namespace UpdateVersion
                     versionsPart[level] = "0";
                 }
                 version = string.Join('.', versionsPart);
+                if (suffixParts.Length > 1)
+                {
+                    suffixParts[0] = version;
+                    version = string.Join('-', suffixParts);
+                }
             }
             return version;
         }
