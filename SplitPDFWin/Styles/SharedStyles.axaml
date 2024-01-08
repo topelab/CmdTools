@@ -1,0 +1,108 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+    <Design.PreviewWith>
+		<StackPanel Width="800" Height="400">
+			<Border Padding="20">
+				<Button Classes="Flat Mine">
+					<materialIcons:MaterialIcon Kind="CalendarAdd" />
+				</Button>
+			</Border>
+			<Border Padding="20">
+				<Button Classes="Big">
+					<materialIcons:MaterialIcon Kind="CalendarAdd" />
+				</Button>
+			</Border>
+			<Grid Classes="Form" RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="60, 10, 600">
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Hello my friend" />
+				<TextBox Grid.Row="0" Grid.Column="2" Text="Write here" />
+				<TextBlock Grid.Row="1" Grid.Column="0" Text="Hello" />
+				<ComboBox Grid.Row="1" Grid.Column="2" SelectedIndex="0">
+					<ComboBoxItem Content="Item 1" />
+					<ComboBoxItem Content="Item 2" />
+					<ComboBoxItem Content="Item 3" />
+					
+				</ComboBox>
+			</Grid>
+			<TimePicker SelectedTime="8:00"
+						ClockIdentifier="24HourClock"
+						MinuteIncrement="5"
+						Margin="10,5" />
+
+		</StackPanel>
+    </Design.PreviewWith>
+
+	
+	<Style Selector="Button.Mine">
+		<Setter Property="Padding" Value="2" />
+		<Setter Property="Margin" Value="2" />
+		<Setter Property="Background" Value="Transparent" />
+	</Style>
+	<Style Selector="materialIcons|MaterialIcon:pointerover">
+		<Setter Property="Background" Value="Transparent" />
+	</Style>
+	<Style Selector="materialIcons|MaterialIcon">
+		<Setter Property="Height" Value="24" />
+		<Setter Property="Width" Value="24" />
+		<Setter Property="Background" Value="Transparent" />
+	</Style>
+	<Style Selector="Button.Big materialIcons|MaterialIcon">
+		<Setter Property="Height" Value="48" />
+		<Setter Property="Width" Value="48" />
+		<Setter Property="Background" Value="Transparent" />
+	</Style>
+	<Style Selector="Grid.Form">
+		<Setter Property="Margin" Value="10" />
+	</Style>
+	<Style Selector="Grid.Form TextBlock">
+		<Setter Property="HorizontalAlignment"  Value="Right" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="TextWrapping" Value="Wrap" />
+	</Style>
+	<Style Selector="Grid.Form > TextBox, Grid.Form > StackPanel, Grid.Form > NumericUpDown">
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="Margin" Value="5" />
+	</Style>
+	<Style Selector="Grid.Form > NumericUpDown.Integer">
+		<Setter Property="Width" Value="150" />
+		<Setter Property="Increment" Value="1" />
+	</Style>
+
+	<Style Selector="Grid.Form > NumericUpDown.Integer TextBox">
+		<Setter Property="IsReadOnly" Value="True" />
+	</Style>
+
+	<Style Selector="Grid.Form > ComboBox">
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="Margin" Value="5" />
+	</Style>
+
+	<Style Selector="DataGridCell.small">
+		<Setter Property="FontSize" Value="12" />
+	</Style>
+
+	<Style Selector="DataGridCell.right">
+		<Setter Property="HorizontalContentAlignment" Value="Right" />
+	</Style>
+
+	<Style Selector="DataGridCell.center">
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="DataGridRow TextBlock">
+		<Setter Property="Margin" Value="10,0" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="DataGridRow CheckBox">
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+	</Style>
+
+	<Style Selector="TimePicker > Border">
+		<Setter Property="Width" Value="50"/>
+		<Setter Property="Padding" Value="10"/>
+	</Style>
+
+</Styles>
