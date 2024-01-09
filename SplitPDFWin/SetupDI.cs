@@ -20,6 +20,7 @@ namespace CalendarCreator
                 .AddTransient<IMainWindowVMChangeListener, MainWindowVMChangeListener>()
                 .AddTransient<ISelectFileCommandFactory, SelectFileCommandFactory>()
                 .AddTransient<IStartCommandFactory, StartCommandFactory>()
+                .AddTransient<ISelectOutputPathCommandFactory, SelectOutputPathCommandFactory>()
                 .AddSingleton<IFilesService, FilesService>()
                 .AddFactory(r => App.StorageProvider)
                 ;

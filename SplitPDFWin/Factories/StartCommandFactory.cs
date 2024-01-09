@@ -5,6 +5,7 @@ using System.IO;
 using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.Writer;
 using UglyToad.PdfPig;
+using System.Diagnostics;
 
 namespace SplitPDFWin.Factories
 {
@@ -18,15 +19,23 @@ namespace SplitPDFWin.Factories
 
         public override void Execute()
         {
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(context.PdfInput);
             using PdfDocument document = PdfDocument.Open(context.PdfInput);
 
             foreach (Page page in document.GetPages())
             {
-                using PdfDocumentBuilder builder = new PdfDocumentBuilder();
-                builder.AddPage(document, page.Number);
-                var pdfBytes = builder.Build();
-                File.WriteAllBytes(@$"{context.PdfOutput}\page-{page.Number}.pdf", pdfBytes);
+                string outputFileName = @$"{context.PdfOutput}\{fileNameWithoutExtension}-{page.Number:0000}.pdf";
+
+                if (context.FileOverride || !File.Exists(outputFileName))
+                {
+                    using PdfDocumentBuilder builder = new PdfDocumentBuilder();
+                    builder.AddPage(document, page.Number);
+                    var pdfBytes = builder.Build();
+                    File.WriteAllBytes(outputFileName, pdfBytes);
+                }
             }
+
+            Process.Start(new ProcessStartInfo(context.PdfOutput) { UseShellExecute = true });
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using SplitPDFWin.Models;
+using SplitPDFWin.Resources;
 using SplitPDFWin.ViewModels;
-using System;
 using System.IO;
 
 namespace SplitPDFWin.ChangeListeners
@@ -13,6 +13,9 @@ namespace SplitPDFWin.ChangeListeners
             {
                 case nameof(vm.PdfInput):
                     vm.PdfOutput = Path.GetDirectoryName(vm.PdfInput);
+                    break;
+                case nameof(vm.FileOverride):
+                    vm.FileOverrideTipInfo = vm.FileOverride ? Strings.FileOverrideOn : Strings.FileOverrideOff;
                     break;
                 default:
                     break;

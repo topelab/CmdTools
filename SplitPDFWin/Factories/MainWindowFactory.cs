@@ -1,36 +1,26 @@
-﻿using ReactiveUI;
-using SplitPDFWin.ChangeListeners;
+﻿using SplitPDFWin.ChangeListeners;
+using SplitPDFWin.Resources;
 using SplitPDFWin.ViewModels;
-using Avalonia.Platform.Storage;
 
 namespace SplitPDFWin.Factories
 {
-    internal class MainWindowFactory : IMainWindowFactory
+    internal class MainWindowFactory(ISelectFileCommandFactory selectFileCommandFactory,
+                                     IMainWindowVMChangeListener changeListener,
+                                     IStartCommandFactory startCommandFactory,
+                                     ISelectOutputPathCommandFactory selectOutputPathCommandFactory) : IMainWindowFactory
     {
-        private readonly ISelectFileCommandFactory selectFileCommandFactory;
-        private readonly IMainWindowVMChangeListener changeListener;
-        private readonly IStartCommandFactory startCommandFactory;
-
-        public MainWindowFactory(ISelectFileCommandFactory selectFileCommandFactory, IMainWindowVMChangeListener changeListener, IStartCommandFactory startCommandFactory)
-        {
-            this.selectFileCommandFactory = selectFileCommandFactory ?? throw new System.ArgumentNullException(nameof(selectFileCommandFactory));
-            this.changeListener = changeListener ?? throw new System.ArgumentNullException(nameof(changeListener));
-            this.startCommandFactory = startCommandFactory ?? throw new System.ArgumentNullException(nameof(startCommandFactory));
-        }
+        private readonly ISelectFileCommandFactory selectFileCommandFactory = selectFileCommandFactory ?? throw new System.ArgumentNullException(nameof(selectFileCommandFactory));
+        private readonly IMainWindowVMChangeListener changeListener = changeListener ?? throw new System.ArgumentNullException(nameof(changeListener));
+        private readonly IStartCommandFactory startCommandFactory = startCommandFactory ?? throw new System.ArgumentNullException(nameof(startCommandFactory));
+        private readonly ISelectOutputPathCommandFactory selectOutputPathCommandFactory = selectOutputPathCommandFactory ?? throw new System.ArgumentNullException(nameof(selectOutputPathCommandFactory));
 
         public MainWindowViewModel Create()
         {
             MainWindowViewModel viewModel = new MainWindowViewModel();
             viewModel.SelectFileCommand = selectFileCommandFactory.Create(viewModel);
             viewModel.StartCommand = startCommandFactory.Create(viewModel);
-            viewModel.SelectOutputPathCommand = ReactiveCommand.Create(async () =>
-            {
-                var folder = await App.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions() { AllowMultiple = false, Title = "Escoger directorio" });
-                if (folder != null && folder.Count > 0)
-                {
-                    viewModel.PdfOutput = folder[0].TryGetLocalPath();
-                }
-            });
+            viewModel.SelectOutputPathCommand = selectOutputPathCommandFactory.Create(viewModel);
+            viewModel.FileOverrideTipInfo = Strings.FileOverrideOff;
 
             changeListener.Start(viewModel);
             return viewModel;

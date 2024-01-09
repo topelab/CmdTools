@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace SplitPDFWin.Factories
 {
-    internal class SelectFileCommandFactory : CommandFactory<MainWindowViewModel>, ISelectFileCommandFactory
+    internal class SelectFileCommandFactory(IFilesService filesService) : CommandFactory<MainWindowViewModel>, ISelectFileCommandFactory
     {
-        private readonly IFilesService filesService;
-
-        public SelectFileCommandFactory(IFilesService filesService)
-        {
-            this.filesService = filesService ?? throw new ArgumentNullException(nameof(filesService));
-        }
+        private readonly IFilesService filesService = filesService ?? throw new ArgumentNullException(nameof(filesService));
 
         public override async void Execute()
         {

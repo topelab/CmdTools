@@ -8,8 +8,6 @@ namespace SplitPDFWin.ViewModels
     {
         private string pdfInput;
 
-        public string Greeting => "Separador de PDFs";
-
         public string PdfInput
         {
             get { return pdfInput; }
@@ -29,9 +27,16 @@ namespace SplitPDFWin.ViewModels
         public bool FileOverride
         {
             get { return fileOverride; }
-            set { fileOverride = value; }
+            set { this.RaiseAndSetIfChanged(ref fileOverride, value); }
         }
 
+        private string fileOverrideTipInfo;
+
+        public string FileOverrideTipInfo
+        {
+            get { return fileOverrideTipInfo; }
+            set { this.RaiseAndSetIfChanged(ref fileOverrideTipInfo, value); }
+        }
 
         public ICommand SelectFileCommand { get; set; }
         public ICommand SelectOutputPathCommand { get; set; }
