@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RunCustomTool": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\arc\\src\\tmp\\3.3-sqlite\\Topelab.Calendar.sqlite.UI\\CalendarCreator\\Resources\\Strings.resx\" \"CalendarCreator.Resources\""
+    }
+  }
+}
