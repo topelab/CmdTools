@@ -1,14 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-	<UseWindowsForms>true</UseWindowsForms>
+    <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.1.5</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.CodeDom" Version="8.0.0" />
   </ItemGroup>
-
 </Project>
