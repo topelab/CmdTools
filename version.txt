@@ -1,2 +1,2 @@
-RunCustomTool*: 1.1.11
-UpdateVersion*: 1.1.11
+RunCustomTool*: 1.1.12
+UpdateVersion*: 1.1.12
