@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CreateRelationsDiagram": {
+      "commandName": "Project",
+      "commandLineArgs": "-p C:\\arc\\src\\github\\topelab\\l2data2code -o C:\\Users\\detos\\Downloads\\relations.md"
+    }
+  }
+}

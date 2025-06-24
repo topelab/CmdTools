@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleProjects", "SamplePro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCustomTool", "RunCustomTool\RunCustomTool.csproj", "{BC8B6464-9E3C-4DCE-B44D-84EA14236A52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateRelationsDiagram", "CreateRelationsDiagram\CreateRelationsDiagram.csproj", "{33EF928E-D39A-4CDB-B36F-39F73BFBC01B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{BC8B6464-9E3C-4DCE-B44D-84EA14236A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC8B6464-9E3C-4DCE-B44D-84EA14236A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC8B6464-9E3C-4DCE-B44D-84EA14236A52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33EF928E-D39A-4CDB-B36F-39F73BFBC01B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33EF928E-D39A-4CDB-B36F-39F73BFBC01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33EF928E-D39A-4CDB-B36F-39F73BFBC01B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33EF928E-D39A-4CDB-B36F-39F73BFBC01B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{394FA13B-FB12-4F58-B50D-4518F82A6A59} = {271BAA8B-694B-4380-9811-6602077011C8}
 		{BC8B6464-9E3C-4DCE-B44D-84EA14236A52} = {271BAA8B-694B-4380-9811-6602077011C8}
+		{33EF928E-D39A-4CDB-B36F-39F73BFBC01B} = {271BAA8B-694B-4380-9811-6602077011C8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1810B80-0021-4211-A64B-8118D9AC27BD}
