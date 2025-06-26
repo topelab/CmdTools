@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "UpdateVersion": {
-      "commandName": "Project",
-      "commandLineArgs": "-p .\\Sample\\ --bump-patch"
-    }
-  }
-}
