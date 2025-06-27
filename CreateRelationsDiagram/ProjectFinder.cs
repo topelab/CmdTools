@@ -15,19 +15,45 @@ namespace CreateRelationsDiagram
 
         public void Run(Options options)
         {
-            var path = options.BasePath ?? Environment.ProcessPath;
+            var path = options.SolutionPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
+            var excludeProjects = options.Exclude ?? [];
+            var projectFilter = options.ProjectPath;
 
             StringBuilder content = new StringBuilder("```mermaid\nclassDiagram\n");
             fileExecutor.Initialize(path, Constants.FilePattern);
-            fileExecutor.RunOnFiles(file =>
+            Dictionary<string, List<string>> references = [];
+            fileExecutor.RunOnFiles(file => references.Add(Path.GetFileNameWithoutExtension(file), projectReferences.Get(file).ToList()));
+
+            HashSet<string> welcomeProjects = [];
+            references.Keys
+                .Where(p => !excludeProjects.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase)))
+                .Where(p => string.IsNullOrEmpty(projectFilter) || p.Contains(projectFilter, StringComparison.OrdinalIgnoreCase))
+                .ToList()
+                .ForEach(p => welcomeProjects.Add(p));
+
+            int count = welcomeProjects.Count;
+
+            do
             {
-                var references = projectReferences.Get(file);
-                foreach (var reference in references)
+                count = welcomeProjects.Count;
+                welcomeProjects
+                    .ToList()
+                    .ForEach(p => references[p].ForEach(r => welcomeProjects.Add(r)));
+            }
+            while (count != welcomeProjects.Count);
+
+            welcomeProjects.OrderBy(p => p)
+                .Distinct()
+                .ToList()
+                .ForEach(project =>
                 {
-                    content.AppendLine($"\t{Path.GetFileNameWithoutExtension(file)} --> {reference}");
-                }
-            });
+                    foreach (var reference in references[project])
+                    {
+                        content.AppendLine($"\t{project} --> {reference}");
+                    }
+                });
+
             content.AppendLine("```");
 
             if (content.Length > 0)
@@ -39,6 +65,15 @@ namespace CreateRelationsDiagram
             {
                 Console.WriteLine("No project references found.");
             }
+        }
+
+        private bool CanRun(string project, string projectFilter, IEnumerable<string> excludeProjects)
+        {
+            if (string.IsNullOrEmpty(projectFilter) || project.Contains(projectFilter, StringComparison.OrdinalIgnoreCase))
+            {
+                return !excludeProjects.Any(e => project.Contains(e, StringComparison.OrdinalIgnoreCase));
+            }
+            return false;
         }
     }
 }
