@@ -20,10 +20,10 @@ namespace CreateRelationsDiagram
             var excludeProjects = options.Exclude ?? [];
             var projectFilter = options.ProjectPath;
 
-            StringBuilder content = new StringBuilder("```mermaid\nclassDiagram\n");
+            StringBuilder content = new StringBuilder("```mermaid\n---\nconfig:\n  theme: default\n---\nflowchart LR\n");
             fileExecutor.Initialize(path, Constants.FilePattern);
             Dictionary<string, List<string>> references = [];
-            fileExecutor.RunOnFiles(file => references.Add(Path.GetFileNameWithoutExtension(file), projectReferences.Get(file).ToList()));
+            fileExecutor.RunOnFiles(file => references[Path.GetFileNameWithoutExtension(file)] = projectReferences.Get(file).ToList());
 
             HashSet<string> welcomeProjects = [];
             references.Keys
@@ -38,6 +38,7 @@ namespace CreateRelationsDiagram
             {
                 count = welcomeProjects.Count;
                 welcomeProjects
+                    .Where(p => references.ContainsKey(p))
                     .ToList()
                     .ForEach(p => references[p].ForEach(r => welcomeProjects.Add(r)));
             }
@@ -45,6 +46,7 @@ namespace CreateRelationsDiagram
 
             welcomeProjects.OrderBy(p => p)
                 .Distinct()
+                .Where(p => references.ContainsKey(p))
                 .ToList()
                 .ForEach(project =>
                 {
