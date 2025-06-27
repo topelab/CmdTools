@@ -18,7 +18,7 @@ namespace CreateRelationsDiagram
             var path = options.SolutionPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             var excludeProjects = options.Exclude ?? [];
-            var projectFilter = options.ProjectPath;
+            var projectFilter = options.ProjectFilter;
 
             StringBuilder content = new StringBuilder("```mermaid\n---\nconfig:\n  theme: default\n---\nflowchart LR\n");
             fileExecutor.Initialize(path, Constants.FilePattern);

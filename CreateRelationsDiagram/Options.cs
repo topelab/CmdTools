@@ -11,7 +11,7 @@ namespace CreateRelationsDiagram
         public string OutputFile { get; set; }
 
         [Option('p', "project", Required = false, HelpText = "Filter by project (if not set, all projects in the solution will be processed)")]
-        public string ProjectPath { get; set; }
+        public string ProjectFilter { get; set; }
 
         [Option('e', "exclude", Required = false, HelpText = "Exclude specific projects from processing (comma-separated list)")]
         public IEnumerable<string> Exclude { get; set; }
