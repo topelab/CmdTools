@@ -14,11 +14,5 @@ namespace CreateRelationsDiagram
 
             return projectReferences.Select(r => Path.GetFileNameWithoutExtension(r)).Where(v => !string.IsNullOrEmpty(v));
         }
-
-        private static string GetProjectName(string v)
-        {
-            var parts = v.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
-            return parts.LastOrDefault()?.Replace(".csproj", string.Empty) ?? string.Empty;
-        }
     }
 }
