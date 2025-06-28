@@ -50,7 +50,6 @@ namespace CreateRelationsDiagram
 
             references.Keys
                 .Where(p => !excludeProjects.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase)))
-                .Where(p => !excludeProjects.Any(e => references[p].Any(r => r.Contains(e, StringComparison.OrdinalIgnoreCase))))
                 .Where(p => p.Contains(projectFilter, StringComparison.OrdinalIgnoreCase) || references[p].Any(r => r.Contains(projectFilter, StringComparison.OrdinalIgnoreCase)))
                 .ToList()
                 .ForEach(p => welcomeReferences.Add(p));
