@@ -8,7 +8,8 @@ namespace CreateRelationsDiagram
         {
             return new ResolveInfoCollection()
                 .AddTransient<IProjectReferences, ProjectReferences>()
-                .AddTransient<IProjectFinder, ProjectFinder>()
+                .AddTransient<IProjectFinder, ProjectFinderReverse>(true.ToString())
+                .AddTransient<IProjectFinder, ProjectFinder>(false.ToString())
                 .AddTransient<IFileExecutor, FileExecutor>()
                 ;
         }
