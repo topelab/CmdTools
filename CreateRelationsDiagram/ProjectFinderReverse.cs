@@ -2,18 +2,13 @@
 
 namespace CreateRelationsDiagram
 {
-    internal class ProjectFinderReverse : IProjectFinder
+    internal class ProjectFinderReverse : ProjectFinder
     {
-        private readonly IProjectReferences projectReferences;
-        private readonly IFileExecutor fileExecutor;
-
-        public ProjectFinderReverse(IProjectReferences projectReferences, IFileExecutor fileExecutor)
+        public ProjectFinderReverse(IProjectReferences projectReferences, IFileExecutor fileExecutor) : base(projectReferences, fileExecutor)
         {
-            this.projectReferences = projectReferences ?? throw new ArgumentNullException(nameof(projectReferences));
-            this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
         }
 
-        public void Run(Options options)
+        public override void Run(Options options)
         {
             var path = options.SolutionPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
@@ -26,7 +21,6 @@ namespace CreateRelationsDiagram
                 return;
             }
 
-            StringBuilder content = new StringBuilder("```mermaid\n---\nconfig:\n  theme: default\n---\nflowchart BT\n");
             fileExecutor.Initialize(path, Constants.FilePattern);
             Dictionary<string, HashSet<string>> references = [];
 
@@ -66,29 +60,27 @@ namespace CreateRelationsDiagram
             }
             while (count != welcomeReferences.Count);
 
-            welcomeReferences.OrderBy(p => p)
+            var projectsToProcess = welcomeReferences
+                .OrderBy(p => p)
                 .Distinct()
                 .Where(p => references.ContainsKey(p))
-                .ToList()
-                .ForEach(reference =>
+                .ToList();
+
+            int depth = GetDepth(projectsToProcess, references);
+            int keysCount = projectsToProcess.Count;
+            string direction = keysCount > depth ? "BT" : "RL";
+            StringBuilder content = Initialize(direction);
+
+
+            projectsToProcess.ForEach(reference =>
+            {
+                foreach (var project in references[reference].Where(p => !excludeProjects.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase))))
                 {
-                    foreach (var project in references[reference].Where(p => !excludeProjects.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase))))
-                    {
-                        content.AppendLine($"\t{project} --> {reference}");
-                    }
-                });
+                    content.AppendLine($"\t{project} --> {reference}");
+                }
+            });
 
-            content.AppendLine("```");
-
-            if (content.Length > 0)
-            {
-                File.WriteAllText(outputFile, content.ToString());
-                Console.WriteLine($"Reverse project references diagram created at: {outputFile}");
-            }
-            else
-            {
-                Console.WriteLine("No project references found.");
-            }
+            Finalize(content, outputFile);
         }
     }
 }

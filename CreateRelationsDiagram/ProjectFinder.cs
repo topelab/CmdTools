@@ -4,8 +4,8 @@ namespace CreateRelationsDiagram
 {
     internal class ProjectFinder : IProjectFinder
     {
-        private readonly IProjectReferences projectReferences;
-        private readonly IFileExecutor fileExecutor;
+        protected readonly IProjectReferences projectReferences;
+        protected readonly IFileExecutor fileExecutor;
 
         public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor)
         {
@@ -13,17 +13,16 @@ namespace CreateRelationsDiagram
             this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
         }
 
-        public void Run(Options options)
+        public virtual void Run(Options options)
         {
             var path = options.SolutionPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             var excludeProjects = options.Exclude ?? [];
             var projectFilter = options.ProjectFilter;
 
-            StringBuilder content = new StringBuilder("```mermaid\n---\nconfig:\n  theme: default\n---\nflowchart LR\n");
+            Dictionary<string, HashSet<string>> references = [];
             fileExecutor.Initialize(path, Constants.FilePattern);
-            Dictionary<string, List<string>> references = [];
-            fileExecutor.RunOnFiles(file => references[Path.GetFileNameWithoutExtension(file)] = projectReferences.Get(file).ToList());
+            fileExecutor.RunOnFiles(file => references[Path.GetFileNameWithoutExtension(file)] = projectReferences.Get(file).ToHashSet());
 
             HashSet<string> welcomeProjects = [];
             references.Keys
@@ -40,42 +39,65 @@ namespace CreateRelationsDiagram
                 welcomeProjects
                     .Where(p => references.ContainsKey(p))
                     .ToList()
-                    .ForEach(p => references[p].ForEach(r => welcomeProjects.Add(r)));
+                    .ForEach(p => references[p].ToList().ForEach(r => welcomeProjects.Add(r)));
             }
             while (count != welcomeProjects.Count);
 
-            welcomeProjects.OrderBy(p => p)
-                .Distinct()
+            var projectsToProcess = welcomeProjects
                 .Where(p => references.ContainsKey(p))
-                .ToList()
-                .ForEach(project =>
+                .ToList();
+
+            int depth = GetDepth(projectsToProcess, references);
+            int keysCount = projectsToProcess.Count;
+            string direction = keysCount > depth ? "TD" : "LR";
+
+            StringBuilder content = Initialize(direction);
+
+            projectsToProcess.ForEach(project =>
+            {
+                foreach (var reference in references[project])
                 {
-                    foreach (var reference in references[project])
-                    {
-                        content.AppendLine($"\t{project} --> {reference}");
-                    }
-                });
+                    content.AppendLine($"\t{project} --> {reference}");
+                }
+            });
 
-            content.AppendLine("```");
-
-            if (content.Length > 0)
-            {
-                File.WriteAllText(outputFile, content.ToString());
-                Console.WriteLine($"Project references diagram created at: {outputFile}");
-            }
-            else
-            {
-                Console.WriteLine("No project references found.");
-            }
+            Finalize(content, outputFile);
         }
 
-        private bool CanRun(string project, string projectFilter, IEnumerable<string> excludeProjects)
+        protected StringBuilder Initialize(string direction)
         {
-            if (string.IsNullOrEmpty(projectFilter) || project.Contains(projectFilter, StringComparison.OrdinalIgnoreCase))
-            {
-                return !excludeProjects.Any(e => project.Contains(e, StringComparison.OrdinalIgnoreCase));
-            }
-            return false;
+            StringBuilder content = new StringBuilder();
+            content.AppendLine("```mermaid");
+            content.AppendLine("---");
+            content.AppendLine("config:");
+            content.AppendLine("  theme: default");
+            content.AppendLine("---");
+            content.AppendLine($"flowchart {direction}");
+            return content;
+        }
+
+        protected void Finalize(StringBuilder content, string outputFile)
+        {
+            content.AppendLine("```");
+            File.WriteAllText(outputFile, content.ToString());
+            Console.WriteLine($"References diagram created at: {outputFile}");
+        }
+
+        protected int GetDepth(List<string> projectsToProcess, Dictionary<string, HashSet<string>> references)
+        {
+            return projectsToProcess
+                .Select(p => GetDepth(p, references))
+                .DefaultIfEmpty(0)
+                .Max();
+        }
+
+        private int GetDepth(string project, Dictionary<string, HashSet<string>> references)
+        {
+            return !references.TryGetValue(project, out var value) 
+                ? 0 
+                : value.Select(r => GetDepth(r, references) + 1)
+                    .DefaultIfEmpty(0)
+                    .Max();
         }
     }
 }
