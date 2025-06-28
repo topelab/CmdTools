@@ -15,5 +15,8 @@ namespace CreateRelationsDiagram
 
         [Option('e', "exclude", Required = false, HelpText = "Exclude specific projects from processing (comma-separated list)")]
         public IEnumerable<string> Exclude { get; set; }
+
+        [Option('r', "reverse", Required = false, Default = false, HelpText = "Reverse the direction of the relations in the diagram")]
+        public bool Reverse { get; set; }
     }
 }
