@@ -9,6 +9,11 @@ namespace CmdTools.Shared
         {
             return new ResolveInfoCollection()
                 .AddTransient<IFileExecutor, FileExecutor>()
+                .AddTransient<IRelationGetterFactory, RelationGetterFactory>()
+                .AddTransient<IRelationsGetter, RelationsGetter>(nameof(FinderType.Projects))
+                .AddTransient<IRelationsGetter, RelationsGetter>(nameof(FinderType.Classes))
+                .AddTransient<IRelationsGetter, ReverseRelationsGetter>(nameof(FinderType.ReverseProjects))
+                .AddTransient<IRelationsGetter, ReverseRelationsGetter>(nameof(FinderType.ReverseClasses))
                 ;
         }
     }

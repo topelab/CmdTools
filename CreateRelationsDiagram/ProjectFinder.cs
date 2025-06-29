@@ -1,5 +1,4 @@
 using CmdTools.Contracts;
-using System.Text;
 
 namespace CreateRelationsDiagram
 {
@@ -7,11 +6,13 @@ namespace CreateRelationsDiagram
     {
         protected readonly IProjectReferences projectReferences;
         protected readonly IFileExecutor fileExecutor;
+        protected readonly IRelationGetterFactory relationGetterFactory;
 
-        public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor)
+        public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory)
         {
             this.projectReferences = projectReferences ?? throw new ArgumentNullException(nameof(projectReferences));
             this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
+            this.relationGetterFactory = relationGetterFactory ?? throw new ArgumentNullException(nameof(relationGetterFactory));
         }
 
         public virtual void Run(Options options)
@@ -24,81 +25,20 @@ namespace CreateRelationsDiagram
             Dictionary<string, HashSet<string>> references = [];
             fileExecutor.Initialize(path, Constants.FilePattern);
             fileExecutor.RunOnFiles(file => references[Path.GetFileNameWithoutExtension(file)] = projectReferences.Get(file).ToHashSet());
+            var relationsGetter = relationGetterFactory.Create(options.FinderType);
 
-            HashSet<string> welcomeProjects = [];
-            references.Keys
-                .Where(p => !excludeProjects.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase)))
-                .Where(p => string.IsNullOrEmpty(projectFilter) || p.Contains(projectFilter, StringComparison.OrdinalIgnoreCase))
-                .ToList()
-                .ForEach(p => welcomeProjects.Add(p));
-
-            int count = welcomeProjects.Count;
-
-            do
-            {
-                count = welcomeProjects.Count;
-                welcomeProjects
-                    .Where(p => references.ContainsKey(p))
-                    .ToList()
-                    .ForEach(p => references[p].ToList().ForEach(r => welcomeProjects.Add(r)));
-            }
-            while (count != welcomeProjects.Count);
-
-            var projectsToProcess = welcomeProjects
-                .Where(p => references.ContainsKey(p))
-                .ToList();
-
-            int depth = GetDepth(projectsToProcess, references);
-            int keysCount = projectsToProcess.Count;
-            string direction = keysCount > depth ? "TD" : "LR";
-
-            StringBuilder content = Initialize(direction);
-
-            projectsToProcess.ForEach(project =>
-            {
-                foreach (var reference in references[project])
-                {
-                    content.AppendLine($"\t{project} --> {reference}");
-                }
-            });
+            var content = relationsGetter.Get(
+                references,
+                excludeProjects,
+                projectFilter);
 
             Finalize(content, outputFile);
         }
 
-        protected StringBuilder Initialize(string direction)
+        protected void Finalize(string content, string outputFile)
         {
-            StringBuilder content = new StringBuilder();
-            content.AppendLine("```mermaid");
-            content.AppendLine("---");
-            content.AppendLine("config:");
-            content.AppendLine("  theme: default");
-            content.AppendLine("---");
-            content.AppendLine($"flowchart {direction}");
-            return content;
-        }
-
-        protected void Finalize(StringBuilder content, string outputFile)
-        {
-            content.AppendLine("```");
-            File.WriteAllText(outputFile, content.ToString());
+            File.WriteAllText(outputFile, content);
             Console.WriteLine($"References diagram created at: {outputFile}");
-        }
-
-        protected int GetDepth(List<string> projectsToProcess, Dictionary<string, HashSet<string>> references)
-        {
-            return projectsToProcess
-                .Select(p => GetDepth(p, references))
-                .DefaultIfEmpty(0)
-                .Max();
-        }
-
-        private int GetDepth(string project, Dictionary<string, HashSet<string>> references)
-        {
-            return !references.TryGetValue(project, out var value) 
-                ? 0 
-                : value.Select(r => GetDepth(r, references) + 1)
-                    .DefaultIfEmpty(0)
-                    .Max();
         }
     }
 }

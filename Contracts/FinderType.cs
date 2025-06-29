@@ -1,6 +1,6 @@
-﻿namespace CreateRelationsDiagram
+namespace CmdTools.Contracts
 {
-    internal enum FinderType
+    public enum FinderType
     {
         Projects,
         Classes,

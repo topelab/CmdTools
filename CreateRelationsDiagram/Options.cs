@@ -1,4 +1,5 @@
-﻿using CommandLine;
+using CmdTools.Contracts;
+using CommandLine;
 
 namespace CreateRelationsDiagram
 {
