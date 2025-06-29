@@ -1,4 +1,6 @@
-﻿using Topelab.Core.Resolver.Entities;
+﻿using CmdTools.Contracts;
+using CmdTools.Shared;
+using Topelab.Core.Resolver.Entities;
 
 namespace CreateRelationsDiagram
 {
@@ -7,10 +9,10 @@ namespace CreateRelationsDiagram
         internal static ResolveInfoCollection Register()
         {
             return new ResolveInfoCollection()
+                .AddCollection(SharedSetupDI.Register())
                 .AddTransient<IProjectReferences, ProjectReferences>()
-                .AddTransient<IProjectFinder, ProjectFinderReverse>(true.ToString())
-                .AddTransient<IProjectFinder, ProjectFinder>(false.ToString())
-                .AddTransient<IFileExecutor, FileExecutor>()
+                .AddTransient<IElementFinder<Options>, ProjectFinderReverse>(nameof(FinderType.ReverseProjects))
+                .AddTransient<IElementFinder<Options>, ProjectFinder>(nameof(FinderType.Projects))
                 ;
         }
     }

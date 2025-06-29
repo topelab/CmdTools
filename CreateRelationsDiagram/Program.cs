@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using CmdTools.Contracts;
+using CommandLine;
 using Topelab.Core.Resolver.Microsoft;
 
 namespace CreateRelationsDiagram
@@ -14,8 +15,8 @@ namespace CreateRelationsDiagram
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var projectFinder = resolver.Get<IProjectFinder>(options.Reverse.ToString());
-            projectFinder.Run(options);
+            var elementFinder = resolver.Get<IElementFinder<Options>>(options.FinderType.ToString());
+            elementFinder.Run(options);
         }
     }
 }

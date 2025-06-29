@@ -1,4 +1,5 @@
-﻿using System.Text;
+using CmdTools.Contracts;
+using System.Text;
 
 namespace CreateRelationsDiagram
 {

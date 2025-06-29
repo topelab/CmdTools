@@ -1,0 +1,28 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = false
+end_of_line = crlf
+spelling_languages = es-es,en-us,en-gb
+
+[*.xml]
+indent_style = tab
+tab_width = 2
+[*.xaml]
+indent_style = tab
+[*.axaml]
+indent_style = tab
+[*.xsd]
+indent_style = tab
+[*.csproj]
+indent_style = space
+indent_size = 2
+[*.json]
+indent_size = 2
+[*.sln]
+indent_style = tab
+tab_width = 4

@@ -1,3 +1,2 @@
-﻿RunCustomTool*: 1.1.13
-UpdateVersion*: 1.1.13
+*: 1.1.13
 CreateRelations*: 1.1.0
