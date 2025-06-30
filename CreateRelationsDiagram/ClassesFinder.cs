@@ -17,7 +17,7 @@ namespace CreateRelationsDiagram
         public void Run(Options options)
         {
             var assembly = options.Assembly;
-            var nameSpace = options.NameSpace;
+            var nameSpace = options.NameSpace ?? Path.GetFileNameWithoutExtension(options.Assembly);
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             if (string.IsNullOrEmpty(assembly))
             {
@@ -104,19 +104,10 @@ namespace CreateRelationsDiagram
 
                 if (!string.IsNullOrWhiteSpace(nameSpace))
                 {
-                    var supNameSpace = nameSpace.Replace(nameSpace.Split('.').Last(), string.Empty);
-                    if (typeName.StartsWith(supNameSpace))
-                    {
-                        typeName = typeName.Replace(typeName.Replace(typeName.Split('.').Last(), string.Empty), string.Empty);
-                    }
                     string nameSpaceWithDot = $"{nameSpace}.";
                     if (typeName.Contains(nameSpaceWithDot))
                     {
                         typeName = typeName.Replace(nameSpaceWithDot, string.Empty);
-                    }
-                    if (typeName.Contains(nameSpace))
-                    {
-                        typeName = typeName.Replace(nameSpace, string.Empty);
                     }
                 }
 
