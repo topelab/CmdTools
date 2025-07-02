@@ -1,9 +1,9 @@
-using CmdTools.Contracts;
-using CmdTools.Shared;
-using Topelab.Core.Resolver.Entities;
-
 namespace UpdateVersion
 {
+    using CmdTools.Contracts;
+    using CmdTools.Shared;
+    using Topelab.Core.Resolver.Entities;
+
     internal class SetupDI
     {
         internal static ResolveInfoCollection Register()

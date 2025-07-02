@@ -1,7 +1,7 @@
-﻿using System.Xml.Linq;
-
-namespace CreateRelationsDiagram
+﻿namespace CreateRelationsDiagram
 {
+    using System.Xml.Linq;
+
     internal class ProjectReferences : IProjectReferences
     {
         public IEnumerable<string> Get(string projectPath)

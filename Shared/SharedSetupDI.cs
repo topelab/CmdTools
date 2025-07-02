@@ -1,8 +1,8 @@
-using CmdTools.Contracts;
-using Topelab.Core.Resolver.Entities;
-
 namespace CmdTools.Shared
 {
+    using CmdTools.Contracts;
+    using Topelab.Core.Resolver.Entities;
+
     public class SharedSetupDI
     {
         public static ResolveInfoCollection Register()

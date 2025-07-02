@@ -1,7 +1,7 @@
-using System.Text;
-
 namespace CmdTools.Shared
 {
+    using System.Text;
+
     internal class ReverseRelationsGetter : RelationsGetter
     {
         public override string Get(Dictionary<string, HashSet<string>> references, IEnumerable<string> excludedElements, string elementFilter)

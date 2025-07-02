@@ -1,7 +1,7 @@
-using CmdTools.Contracts;
-
-namespace CreateRelationsDiagram
+﻿namespace CreateRelationsDiagram
 {
+    using CmdTools.Contracts;
+
     internal class ProjectFinder : IElementFinder<Options>
     {
         protected readonly IProjectReferences projectReferences;

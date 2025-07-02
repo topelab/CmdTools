@@ -1,11 +1,11 @@
-﻿using CmdTools.Contracts;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace UpdateVersion
 {
+    using CmdTools.Contracts;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
     internal class ProjectFinder : IElementFinder<Options>
     {
         private readonly IFileExecutor fileExecutor;

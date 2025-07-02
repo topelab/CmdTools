@@ -1,8 +1,8 @@
-using CmdTools.Contracts;
-using CommandLine;
-
-namespace CreateRelationsDiagram
+﻿namespace CreateRelationsDiagram
 {
+    using CmdTools.Contracts;
+    using CommandLine;
+
     internal class Options
     {
         private const string ProjectsGroup = "projects";

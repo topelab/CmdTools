@@ -1,8 +1,8 @@
-using CmdTools.Contracts;
-using Topelab.Core.Resolver.Interfaces;
-
 namespace CmdTools.Shared
 {
+    using CmdTools.Contracts;
+    using Topelab.Core.Resolver.Interfaces;
+
     internal class RelationGetterFactory : IRelationGetterFactory
     {
         private readonly IResolver resolver;

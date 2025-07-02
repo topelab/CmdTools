@@ -1,7 +1,7 @@
-using CmdTools.Contracts;
-
 namespace CmdTools.Shared
 {
+    using CmdTools.Contracts;
+
     /// <summary>
     /// Ejecuta acciones sobre rutas y archivos.
     /// Proporciona métodos para inicializar rutas de archivos y directorios y ejecutar acciones sobre ellos.

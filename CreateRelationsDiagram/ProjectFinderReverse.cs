@@ -1,7 +1,7 @@
-using CmdTools.Contracts;
-
-namespace CreateRelationsDiagram
+﻿namespace CreateRelationsDiagram
 {
+    using CmdTools.Contracts;
+
     internal class ProjectFinderReverse : ProjectFinder
     {
         public ProjectFinderReverse(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory) : base(projectReferences, fileExecutor, relationGetterFactory)

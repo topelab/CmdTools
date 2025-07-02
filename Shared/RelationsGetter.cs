@@ -1,8 +1,8 @@
-using CmdTools.Contracts;
-using System.Text;
-
 namespace CmdTools.Shared
 {
+    using CmdTools.Contracts;
+    using System.Text;
+
     internal class RelationsGetter : IRelationsGetter
     {
         public virtual string Get(Dictionary<string, HashSet<string>> references, IEnumerable<string> excludedElements, string elementFilter)
@@ -30,9 +30,9 @@ namespace CmdTools.Shared
                 .Where(p => references.ContainsKey(p))
                 .ToList();
 
-            int depth = 10; //GetDepth(elementsToProcess, references);
+            int depth = GetDepth(elementsToProcess, references);
             int keysCount = elementsToProcess.Count;
-            string direction = keysCount > depth ? "TD" : "LR";
+            string direction = keysCount > depth ? "LR" : "TD";
 
             StringBuilder content = Initialize(direction);
 
@@ -63,16 +63,22 @@ namespace CmdTools.Shared
 
         protected int GetDepth(List<string> elementsToProcess, Dictionary<string, HashSet<string>> references)
         {
+            HashSet<string> visited = [];
             return elementsToProcess
-                .Select(p => GetDepth(p, references))
+                .Select(p => GetDepth(p, references, visited))
                 .DefaultIfEmpty(0)
                 .Max();
         }
-        private int GetDepth(string element, Dictionary<string, HashSet<string>> references)
+        private int GetDepth(string element, Dictionary<string, HashSet<string>> references, HashSet<string> visited)
         {
+            if (visited.Contains(element))
+            {
+                return -1;
+            }
+            visited.Add(element);
             return !references.TryGetValue(element, out var value)
                 ? 0
-                : value.Select(r => GetDepth(r, references) + 1)
+                : value.Select(r => GetDepth(r, references, visited) + 1)
                     .DefaultIfEmpty(0)
                     .Max();
         }

@@ -1,10 +1,10 @@
-using CmdTools.Contracts;
-using Microsoft.CSharp;
-using System.CodeDom;
-using System.Reflection;
-
-namespace CreateRelationsDiagram
+﻿namespace CreateRelationsDiagram
 {
+    using CmdTools.Contracts;
+    using Microsoft.CSharp;
+    using System.CodeDom;
+    using System.Reflection;
+
     internal class ClassesFinder : IElementFinder<Options>
     {
         protected readonly IRelationGetterFactory relationGetterFactory;
@@ -101,34 +101,43 @@ namespace CreateRelationsDiagram
             {
                 CodeTypeReference typeRef = new(t);
                 typeName = provider.GetTypeOutput(typeRef);
-
-                if (!string.IsNullOrWhiteSpace(nameSpace))
-                {
-                    string nameSpaceWithDot = $"{nameSpace}.";
-                    if (typeName.Contains(nameSpaceWithDot))
-                    {
-                        typeName = typeName.Replace(nameSpaceWithDot, string.Empty);
-                    }
-                }
-
-                typeName = typeName
-                    .Replace("System.Collections.Generic.", string.Empty)
-                    .Replace("System.Linq.Expressions.", string.Empty)
-                    .Replace("System.Linq.", string.Empty)
-                    .Replace("System.", string.Empty);
-
-                if (typeName.Contains('<') || typeName.Contains('>'))
-                {
-                    string originalTypeName = typeName.Replace("<", "&lt;").Replace(">", "&gt");
-                    typeName = typeName.Replace("<", "/")
-                        .Replace(">", "\\")
-                        .Replace(" ", string.Empty);
-
-                    typeName = string.Concat(typeName, "[", originalTypeName, "]");
-                }
+                typeName = GetSimplifiedNameSpace(nameSpace, typeName);
+                typeName = TryEncode(typeName);
             }
             return typeName;
         }
 
+        private string TryEncode(string typeName)
+        {
+            if (typeName.Contains('<') || typeName.Contains('>'))
+            {
+                string originalTypeName = typeName.Replace("<", "&lt;").Replace(">", "&gt");
+                typeName = typeName.Replace("<", "/")
+                    .Replace(">", "\\")
+                    .Replace(" ", string.Empty);
+
+                typeName = string.Concat(typeName, "[", originalTypeName, "]");
+            }
+
+            return typeName;
+        }
+
+        private string GetSimplifiedNameSpace(string nameSpace, string typeName)
+        {
+            typeName = typeName
+                .Replace("System.Collections.Generic.", string.Empty)
+                .Replace("System.Linq.Expressions.", string.Empty)
+                .Replace("System.Linq.", string.Empty)
+                .Replace("System.", string.Empty);
+
+            string[] nameSpaceParts = nameSpace.Split('.');
+            for (int i = nameSpaceParts.Length; i > 0; i--)
+            {
+                string restOfNameSpace = string.Concat(string.Join(".", nameSpaceParts.Take(i)), ".");
+                typeName = typeName.Replace(restOfNameSpace, string.Empty);
+            }
+
+            return typeName;
+        }
     }
 }

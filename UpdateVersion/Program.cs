@@ -1,9 +1,9 @@
-﻿using CmdTools.Contracts;
-using CommandLine;
-using Topelab.Core.Resolver.Microsoft;
-
 namespace UpdateVersion
 {
+    using CmdTools.Contracts;
+    using CommandLine;
+    using Topelab.Core.Resolver.Microsoft;
+
     internal class Program
     {
         static void Main(string[] args)
