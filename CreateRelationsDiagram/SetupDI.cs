@@ -1,4 +1,4 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
@@ -14,7 +14,7 @@
                 .AddTransient<IElementFinder<Options>, ProjectFinder>(nameof(FinderType.Projects))
                 .AddTransient<IElementFinder<Options>, ProjectFinderReverse>(nameof(FinderType.ReverseProjects))
                 .AddTransient<IElementFinder<Options>, ClassesFinder>(nameof(FinderType.Classes))
-                .AddTransient<IElementFinder<Options>, ClassesFinder>(nameof(FinderType.ReverseClasses))
+                .AddTransient<IElementFinder<Options>, ClassesFinderReverse>(nameof(FinderType.ReverseClasses))
                 ;
         }
     }

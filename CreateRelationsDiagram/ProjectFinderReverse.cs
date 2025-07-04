@@ -1,4 +1,4 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
 
@@ -14,12 +14,6 @@
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             var excludeProjects = options.Exclude ?? [];
             var projectFilter = options.ProjectFilter;
-
-            if (string.IsNullOrEmpty(projectFilter))
-            {
-                Console.WriteLine("ProjectFilter (-p --project) is mandatory when reverse option is set");
-                return;
-            }
 
             fileExecutor.Initialize(path, Constants.FilePattern);
             Dictionary<string, HashSet<string>> references = [];

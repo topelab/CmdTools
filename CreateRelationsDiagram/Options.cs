@@ -1,4 +1,4 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
     using CommandLine;
@@ -19,6 +19,9 @@
 
         [Option('a', "assembly", Required = false, HelpText = "Assembly (full path to dll) where classes will be processed", SetName = ClassesGroup)]
         public string Assembly { get; set; }
+
+        [Option('c', "class", Required = false, HelpText = "Class name to process (if not set, all classes in the assembly will be processed)", SetName = ClassesGroup)]
+        public string ClassName { get; set; }
 
         [Option('o', "output", Required = false, Default = Constants.RelationsFileName, HelpText = $"Output file name (default: {Constants.RelationsFileName})")]
         public string OutputFile { get; set; }

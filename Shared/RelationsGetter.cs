@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace CmdTools.Shared
 {
     using CmdTools.Contracts;
@@ -36,13 +38,15 @@ namespace CmdTools.Shared
 
             StringBuilder content = Initialize(direction);
 
-            elementsToProcess.ForEach(element =>
-            {
-                foreach (var reference in references[element])
-                {
-                    content.AppendLine($"\t{element} --> {reference}");
-                }
-            });
+            List<(string element, string reference)> contentResult = [];
+            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
+
+            contentResult
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.OrdinalIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(p => p.element)
+                .ThenBy(p => p.reference)
+                .ToList()
+                .ForEach(p => content.AppendLine($"\t{p.element} --> {p.reference}"));
 
             content.AppendLine("```");
 

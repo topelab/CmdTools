@@ -14,12 +14,14 @@ namespace CreateRelationsDiagram
             this.relationGetterFactory = relationGetterFactory;
         }
 
-        public void Run(Options options)
+        public virtual void Run(Options options)
         {
             var assembly = options.Assembly;
             var nameSpace = options.NameSpace;
             var nameSpaceToClean = options.NameSpace ?? Path.GetFileNameWithoutExtension(options.Assembly);
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
+            var className = options.ClassName;
+
             if (string.IsNullOrEmpty(assembly))
             {
                 Console.WriteLine("Assembly (-a --assembly) is mandatory when classes option is set");
@@ -34,7 +36,7 @@ namespace CreateRelationsDiagram
                 var content = relationsGetter.Get(
                     classes,
                     options.Exclude ?? [],
-                    options.ProjectFilter);
+                    className);
 
                 Finalize(content, outputFile);
             }
