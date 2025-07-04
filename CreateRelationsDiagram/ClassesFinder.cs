@@ -1,4 +1,4 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
     using Microsoft.CSharp;
@@ -17,7 +17,8 @@
         public void Run(Options options)
         {
             var assembly = options.Assembly;
-            var nameSpace = options.NameSpace ?? Path.GetFileNameWithoutExtension(options.Assembly);
+            var nameSpace = options.NameSpace;
+            var nameSpaceToClean = options.NameSpace ?? Path.GetFileNameWithoutExtension(options.Assembly);
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             if (string.IsNullOrEmpty(assembly))
             {
@@ -25,15 +26,18 @@
                 return;
             }
 
-            Dictionary<string, HashSet<string>> classes = GetClasses(assembly, nameSpace);
-            var relationsGetter = relationGetterFactory.Create(options.FinderType);
+            Dictionary<string, HashSet<string>> classes = GetClasses(assembly, nameSpace, nameSpaceToClean);
+            if (classes.Count > 0)
+            {
+                var relationsGetter = relationGetterFactory.Create(options.FinderType);
 
-            var content = relationsGetter.Get(
-                classes,
-                options.Exclude ?? [],
-                options.ProjectFilter);
+                var content = relationsGetter.Get(
+                    classes,
+                    options.Exclude ?? [],
+                    options.ProjectFilter);
 
-            Finalize(content, outputFile);
+                Finalize(content, outputFile);
+            }
         }
 
         protected void Finalize(string content, string outputFile)
@@ -42,7 +46,7 @@
             Console.WriteLine($"References diagram created at: {outputFile}");
         }
 
-        protected virtual Dictionary<string, HashSet<string>> GetClasses(string assembly, string nameSpace)
+        protected virtual Dictionary<string, HashSet<string>> GetClasses(string assembly, string nameSpace, string nameSpaceToClean)
         {
             Dictionary<string, HashSet<string>> result = [];
             try
@@ -51,10 +55,10 @@
 
                 foreach (var type in types)
                 {
-                    var typeName = GetFriendlyTypeName(type, nameSpace);
+                    var typeName = GetFriendlyTypeName(type, nameSpaceToClean);
                     if (!result.ContainsKey(typeName))
                     {
-                        result[typeName] = GetProperties(nameSpace, type);
+                        result[typeName] = GetProperties(nameSpaceToClean, type);
                     }
                 }
             }
@@ -91,7 +95,9 @@
                 && !type.Name.StartsWith("Byte[")
                 && !type.Name.StartsWith("Func`")
                 && !type.Name.StartsWith("Action`")
-                && !type.Name.StartsWith("Expression`");
+                && !type.Name.StartsWith("Expression`")
+                && type.Name != typeof(object).Name
+                && type.Name != typeof(Type).Name;
         }
 
         protected string GetFriendlyTypeName(Type t, string nameSpace)
@@ -130,11 +136,14 @@
                 .Replace("System.Linq.", string.Empty)
                 .Replace("System.", string.Empty);
 
-            string[] nameSpaceParts = nameSpace.Split('.');
-            for (int i = nameSpaceParts.Length; i > 0; i--)
+            if (!string.IsNullOrEmpty(nameSpace))
             {
-                string restOfNameSpace = string.Concat(string.Join(".", nameSpaceParts.Take(i)), ".");
-                typeName = typeName.Replace(restOfNameSpace, string.Empty);
+                string[] nameSpaceParts = nameSpace.Split('.');
+                for (int i = nameSpaceParts.Length; i > 0; i--)
+                {
+                    string restOfNameSpace = string.Concat(string.Join(".", nameSpaceParts.Take(i)), ".");
+                    typeName = typeName.Replace(restOfNameSpace, string.Empty);
+                }
             }
 
             return typeName;
