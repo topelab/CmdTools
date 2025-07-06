@@ -32,11 +32,7 @@ namespace CmdTools.Shared
                 .Where(p => references.ContainsKey(p))
                 .ToList();
 
-            int depth = GetDepth(elementsToProcess, references);
-            int keysCount = elementsToProcess.Count;
-            string direction = keysCount > depth ? "LR" : "TD";
-            StringBuilder content = Initialize(direction);
-
+            StringBuilder content = new();
 
             List<(string element, string reference)> contentResult = [];
             elementsToProcess.ForEach(reference =>
@@ -53,8 +49,6 @@ namespace CmdTools.Shared
                 .ThenBy(p => p.reference)
                 .ToList()
                 .ForEach(p => content.AppendLine($"\t{p.element} --> {p.reference}"));
-
-            content.AppendLine("```");
 
             return content.ToString();
         }

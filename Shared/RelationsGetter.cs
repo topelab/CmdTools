@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace CmdTools.Shared
 {
     using CmdTools.Contracts;
@@ -16,7 +14,7 @@ namespace CmdTools.Shared
                 .ToList()
                 .ForEach(p => welcomeElements.Add(p));
 
-            int count = welcomeElements.Count;
+            var count = welcomeElements.Count;
 
             do
             {
@@ -32,11 +30,7 @@ namespace CmdTools.Shared
                 .Where(p => references.ContainsKey(p))
                 .ToList();
 
-            int depth = GetDepth(elementsToProcess, references);
-            int keysCount = elementsToProcess.Count;
-            string direction = keysCount > depth ? "LR" : "TD";
-
-            StringBuilder content = Initialize(direction);
+            var content = new StringBuilder();
 
             List<(string element, string reference)> contentResult = [];
             elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
@@ -48,44 +42,7 @@ namespace CmdTools.Shared
                 .ToList()
                 .ForEach(p => content.AppendLine($"\t{p.element} --> {p.reference}"));
 
-            content.AppendLine("```");
-
             return content.ToString();
         }
-
-        protected StringBuilder Initialize(string direction)
-        {
-            StringBuilder content = new StringBuilder();
-            content.AppendLine("```mermaid");
-            content.AppendLine("---");
-            content.AppendLine("config:");
-            content.AppendLine("  theme: default");
-            content.AppendLine("---");
-            content.AppendLine($"flowchart {direction}");
-            return content;
-        }
-
-        protected int GetDepth(List<string> elementsToProcess, Dictionary<string, HashSet<string>> references)
-        {
-            HashSet<string> visited = [];
-            return elementsToProcess
-                .Select(p => GetDepth(p, references, visited))
-                .DefaultIfEmpty(0)
-                .Max();
-        }
-        private int GetDepth(string element, Dictionary<string, HashSet<string>> references, HashSet<string> visited)
-        {
-            if (visited.Contains(element))
-            {
-                return -1;
-            }
-            visited.Add(element);
-            return !references.TryGetValue(element, out var value)
-                ? 0
-                : value.Select(r => GetDepth(r, references, visited) + 1)
-                    .DefaultIfEmpty(0)
-                    .Max();
-        }
-
     }
 }

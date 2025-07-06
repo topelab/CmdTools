@@ -1,8 +1,8 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
 
-    internal class ProjectFinder : IElementFinder<Options>
+    internal class ProjectFinder : ElementFinderBase, IElementFinder<Options>
     {
         protected readonly IProjectReferences projectReferences;
         protected readonly IFileExecutor fileExecutor;
@@ -32,13 +32,8 @@
                 excludeProjects,
                 projectFilter);
 
+            content = GetHeader(content, options.Theme, options.Layout, options.Direction);
             Finalize(content, outputFile);
-        }
-
-        protected void Finalize(string content, string outputFile)
-        {
-            File.WriteAllText(outputFile, content);
-            Console.WriteLine($"References diagram created at: {outputFile}");
         }
     }
 }

@@ -5,7 +5,7 @@ namespace CreateRelationsDiagram
     using System.CodeDom;
     using System.Reflection;
 
-    internal class ClassesFinder : IElementFinder<Options>
+    internal class ClassesFinder : ElementFinderBase, IElementFinder<Options>
     {
         protected readonly IRelationGetterFactory relationGetterFactory;
 
@@ -38,14 +38,9 @@ namespace CreateRelationsDiagram
                     options.Exclude ?? [],
                     className);
 
+                content = GetHeader(content, options.Theme, options.Layout, options.Direction);
                 Finalize(content, outputFile);
             }
-        }
-
-        protected void Finalize(string content, string outputFile)
-        {
-            File.WriteAllText(outputFile, content);
-            Console.WriteLine($"References diagram created at: {outputFile}");
         }
 
         protected virtual Dictionary<string, HashSet<string>> GetClasses(string assembly, string nameSpace, string nameSpaceToClean)

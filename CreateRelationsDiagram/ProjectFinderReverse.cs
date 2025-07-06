@@ -41,6 +41,7 @@ namespace CreateRelationsDiagram
                 excludeProjects,
                 projectFilter);
 
+            content = GetHeader(content, options.Theme, options.Layout, options.Direction);
             Finalize(content, outputFile);
         }
     }
