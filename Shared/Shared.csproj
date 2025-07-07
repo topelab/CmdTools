@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <Version>1.1.13</Version>
+    <Version>1.1.14</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Topelab.Core.Resolver.Microsoft" Version="1.8.7" />
+    <PackageReference Include="Topelab.Core.Resolver.Microsoft" Version="1.8.8" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
   <ItemGroup>
