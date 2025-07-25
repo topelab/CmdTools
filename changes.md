@@ -1,3 +1,7 @@
+## 1.1.18
+
+- Updating Topelab.Core.Resolver.Microsoft to 1.9.0
+
 ## 1.1.17
 
 - Updating Topelab.Core.Resolver.Microsoft to 1.8.12

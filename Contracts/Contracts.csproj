@@ -3,6 +3,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <Version>1.1.17</Version>
+    <Version>1.1.18</Version>
   </PropertyGroup>
 </Project>
