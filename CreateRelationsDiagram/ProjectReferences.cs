@@ -1,4 +1,4 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using System.Xml.Linq;
 
@@ -9,10 +9,19 @@
             XDocument document = XDocument.Load(projectPath);
             var projectReferences = document.Descendants()
                 .Where(d => d.Name.LocalName == "ProjectReference")
-                .Select(d => d.Attribute("Include")?.Value)
-                .Where(v => !string.IsNullOrEmpty(v));
+                .Where(d => d.Attribute("Include") != null)
+                .Select(d => d.Attribute("Include").Value);
 
-            return projectReferences.Select(r => Path.GetFileNameWithoutExtension(r)).Where(v => !string.IsNullOrEmpty(v));
+            var packageReferences = document.Descendants()
+                .Where(d => d.Name.LocalName == "PackageReference")
+                .Where(d => d.Attribute("Include") != null)
+                .Select(d => new { Name = d.Attribute("Include").Value, Version = d.Attribute("Version")?.Value })
+                .Select(d => $"{d.Name}{(string.IsNullOrEmpty(d.Version) ? string.Empty : "-")}{d.Version}");
+
+            return projectReferences
+                .Select(r => Path.GetFileNameWithoutExtension(r))
+                .Where(v => !string.IsNullOrEmpty(v))
+                .Union(packageReferences);
         }
     }
 }

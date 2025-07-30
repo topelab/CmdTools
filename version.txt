@@ -1,2 +1,2 @@
 1.1.18
-CreateRelations*: 1.1.5
+CreateRelations*: 1.1.6

@@ -80,7 +80,7 @@ namespace CreateRelationsDiagram
         protected IEnumerable<Type> GetTypesFromAssembly(string assemblyPath, string nameSpace = null)
         {
             var assembly = Assembly.LoadFrom(assemblyPath);
-            var types = assembly.GetTypes().Where(t => !t.Name.StartsWith('<') && (nameSpace == null || t.Namespace.StartsWith(nameSpace)));
+            var types = assembly.GetTypes().Where(t => !t.Name.StartsWith('<') && (nameSpace == null || (t.Namespace != null && t.Namespace.StartsWith(nameSpace, StringComparison.CurrentCultureIgnoreCase))));
             return types;
         }
 
