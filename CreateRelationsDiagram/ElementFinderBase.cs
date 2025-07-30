@@ -5,7 +5,7 @@ namespace CreateRelationsDiagram
     internal class ElementFinderBase
     {
 
-        protected string GetHeader(string content, Theme theme, Layout layout, Direction direction)
+        protected string GetComposition(string content, Theme theme, Layout layout, Direction direction)
         {
             return $"""
                 ---
@@ -15,6 +15,8 @@ namespace CreateRelationsDiagram
                 ---
                 flowchart {direction.GetDescription()}
                 {content}
+
+                classDef pkg fill:#658;
                 """;
         }
 

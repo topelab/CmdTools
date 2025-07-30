@@ -38,7 +38,7 @@ namespace CreateRelationsDiagram
                     options.Exclude ?? [],
                     className);
 
-                content = GetHeader(content, options.Theme, options.Layout, options.Direction);
+                content = GetComposition(content, options.Theme, options.Layout, options.Direction);
                 Finalize(content, outputFile);
             }
         }

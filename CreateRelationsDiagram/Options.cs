@@ -14,11 +14,14 @@ namespace CreateRelationsDiagram
         [Option('p', "project", Required = false, HelpText = "Filter by project (if not set, all projects in the solution will be processed)", SetName = ProjectsGroup)]
         public string ProjectFilter { get; set; }
 
-        [Option('n', "namespace", Required = false, HelpText = "NameSpace to process (if not set, all name spaces in the solution will be processed)", SetName = ClassesGroup)]
-        public string NameSpace { get; set; }
+        [Option('w', "WithPackages", Required = false, Default = false, HelpText = "Nuget packages will be collected", SetName = ProjectsGroup)]
+        public bool WithPackages { get; set; }
 
         [Option('a', "assembly", Required = false, HelpText = "Assembly (full path to dll) where classes will be processed", SetName = ClassesGroup)]
         public string Assembly { get; set; }
+
+        [Option('n', "namespace", Required = false, HelpText = "NameSpace to process (if not set, all name spaces in the solution will be processed)", SetName = ClassesGroup)]
+        public string NameSpace { get; set; }
 
         [Option('c', "class", Required = false, HelpText = "Class name to process (if not set, all classes in the assembly will be processed)", SetName = ClassesGroup)]
         public string ClassName { get; set; }

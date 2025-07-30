@@ -17,3 +17,4 @@ Supports .Net MAUI projects, which use `ApplicationDisplayVersion` instead of `V
 - `-o C:\Users\detos\Downloads\relations.md -s C:\arc\src\github\topelab\l2data2code\ -p schema`
 - `-o C:\Users\detos\Downloads\relations.mermaid -s C:\arc\src\github\topelab\l2data2code\ -d BottomToTop`
 - `-a C:\arc\output\CalendarCreator\Topelab.Calendar.Domain.dll -o C:\Users\detos\Downloads\classes.mmd -d LeftToRight`
+- `-s C:\arc\src\github\topelab\Topelab.Calendar\ -o C:\Users\detos\Downloads\calendars-projects.mermaid -d LeftToRight -w`

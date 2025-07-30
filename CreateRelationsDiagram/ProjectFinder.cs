@@ -21,10 +21,22 @@ namespace CreateRelationsDiagram
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             var excludeProjects = options.Exclude ?? [];
             var projectFilter = options.ProjectFilter;
+            projectReferences.Initialize(options.WithPackages);
 
             Dictionary<string, HashSet<string>> references = [];
             fileExecutor.Initialize(path, Constants.FilePattern);
-            fileExecutor.RunOnFiles(file => references[Path.GetFileNameWithoutExtension(file)] = projectReferences.Get(file).ToHashSet());
+            HashSet<string> projectFiles = [];
+            fileExecutor.RunOnFiles(file =>
+            {
+                projectFiles.Add(file);
+                projectReferences.GetProjects(file).ToList().ForEach(p => projectFiles.Add(p));
+            });
+
+            foreach (var file in projectFiles)
+            {
+                references[Path.GetFileNameWithoutExtension(file)] = [.. projectReferences.Get(file)];
+            }
+
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
 
             var content = relationsGetter.Get(
@@ -32,7 +44,7 @@ namespace CreateRelationsDiagram
                 excludeProjects,
                 projectFilter);
 
-            content = GetHeader(content, options.Theme, options.Layout, options.Direction);
+            content = GetComposition(content, options.Theme, options.Layout, options.Direction);
             Finalize(content, outputFile);
         }
     }
