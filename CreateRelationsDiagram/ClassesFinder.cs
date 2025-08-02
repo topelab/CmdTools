@@ -1,6 +1,7 @@
 namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
+    using CmdTools.Shared;
     using Microsoft.CSharp;
     using System.CodeDom;
     using System.Reflection;
@@ -28,7 +29,7 @@ namespace CreateRelationsDiagram
                 return;
             }
 
-            Dictionary<string, HashSet<string>> classes = GetClasses(assembly, nameSpace, nameSpaceToClean);
+            ReferencesBag classes = GetClasses(assembly, nameSpace, nameSpaceToClean);
             if (classes.Count > 0)
             {
                 var relationsGetter = relationGetterFactory.Create(options.FinderType);
@@ -43,9 +44,9 @@ namespace CreateRelationsDiagram
             }
         }
 
-        protected virtual Dictionary<string, HashSet<string>> GetClasses(string assembly, string nameSpace, string nameSpaceToClean)
+        protected virtual ReferencesBag GetClasses(string assembly, string nameSpace, string nameSpaceToClean)
         {
-            Dictionary<string, HashSet<string>> result = [];
+            ReferencesBag result = [];
             try
             {
                 var types = GetTypesFromAssembly(assembly, nameSpace);

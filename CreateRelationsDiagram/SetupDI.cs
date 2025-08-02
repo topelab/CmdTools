@@ -12,7 +12,7 @@ namespace CreateRelationsDiagram
                 .AddCollection(SharedSetupDI.Register())
                 .AddTransient<IProjectReferences, ProjectReferences>()
                 .AddTransient<IElementFinder<Options>, ProjectFinder>(nameof(FinderType.Projects))
-                .AddTransient<IElementFinder<Options>, ProjectFinderReverse>(nameof(FinderType.ReverseProjects))
+                .AddTransient<IElementFinder<Options>, ProjectFinder>(nameof(FinderType.ReverseProjects))
                 .AddTransient<IElementFinder<Options>, ClassesFinder>(nameof(FinderType.Classes))
                 .AddTransient<IElementFinder<Options>, ClassesFinderReverse>(nameof(FinderType.ReverseClasses))
                 ;

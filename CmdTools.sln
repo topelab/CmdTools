@@ -8,7 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Info", "_Info", "{93CC1C7E
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		LICENSE.txt = LICENSE.txt
+		inverso.mmd = inverso.mmd
 		README.md = README.md
+		sample.mmd = sample.mmd
 		version.txt = version.txt
 	EndProjectSection
 EndProject

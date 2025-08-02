@@ -1,6 +1,8 @@
 namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
+    using CmdTools.Shared;
+    using System.Xml.Linq;
 
     internal class ProjectFinderReverse : ProjectFinder
     {
@@ -14,30 +16,18 @@ namespace CreateRelationsDiagram
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             var excludeProjects = options.Exclude ?? [];
             var projectFilter = options.ProjectFilter;
+            var fixedProject = options.PinnedProject;
 
+            projectReferences.Initialize(options.WithPackages);
             fileExecutor.Initialize(path, Constants.FilePattern);
-            Dictionary<string, HashSet<string>> references = [];
 
-            fileExecutor.RunOnFiles(file =>
-            {
-                projectReferences.Get(file)
-                    .ToList()
-                    .ForEach(reference => 
-                    {
-                        if (!references.TryGetValue(reference, out var projects))
-                        {
-                            projects = [];
-                            references[reference] = projects;
-                        }
-
-                        projects.Add(Path.GetFileNameWithoutExtension(file));
-                    });
-            });
+            var projectFiles = GetProjectFiles();
+            var filteredRefeferences = GetFilteredReferences(fixedProject, projectFiles, out var s);
 
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
 
             var content = relationsGetter.Get(
-                references,
+                filteredRefeferences,
                 excludeProjects,
                 projectFilter);
 

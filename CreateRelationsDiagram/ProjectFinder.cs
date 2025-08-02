@@ -1,6 +1,7 @@
 namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
+    using CmdTools.Shared;
 
     internal class ProjectFinder : ElementFinderBase, IElementFinder<Options>
     {
@@ -21,31 +22,104 @@ namespace CreateRelationsDiagram
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
             var excludeProjects = options.Exclude ?? [];
             var projectFilter = options.ProjectFilter;
-            projectReferences.Initialize(options.WithPackages);
+            var pinnedProject = options.PinnedProject;
 
-            Dictionary<string, HashSet<string>> references = [];
+            projectReferences.Initialize(options.WithPackages);
             fileExecutor.Initialize(path, Constants.FilePattern);
+
+            var projectFiles = GetProjectFiles();
+            var filteredRefeferences = GetFilteredReferences(pinnedProject, projectFiles, out var selectedElement);
+
+            var relationsGetter = relationGetterFactory.Create(options.FinderType);
+
+            var content = relationsGetter.Get(
+                filteredRefeferences,
+                excludeProjects,
+                projectFilter);
+
+            content = GetComposition(content, options.Theme, options.Layout, options.Direction);
+            if (!string.IsNullOrEmpty(selectedElement))
+            {
+                content = content.Replace($"{selectedElement} ", $"{selectedElement}:::pinned ");
+                content = content.Replace($" {selectedElement}", $" {selectedElement}:::pinned");
+                content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
+            }
+            Finalize(content, outputFile);
+        }
+
+        protected HashSet<string> GetProjectFiles()
+        {
             HashSet<string> projectFiles = [];
             fileExecutor.RunOnFiles(file =>
             {
                 projectFiles.Add(file);
                 projectReferences.GetProjects(file).ToList().ForEach(p => projectFiles.Add(p));
             });
+            return projectFiles;
+        }
 
+        protected virtual ReferencesBag GetFilteredReferences(string pinnedElement, HashSet<string> projectFiles, out string selectedElement)
+        {
+            var references = GetReferences(projectFiles);
+            ReferencesBag filteredRefeferences = [];
+            selectedElement = null;
+
+            if (!string.IsNullOrEmpty(pinnedElement))
+            {
+                selectedElement = GetPinnedElemet(references, pinnedElement);
+                if (selectedElement != null)
+                {
+                    foreach (var reference in references)
+                    {
+                        SetReferences(references, reference.Key, selectedElement, filteredRefeferences);
+
+                        if (reference.Key == selectedElement)
+                        {
+                            filteredRefeferences.AddReferences(reference.Key, reference.Value);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                filteredRefeferences = references;
+            }
+
+            return filteredRefeferences;
+        }
+
+        protected virtual void SetReferences(ReferencesBag references, string parentElement, string pinnedElement, ReferencesBag currentResults)
+        {
+            ReferencesBag results = [];
+            if (references.TryGetValue(parentElement, out var elements))
+            {
+                elements
+                    .Where(e => e == pinnedElement)
+                    .ToList().ForEach(e => results.AddReference(parentElement, e));
+
+                elements
+                    .ToList().ForEach(e => SetReferences(references, e, pinnedElement, results));
+
+                foreach (var key in results.Keys.ToList())
+                {
+                    SetReferences(references, parentElement, key, results);
+                }
+            }
+
+            results.Keys
+                .ToList()
+                .ForEach(key => currentResults.AddReferences(key, results[key]));
+        }
+
+        protected virtual ReferencesBag GetReferences(HashSet<string> projectFiles)
+        {
+            ReferencesBag references = [];
             foreach (var file in projectFiles)
             {
                 references[Path.GetFileNameWithoutExtension(file)] = [.. projectReferences.Get(file)];
             }
 
-            var relationsGetter = relationGetterFactory.Create(options.FinderType);
-
-            var content = relationsGetter.Get(
-                references,
-                excludeProjects,
-                projectFilter);
-
-            content = GetComposition(content, options.Theme, options.Layout, options.Direction);
-            Finalize(content, outputFile);
+            return references;
         }
     }
 }

@@ -1,20 +1,20 @@
 namespace CmdTools.Shared
 {
+    using CmdTools.Contracts;
     using System.Text;
 
     internal class ReverseRelationsGetter : RelationsGetter
     {
-        public override string Get(Dictionary<string, HashSet<string>> references, IEnumerable<string> excludedElements, string elementFilter)
+        public override string Get(IReferencesBag references, IEnumerable<string> excludedElements, string elementFilter)
         {
             HashSet<string> welcomeElements = [];
 
             references.Keys
-                .Where(p => !excludedElements.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase)))
-                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Contains(elementFilter, StringComparison.OrdinalIgnoreCase) || references[p].Any(r => r.Contains(elementFilter, StringComparison.OrdinalIgnoreCase)))
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
                 .ToList()
                 .ForEach(p => welcomeElements.Add(p));
 
-            int count = welcomeElements.Count;
+            int count;
 
             do
             {
@@ -27,28 +27,21 @@ namespace CmdTools.Shared
             while (count != welcomeElements.Count);
 
             var elementsToProcess = welcomeElements
-                .OrderBy(p => p)
-                .Distinct()
                 .Where(p => references.ContainsKey(p))
                 .ToList();
 
-            StringBuilder content = new();
+            var content = new StringBuilder();
 
             List<(string element, string reference)> contentResult = [];
-            elementsToProcess.ForEach(reference =>
-            {
-                foreach (var project in references[reference].Where(p => !excludedElements.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase))))
-                {
-                    contentResult.Add((project, reference));
-                }
-            });
+            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
 
             contentResult
-                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.OrdinalIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(p => p.element)
-                .ThenBy(p => p.reference)
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
+                .Where(p => !excludedElements.Any(e => p.element.Contains(e, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(e, StringComparison.CurrentCultureIgnoreCase)))
+                .OrderBy(p => p.reference)
+                .ThenBy(p => p.element)
                 .ToList()
-                .ForEach(p => content.AppendLine($"\t{p.element} --> {p.reference}"));
+                .ForEach(p => content.AppendLine($"\t{p.reference} --> {p.element}"));
 
             return content.ToString();
         }

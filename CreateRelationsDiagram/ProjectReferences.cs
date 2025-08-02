@@ -23,7 +23,7 @@ namespace CreateRelationsDiagram
             var packageReferences = withPackages ? document.Descendants()
                 .Where(d => d.Name.LocalName == "PackageReference")
                 .Where(d => d.Attribute("Include") != null)
-                .Select(d => new { Name = d.Attribute("Include").Value, Version = d.Attribute("Version")?.Value })
+                .Select(d => new { Name = d.Attribute("Include").Value, Version = d.Attribute("Version")?.Value ?? d.Attribute("version")?.Value })
                 .Select(d => $"{d.Name}{(string.IsNullOrEmpty(d.Version) ? string.Empty : "-")}{d.Version}:::pkg") : [];
 
             return projectReferences

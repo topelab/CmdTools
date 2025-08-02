@@ -5,16 +5,16 @@ namespace CmdTools.Shared
 
     internal class RelationsGetter : IRelationsGetter
     {
-        public virtual string Get(Dictionary<string, HashSet<string>> references, IEnumerable<string> excludedElements, string elementFilter)
+        public virtual string Get(IReferencesBag references, IEnumerable<string> excludedElements, string elementFilter)
         {
             HashSet<string> welcomeElements = [];
+
             references.Keys
-                .Where(p => !excludedElements.Any(e => p.Contains(e, StringComparison.OrdinalIgnoreCase)))
-                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Contains(elementFilter, StringComparison.OrdinalIgnoreCase))
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
                 .ToList()
                 .ForEach(p => welcomeElements.Add(p));
 
-            var count = welcomeElements.Count;
+            int count;
 
             do
             {
@@ -36,7 +36,8 @@ namespace CmdTools.Shared
             elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
 
             contentResult
-                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.OrdinalIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.OrdinalIgnoreCase))
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
+                .Where(p => !excludedElements.Any(e => p.element.Contains(e, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(e, StringComparison.CurrentCultureIgnoreCase)))
                 .OrderBy(p => p.element)
                 .ThenBy(p => p.reference)
                 .ToList()
