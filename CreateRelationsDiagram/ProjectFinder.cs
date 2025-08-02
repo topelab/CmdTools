@@ -2,6 +2,7 @@ namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
+    using System.Text.RegularExpressions;
 
     internal class ProjectFinder : ElementFinderBase, IElementFinder<Options>
     {
@@ -20,12 +21,12 @@ namespace CreateRelationsDiagram
         {
             var path = options.SolutionPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile ?? Constants.RelationsFileName;
-            var excludeProjects = options.Exclude ?? [];
+            var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude);
             var projectFilter = options.ProjectFilter;
             var pinnedProject = options.PinnedProject;
 
             projectReferences.Initialize(options.WithPackages);
-            fileExecutor.Initialize(path, Constants.FilePattern);
+            fileExecutor.Initialize(path, Constants.FilePattern, excludeProjects);
 
             var projectFiles = GetProjectFiles();
             var filteredRefeferences = GetFilteredReferences(pinnedProject, projectFiles, out var selectedElement);
@@ -34,14 +35,12 @@ namespace CreateRelationsDiagram
 
             var content = relationsGetter.Get(
                 filteredRefeferences,
-                excludeProjects,
                 projectFilter);
 
             content = GetComposition(content, options.Theme, options.Layout, options.Direction);
             if (!string.IsNullOrEmpty(selectedElement))
             {
-                content = content.Replace($"{selectedElement} ", $"{selectedElement}:::pinned ");
-                content = content.Replace($" {selectedElement}", $" {selectedElement}:::pinned");
+                content = content.Replace($"\t{selectedElement} ", $"\t{selectedElement}:::pinned");
                 content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
             }
             Finalize(content, outputFile);

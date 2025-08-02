@@ -5,7 +5,7 @@ namespace CmdTools.Shared
 
     internal class ReverseRelationsGetter : RelationsGetter
     {
-        public override string Get(IReferencesBag references, IEnumerable<string> excludedElements, string elementFilter)
+        public override string Get(IReferencesBag references, string elementFilter)
         {
             HashSet<string> welcomeElements = [];
 
@@ -37,11 +37,10 @@ namespace CmdTools.Shared
 
             contentResult
                 .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
-                .Where(p => !excludedElements.Any(e => p.element.Contains(e, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(e, StringComparison.CurrentCultureIgnoreCase)))
                 .OrderBy(p => p.reference)
                 .ThenBy(p => p.element)
                 .ToList()
-                .ForEach(p => content.AppendLine($"\t{p.reference} --> {p.element}"));
+                .ForEach(p => content.AppendLine($"\t{p.reference} -->\t{p.element} "));
 
             return content.ToString();
         }

@@ -14,6 +14,11 @@ namespace CreateRelationsDiagram
 
         public IEnumerable<string> Get(string projectPath)
         {
+            if (!File.Exists(projectPath))
+            {
+                return [];
+            }
+
             XDocument document = XDocument.Load(projectPath);
             var projectReferences = document.Descendants()
                 .Where(d => d.Name.LocalName == "ProjectReference")
@@ -37,18 +42,21 @@ namespace CreateRelationsDiagram
             List<string> result = [];
             currentProjects ??= [];
             var localBasePath = GetFullPath(basePath, projectPath);
-            XDocument document = XDocument.Load(localBasePath);
-            var projectReferences = document.Descendants()
-                .Where(d => d.Name.LocalName == "ProjectReference")
-                .Where(d => d.Attribute("Include") != null)
-                .Select(d => GetFullPath(Path.GetDirectoryName(localBasePath), d.Attribute("Include").Value))
-                .Where(p => !currentProjects.Contains(p))
-                .ToList();
+            if (File.Exists(localBasePath))
+            {
+                XDocument document = XDocument.Load(localBasePath);
+                var projectReferences = document.Descendants()
+                    .Where(d => d.Name.LocalName == "ProjectReference")
+                    .Where(d => d.Attribute("Include") != null)
+                    .Select(d => GetFullPath(Path.GetDirectoryName(localBasePath), d.Attribute("Include").Value))
+                    .Where(p => !currentProjects.Contains(p))
+                    .ToList();
 
-            projectReferences.ForEach(reference => currentProjects.Add(reference));
-            projectReferences.ForEach(reference => result.AddRange(GetProjects(reference, currentProjects, Path.GetDirectoryName(GetFullPath(basePath, projectPath)))));
+                projectReferences.ForEach(reference => currentProjects.Add(reference));
+                projectReferences.ForEach(reference => result.AddRange(GetProjects(reference, currentProjects, Path.GetDirectoryName(GetFullPath(basePath, projectPath)))));
 
-            result.AddRange(projectReferences);
+                result.AddRange(projectReferences);
+            }
 
             return result.Distinct();
         }

@@ -25,7 +25,6 @@ namespace CreateRelationsDiagram
                 var relationsGetter = relationGetterFactory.Create(options.FinderType);
                 var content = relationsGetter.Get(
                     classes,
-                    options.Exclude ?? [],
                     className);
 
                 content = GetComposition(content, options.Theme, options.Layout, options.Direction);

@@ -1,6 +1,7 @@
 namespace CmdTools.Shared
 {
     using CmdTools.Contracts;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Ejecuta acciones sobre rutas y archivos.
@@ -18,13 +19,12 @@ namespace CmdTools.Shared
         /// </summary>
         /// <param name="rootPath">Ruta raíz donde buscar.</param>
         /// <param name="filePattern">Patrón de búsqueda para archivos (por defecto "*.*").</param>
-        /// <param name="pathPattern">Patrón de búsqueda para directorios (por defecto "*.*").</param>
         /// <exception cref="ArgumentNullException">Se lanza si <paramref name="rootPath"/> es null.</exception>
-        public void Initialize(string rootPath, string filePattern = "*.*", string pathPattern = "*.*")
+        public void Initialize(string rootPath, string filePattern = "*.*", Regex exclusionRegex = null)
         {
             rootPath = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
-            files = Directory.GetFiles(rootPath, filePattern, SearchOption.AllDirectories);
-            dirs = Directory.GetDirectories(rootPath, pathPattern, SearchOption.AllDirectories);
+            files = [.. Directory.GetFiles(rootPath, filePattern, SearchOption.AllDirectories).Where(f => exclusionRegex is null || !exclusionRegex.IsMatch(f))];
+            dirs = [.. Directory.GetDirectories(rootPath, "*.*", SearchOption.AllDirectories).Where(f => exclusionRegex is null || !exclusionRegex.IsMatch(f))];
             isInitialized = true;
         }
 

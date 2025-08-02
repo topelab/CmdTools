@@ -1,5 +1,7 @@
 namespace CmdTools.Contracts
 {
+    using System.Text.RegularExpressions;
+
     /// <summary>
     /// Define métodos para inicializar y ejecutar acciones sobre archivos y rutas.
     /// </summary>
@@ -10,8 +12,8 @@ namespace CmdTools.Contracts
         /// </summary>
         /// <param name="rootPath">Ruta raíz donde buscar archivos y rutas.</param>
         /// <param name="filePattern">Patrón de búsqueda para archivos. Por defecto es "*.*".</param>
-        /// <param name="pathPattern">Patrón de búsqueda para rutas. Por defecto es "*.*".</param>
-        void Initialize(string rootPath, string filePattern = "*.*", string pathPattern = "*.*");
+        /// <param name="exclusionRegex">Expresión regular para excluir archivos o rutas específicas. Por defecto es null.</param>
+        void Initialize(string rootPath, string filePattern = "*.*", Regex exclusionRegex = null);
 
         /// <summary>
         /// Ejecuta una acción sobre cada archivo que coincide con el patrón especificado.

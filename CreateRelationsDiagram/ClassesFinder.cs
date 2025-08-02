@@ -5,6 +5,7 @@ namespace CreateRelationsDiagram
     using Microsoft.CSharp;
     using System.CodeDom;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     internal class ClassesFinder : ElementFinderBase, IElementFinder<Options>
     {
@@ -36,7 +37,6 @@ namespace CreateRelationsDiagram
 
                 var content = relationsGetter.Get(
                     classes,
-                    options.Exclude ?? [],
                     className);
 
                 content = GetComposition(content, options.Theme, options.Layout, options.Direction);
