@@ -16,13 +16,14 @@ namespace CreateRelationsDiagram
             this.relationGetterFactory = relationGetterFactory;
         }
 
-        public virtual void Run(Options options)
+        public void Run(Options options)
         {
             var assembly = options.Assembly;
             var nameSpace = options.NameSpace;
-            var nameSpaceToClean = options.NameSpace ?? Path.GetFileNameWithoutExtension(options.Assembly);
+            var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);
             var outputFile = options.OutputFile;
             var className = options.ClassName;
+            var excludeClasses = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
 
             if (string.IsNullOrEmpty(assembly))
             {
@@ -30,7 +31,7 @@ namespace CreateRelationsDiagram
                 return;
             }
 
-            ReferencesBag classes = GetClasses(assembly, nameSpace, nameSpaceToClean);
+            var classes = GetClasses(assembly, nameSpace, nameSpaceToClean, excludeClasses);
             if (classes.Count > 0)
             {
                 var relationsGetter = relationGetterFactory.Create(options.FinderType);
@@ -44,7 +45,7 @@ namespace CreateRelationsDiagram
             }
         }
 
-        protected virtual ReferencesBag GetClasses(string assembly, string nameSpace, string nameSpaceToClean)
+        protected ReferencesBag GetClasses(string assembly, string nameSpace, string nameSpaceToClean, Regex excludeClasses)
         {
             ReferencesBag result = [];
             try
@@ -54,9 +55,9 @@ namespace CreateRelationsDiagram
                 foreach (var type in types)
                 {
                     var typeName = GetFriendlyTypeName(type, nameSpaceToClean);
-                    if (!result.ContainsKey(typeName))
+                    if ((excludeClasses is null || !excludeClasses.IsMatch(typeName)) && !result.ContainsKey(typeName))
                     {
-                        result[typeName] = GetProperties(nameSpaceToClean, type);
+                        result[typeName] = GetProperties(nameSpaceToClean, type, excludeClasses);
                     }
                 }
             }
@@ -67,12 +68,16 @@ namespace CreateRelationsDiagram
             return result;
         }
 
-        protected HashSet<string> GetProperties(string nameSpace, Type type)
+        protected HashSet<string> GetProperties(string nameSpace, Type type, Regex excludeClasses)
         {
             HashSet<string> properties = [];
             foreach (var item in type.GetProperties().Where(p => CanGet(p.PropertyType)))
             {
-                properties.Add(GetFriendlyTypeName(item.PropertyType, nameSpace));
+                var propertyName = GetFriendlyTypeName(item.PropertyType, nameSpace);
+                if (excludeClasses is null || !excludeClasses.IsMatch(propertyName))
+                {
+                    properties.Add(propertyName);
+                }
             }
             return properties;
         }
@@ -115,7 +120,7 @@ namespace CreateRelationsDiagram
         {
             if (typeName.Contains('<') || typeName.Contains('>'))
             {
-                string originalTypeName = typeName.Replace("<", "&lt;").Replace(">", "&gt");
+                var originalTypeName = typeName.Replace("<", "&lt;").Replace(">", "&gt");
                 typeName = typeName.Replace("<", "/")
                     .Replace(">", "\\")
                     .Replace(" ", string.Empty);
@@ -136,10 +141,10 @@ namespace CreateRelationsDiagram
 
             if (!string.IsNullOrEmpty(nameSpace))
             {
-                string[] nameSpaceParts = nameSpace.Split('.');
-                for (int i = nameSpaceParts.Length; i > 0; i--)
+                var nameSpaceParts = nameSpace.Split('.');
+                for (var i = nameSpaceParts.Length; i > 0; i--)
                 {
-                    string restOfNameSpace = string.Concat(string.Join(".", nameSpaceParts.Take(i)), ".");
+                    var restOfNameSpace = string.Concat(string.Join(".", nameSpaceParts.Take(i)), ".");
                     typeName = typeName.Replace(restOfNameSpace, string.Empty);
                 }
             }

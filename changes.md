@@ -1,3 +1,13 @@
+## CreateRelationsDiagram - 1.1.11
+
+Refactor ClassesFinder and update project version
+
+- Updated `Run` method in `ClassesFinder` to remove default `nameSpaceToClean` assignment and added `excludeClasses` parameter for regex filtering.
+- Modified `GetClasses` and `GetProperties` methods to utilize the new `excludeClasses` parameter for more flexible class and property retrieval.
+- Removed `ClassesFinderReverse`.
+- Bumped project version to `1.1.11` in `CreateRelationsDiagram.csproj` and `Shared.csproj`.
+- Documented changes in `changes.md` and updated versioning in `version.txt`.
+
 ## CreateRelationsDiagram - 1.1.10
 
 Update output handling and versioning in project files
