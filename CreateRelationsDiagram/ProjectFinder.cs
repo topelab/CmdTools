@@ -20,7 +20,7 @@ namespace CreateRelationsDiagram
         public virtual void Run(Options options)
         {
             var path = options.SolutionPath ?? Environment.ProcessPath;
-            var outputFile = options.OutputFile ?? Constants.RelationsFileName;
+            var outputFile = options.OutputFile;
             var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude);
             var projectFilter = options.ProjectFilter;
             var pinnedProject = options.PinnedProject;
@@ -65,17 +65,12 @@ namespace CreateRelationsDiagram
 
             if (!string.IsNullOrEmpty(pinnedElement))
             {
-                selectedElement = GetPinnedElemet(references, pinnedElement);
+                selectedElement = FindPinnedElement(references, pinnedElement);
                 if (selectedElement != null)
                 {
                     foreach (var reference in references)
                     {
                         SetReferences(references, reference.Key, selectedElement, filteredRefeferences);
-
-                        if (reference.Key == selectedElement)
-                        {
-                            filteredRefeferences.AddReferences(reference.Key, reference.Value);
-                        }
                     }
                 }
             }

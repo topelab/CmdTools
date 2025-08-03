@@ -28,13 +28,23 @@ namespace CreateRelationsDiagram
             var packageReferences = withPackages ? document.Descendants()
                 .Where(d => d.Name.LocalName == "PackageReference")
                 .Where(d => d.Attribute("Include") != null)
-                .Select(d => new { Name = d.Attribute("Include").Value, Version = d.Attribute("Version")?.Value ?? d.Attribute("version")?.Value })
+                .Select(d => new { Name = d.Attribute("Include").Value, Version = ExtractVersion(d) })
                 .Select(d => $"{d.Name}{(string.IsNullOrEmpty(d.Version) ? string.Empty : "-")}{d.Version}:::pkg") : [];
 
             return projectReferences
                 .Select(r => Path.GetFileNameWithoutExtension(r))
                 .Where(v => !string.IsNullOrEmpty(v))
                 .Union(packageReferences);
+        }
+
+        private static string ExtractVersion(XElement d)
+        {
+            var version = d.Attribute("Version")?.Value ?? d.Attribute("version")?.Value;
+            if (string.IsNullOrEmpty(version))
+            {
+                version = d.Descendants().FirstOrDefault(e => e.Name.LocalName == "Version")?.Value;
+            }
+            return version;
         }
 
         public IEnumerable<string> GetProjects(string projectPath, HashSet<string> currentProjects = null, string basePath = null)

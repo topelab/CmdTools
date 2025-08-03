@@ -10,7 +10,7 @@ namespace CreateRelationsDiagram
             var assembly = options.Assembly;
             var nameSpace = options.NameSpace;
             var nameSpaceToClean = options.NameSpace ?? Path.GetFileNameWithoutExtension(options.Assembly);
-            var outputFile = options.OutputFile ?? Constants.RelationsFileName;
+            var outputFile = options.OutputFile;
             var className = options.ClassName;
 
             if (string.IsNullOrEmpty(assembly))

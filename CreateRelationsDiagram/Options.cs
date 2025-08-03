@@ -17,7 +17,7 @@ namespace CreateRelationsDiagram
         [Option('w', "WithPackages", Required = false, Default = false, HelpText = "Nuget packages will be collected", SetName = ProjectsGroup)]
         public bool WithPackages { get; set; }
 
-        [Option('p', "pinned", Required = false, HelpText = "Show all projects that use or is used by pinned project", SetName = ProjectsGroup)]
+        [Option('p', "pinned", Required = false, HelpText = "Show all parent projects that use pinned project", SetName = ProjectsGroup)]
         public string PinnedProject { get; set; }
 
 
@@ -30,7 +30,7 @@ namespace CreateRelationsDiagram
         [Option('c', "class", Required = false, HelpText = "Class name to process (if not set, all classes in the assembly will be processed)", SetName = ClassesGroup)]
         public string ClassName { get; set; }
 
-        [Option('o', "output", Required = false, Default = Constants.RelationsFileName, HelpText = $"Output file name (default: {Constants.RelationsFileName})")]
+        [Option('o', "output", Required = false, HelpText = $"Output file name (default: output to console)")]
         public string OutputFile { get; set; }
 
         [Option('e', "exclude", Required = false, HelpText = "Exclude specific elements from processing (regular expression)")]
