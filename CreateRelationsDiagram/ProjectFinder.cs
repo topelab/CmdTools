@@ -82,27 +82,37 @@ namespace CreateRelationsDiagram
             return filteredRefeferences;
         }
 
-        protected virtual void SetReferences(ReferencesBag references, string parentElement, string pinnedElement, ReferencesBag currentResults)
+        protected virtual void SetReferences(ReferencesBag references, string parentElement, string pinnedElement, ReferencesBag currentResults, HashSet<(string, string)> processed = null)
         {
+            processed ??= [];
+
+            if (string.IsNullOrEmpty(parentElement) || string.IsNullOrEmpty(pinnedElement) || processed.Contains((parentElement, pinnedElement)))
+            {
+                return;
+            }
+
             ReferencesBag results = [];
             if (references.TryGetValue(parentElement, out var elements))
             {
+                processed.Add((parentElement, pinnedElement));
+
                 elements
                     .Where(e => e == pinnedElement)
                     .ToList().ForEach(e => results.AddReference(parentElement, e));
 
                 elements
-                    .ToList().ForEach(e => SetReferences(references, e, pinnedElement, results));
+                    .ToList().ForEach(e => SetReferences(references, e, pinnedElement, results, processed));
 
                 foreach (var key in results.Keys.ToList())
                 {
-                    SetReferences(references, parentElement, key, results);
+                    SetReferences(references, parentElement, key, results, processed);
                 }
             }
 
             results.Keys
                 .ToList()
                 .ForEach(key => currentResults.AddReferences(key, results[key]));
+
         }
 
         protected virtual ReferencesBag GetReferences(HashSet<string> projectFiles)

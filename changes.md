@@ -1,3 +1,7 @@
+## CreateRelationsDiagram - 1.1.12
+
+- Fix pinning logic in `ProjectFinder` to ensure correct handling of pinned elements.
+
 ## CreateRelationsDiagram - 1.1.11
 
 Refactor ClassesFinder and update project version
