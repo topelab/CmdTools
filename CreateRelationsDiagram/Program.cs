@@ -1,4 +1,4 @@
-﻿namespace CreateRelationsDiagram
+namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
     using CommandLine;
@@ -8,6 +8,11 @@
     {
         static void Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                args = ["--help"];
+            }
+
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(Proceed);
         }
