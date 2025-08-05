@@ -7,7 +7,7 @@ namespace CreateRelationsDiagram
     using System.Reflection;
     using System.Text.RegularExpressions;
 
-    internal class ClassesFinder : ElementFinderBase, IElementFinder<Options>
+    internal class ClassesFinder : ElementFinderBase, IElementFinder
     {
         protected readonly IRelationGetterFactory relationGetterFactory;
 
@@ -16,8 +16,13 @@ namespace CreateRelationsDiagram
             this.relationGetterFactory = relationGetterFactory;
         }
 
-        public void Run(Options options)
+        public void Run<T>(T args) where T : class
         {
+            if (args is not ClassOptions options)
+            {
+                throw new ArgumentException("Invalid options type", nameof(args));
+            }
+
             var assembly = options.Assembly;
             var nameSpace = options.NameSpace;
             var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);

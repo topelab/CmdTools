@@ -11,10 +11,10 @@ namespace CreateRelationsDiagram
             return new ResolveInfoCollection()
                 .AddCollection(SharedSetupDI.Register())
                 .AddTransient<IProjectReferences, ProjectReferences>()
-                .AddTransient<IElementFinder<Options>, ProjectFinder>(nameof(FinderType.Projects))
-                .AddTransient<IElementFinder<Options>, ProjectFinder>(nameof(FinderType.ReverseProjects))
-                .AddTransient<IElementFinder<Options>, ClassesFinder>(nameof(FinderType.Classes))
-                .AddTransient<IElementFinder<Options>, ClassesFinder>(nameof(FinderType.ReverseClasses))
+                .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.Projects))
+                .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.ReverseProjects))
+                .AddTransient<IElementFinder, ClassesFinder>(nameof(FinderType.Classes))
+                .AddTransient<IElementFinder, ClassesFinder>(nameof(FinderType.ReverseClasses))
                 ;
         }
     }

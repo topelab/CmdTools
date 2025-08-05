@@ -10,7 +10,7 @@ namespace UpdateVersion
         {
             return new ResolveInfoCollection()
                 .AddCollection(SharedSetupDI.Register())
-                .AddTransient<IElementFinder<Options>, ProjectFinder>()
+                .AddTransient<IElementFinder, ProjectFinder>()
                 .AddTransient<IProjectUpdater, ProjectUpdater>()
 
                 .AddSingleton<IVersionSplitter, VersionSplitter>()

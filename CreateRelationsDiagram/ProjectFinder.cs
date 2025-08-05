@@ -4,7 +4,7 @@ namespace CreateRelationsDiagram
     using CmdTools.Shared;
     using System.Text.RegularExpressions;
 
-    internal class ProjectFinder : ElementFinderBase, IElementFinder<Options>
+    internal class ProjectFinder : ElementFinderBase, IElementFinder
     {
         protected readonly IProjectReferences projectReferences;
         protected readonly IFileExecutor fileExecutor;
@@ -17,9 +17,14 @@ namespace CreateRelationsDiagram
             this.relationGetterFactory = relationGetterFactory ?? throw new ArgumentNullException(nameof(relationGetterFactory));
         }
 
-        public virtual void Run(Options options)
+        public virtual void Run<T>(T args) where T : class
         {
-            var path = options.SolutionPath ?? Environment.ProcessPath;
+            if (args is not ProjectOptions options)
+            {
+                throw new ArgumentException("Invalid options type", nameof(args));
+            }
+
+            var path = options.RootPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile;
             var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude);
             var projectFilter = options.ProjectFilter;

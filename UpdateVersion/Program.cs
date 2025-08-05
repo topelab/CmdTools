@@ -15,7 +15,7 @@ namespace UpdateVersion
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var projectUpdater = resolver.Get<IElementFinder<Options>>();
+            var projectUpdater = resolver.Get<IElementFinder>();
 
             projectUpdater.Run(options.Resolve());
         }

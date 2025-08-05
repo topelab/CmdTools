@@ -13,14 +13,20 @@ namespace CreateRelationsDiagram
                 args = ["--help"];
             }
 
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(Proceed);
+            if (args.Length == 1)
+            {
+                args = [..args, "--help"];
+            }
+
+            Parser.Default.ParseArguments<ProjectOptions, ClassOptions>(args)
+                .WithParsed<ProjectOptions>(Proceed)
+                .WithParsed<ClassOptions>(Proceed);
         }
 
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var elementFinder = resolver.Get<IElementFinder<Options>>(options.FinderType.ToString());
+            var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
             elementFinder.Run(options);
         }
     }
