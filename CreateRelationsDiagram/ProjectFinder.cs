@@ -6,9 +6,9 @@ namespace CreateRelationsDiagram
 
     internal class ProjectFinder : ElementFinderBase, IElementFinder
     {
-        protected readonly IProjectReferences projectReferences;
-        protected readonly IFileExecutor fileExecutor;
-        protected readonly IRelationGetterFactory relationGetterFactory;
+        private readonly IProjectReferences projectReferences;
+        private readonly IFileExecutor fileExecutor;
+        private readonly IRelationGetterFactory relationGetterFactory;
 
         public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory)
         {
@@ -17,7 +17,7 @@ namespace CreateRelationsDiagram
             this.relationGetterFactory = relationGetterFactory ?? throw new ArgumentNullException(nameof(relationGetterFactory));
         }
 
-        public virtual void Run<T>(T args) where T : class
+        public void Run<T>(T args) where T : class
         {
             if (args is not ProjectOptions options)
             {
@@ -51,7 +51,7 @@ namespace CreateRelationsDiagram
             Finalize(content, outputFile);
         }
 
-        protected HashSet<string> GetProjectFiles()
+        private HashSet<string> GetProjectFiles()
         {
             HashSet<string> projectFiles = [];
             fileExecutor.RunOnFiles(file =>
@@ -62,29 +62,29 @@ namespace CreateRelationsDiagram
             return projectFiles;
         }
 
-        protected virtual ReferencesBag GetFilteredReferences(string pinnedElement, HashSet<string> projectFiles, out string selectedElement)
+        private ReferencesBag GetFilteredReferences(string pinnedElement, HashSet<string> projectFiles, out string selectedElement)
         {
-            ReferencesBag filteredRefeferences = [];
+            ReferencesBag filteredReferences = [];
             selectedElement = null;
 
             if (!string.IsNullOrEmpty(pinnedElement))
             {
-                var inverseReferences = GetInverseReferences(projectFiles);
+                var inverseReferences = projectReferences.GetInverseReferences(projectFiles);
                 selectedElement = FindPinnedElement(inverseReferences, pinnedElement);
                 if (selectedElement != null)
                 {
-                    SetInverseReferences(inverseReferences, selectedElement, selectedElement, filteredRefeferences);
+                    SetReferences(inverseReferences, selectedElement, selectedElement, filteredReferences);
                 }
             }
             else
             {
-                filteredRefeferences = GetReferences(projectFiles);
+                filteredReferences = projectReferences.GetReferences(projectFiles);
             }
 
-            return filteredRefeferences;
+            return filteredReferences;
         }
 
-        protected virtual void SetReferences(ReferencesBag references, string parentElement, string pinnedElement, ReferencesBag currentResults, HashSet<(string, string)> processed = null)
+        private void SetReferences(ReferencesBag references, string parentElement, string pinnedElement, ReferencesBag currentResults, HashSet<(string, string)> processed = null)
         {
             processed ??= [];
 
@@ -99,72 +99,40 @@ namespace CreateRelationsDiagram
                 processed.Add((parentElement, pinnedElement));
 
                 elements
-                    .Where(e => e == pinnedElement)
                     .ToList().ForEach(e => results.AddReference(parentElement, e));
 
                 elements
                     .ToList().ForEach(e => SetReferences(references, e, pinnedElement, results, processed));
 
-                foreach (var key in results.Keys.ToList())
+            }
+
+            results.Keys
+                .ToList()
+                .ForEach(key => currentResults.AddReferences(key, results[key]));
+
+        }
+
+        private string FindPinnedElement(ReferencesBag references, string pinnedElement)
+        {
+            var pinned =
+                references.Keys.FirstOrDefault(p => p.Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase))
+                    ?? references.Keys.FirstOrDefault(p => p.Split('-')[0].Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase));
+
+            if (pinned == null)
+            {
+                if (pinnedElement.Contains('-'))
                 {
-                    SetReferences(references, parentElement, key, results, processed);
+                    pinned = references.Keys.FirstOrDefault(p => p.StartsWith(pinnedElement, StringComparison.CurrentCultureIgnoreCase))
+                        ?? references.SelectMany(r => r.Value).FirstOrDefault(r => r.StartsWith(pinnedElement, StringComparison.CurrentCultureIgnoreCase));
+                }
+                else
+                {
+                    var allReferences = references.SelectMany(r => r.Value).ToList();
+                    pinned = allReferences.FirstOrDefault(r => r.Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase))
+                        ?? allReferences.FirstOrDefault(r => r.Split('-')[0].Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase));
                 }
             }
-
-            results.Keys
-                .ToList()
-                .ForEach(key => currentResults.AddReferences(key, results[key]));
-
-        }
-
-        protected virtual void SetInverseReferences(ReferencesBag references, string parentElement, string pinnedElement, ReferencesBag currentResults, HashSet<(string, string)> processed = null)
-        {
-            processed ??= [];
-
-            if (string.IsNullOrEmpty(parentElement) || string.IsNullOrEmpty(pinnedElement) || processed.Contains((parentElement, pinnedElement)))
-            {
-                return;
-            }
-
-            ReferencesBag results = [];
-            if (references.TryGetValue(parentElement, out var elements))
-            {
-                processed.Add((parentElement, pinnedElement));
-
-                elements
-                    .ToList().ForEach(e => results.AddReference(parentElement, e));
-
-                elements
-                    .ToList().ForEach(e => SetInverseReferences(references, e, pinnedElement, results, processed));
-
-            }
-
-            results.Keys
-                .ToList()
-                .ForEach(key => currentResults.AddReferences(key, results[key]));
-
-        }
-
-        protected virtual ReferencesBag GetReferences(HashSet<string> projectFiles)
-        {
-            ReferencesBag references = [];
-            foreach (var file in projectFiles)
-            {
-                references[Path.GetFileNameWithoutExtension(file)] = [.. projectReferences.Get(file)];
-            }
-
-            return references;
-        }
-
-        protected virtual ReferencesBag GetInverseReferences(HashSet<string> projectFiles)
-        {
-            ReferencesBag references = [];
-            foreach (var file in projectFiles)
-            {
-                this.projectReferences.Get(file).ToList().ForEach(r => references.AddReference(r, Path.GetFileNameWithoutExtension(file)));
-            }
-
-            return references;
+            return pinned;
         }
     }
 }

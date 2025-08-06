@@ -34,28 +34,5 @@ namespace CreateRelationsDiagram
                 Console.WriteLine($"Diagram created at: {outputFile}");
             }
         }
-
-        protected string FindPinnedElement(ReferencesBag references, string pinnedElement)
-        {
-            var pinned =
-                references.Keys.FirstOrDefault(p => p.Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase))
-                    ?? references.Keys.FirstOrDefault(p => p.Split('-')[0].Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase));
-
-            if (pinned == null)
-            {
-                if (pinnedElement.Contains('-'))
-                {
-                    pinned = references.Keys.FirstOrDefault(p => p.StartsWith(pinnedElement, StringComparison.CurrentCultureIgnoreCase))
-                        ?? references.SelectMany(r => r.Value).FirstOrDefault(r => r.StartsWith(pinnedElement, StringComparison.CurrentCultureIgnoreCase));
-                }
-                else
-                {
-                    var allReferences = references.SelectMany(r => r.Value).ToList();
-                    pinned = allReferences.FirstOrDefault(r => r.Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase))
-                        ?? allReferences.FirstOrDefault(r => r.Split('-')[0].Equals(pinnedElement, StringComparison.CurrentCultureIgnoreCase));
-                }
-            }
-            return pinned;
-        }
     }
 }

@@ -1,3 +1,7 @@
+## CreateRelationsDiagram - 1.1.15
+
+- Small refactor in `ProjectReferences` and `ProjectFinder` to improve `GetFilteredReferences` method.
+
 ## CreateRelationsDiagram - 1.1.14
 
 - Updated version numbers in project files.

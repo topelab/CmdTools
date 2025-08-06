@@ -1,5 +1,6 @@
 namespace CreateRelationsDiagram
 {
+    using CmdTools.Shared;
     using System.Collections.Generic;
     using System.Xml.Linq;
 
@@ -36,6 +37,29 @@ namespace CreateRelationsDiagram
                 .Where(v => !string.IsNullOrEmpty(v))
                 .Union(packageReferences);
         }
+
+        public ReferencesBag GetReferences(HashSet<string> projectFiles)
+        {
+            ReferencesBag references = [];
+            foreach (var file in projectFiles)
+            {
+                references[Path.GetFileNameWithoutExtension(file)] = [.. Get(file)];
+            }
+
+            return references;
+        }
+
+        public ReferencesBag GetInverseReferences(HashSet<string> projectFiles)
+        {
+            ReferencesBag references = [];
+            foreach (var file in projectFiles)
+            {
+                Get(file).ToList().ForEach(r => references.AddReference(r, Path.GetFileNameWithoutExtension(file)));
+            }
+
+            return references;
+        }
+
 
         private static string ExtractVersion(XElement d)
         {
