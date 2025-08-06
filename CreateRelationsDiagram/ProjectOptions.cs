@@ -18,6 +18,8 @@ namespace CreateRelationsDiagram
         [Option('w', "with-packages", Required = false, Default = false, HelpText = "Nuget packages will be collected")]
         public bool WithPackages { get; set; }
 
-        public override FinderType FinderType => Reverse ? FinderType.ReverseProjects : FinderType.Projects;
+        public override FinderType FinderType => string.IsNullOrEmpty(PinnedProject)
+            ? Reverse ? FinderType.ReverseProjects : FinderType.Projects
+            : Reverse ? FinderType.Projects : FinderType.ReverseProjects;
     }
 }

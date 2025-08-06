@@ -14,13 +14,13 @@ namespace CreateRelationsDiagram
         [Option('r', "reverse", Required = false, Default = false, HelpText = "Reverse the direction of the relations in the diagram")]
         public bool Reverse { get; set; }
 
-        [Option('d', "direction", Required = false, Default = Direction.TopToDown, HelpText = "Direction of the diagram (TopToDown, LefToRight, RightToLeft or BottomToTop; default: TopToDown)")]
+        [Option('d', "direction", Required = false, Default = Direction.TopToDown, HelpText = "Direction of the diagram (TopToDown or TD, LefToRight or LR, RightToLeft or RL, BottomToTop or BT; default: TopToDown)")]
         public Direction Direction { get; set; }
 
-        [Option('t', "theme", Required = false, Default = Theme.NeoDark, HelpText = "Theme of the diagram (Default, Base, MermaidChart, Neo, NeoDark, Forest, Dark or Neutral; default: NeoDark)")]
+        [Option('t', "theme", Required = false, Default = Theme.NeoDark, HelpText = "Theme of the diagram (Default, Base, MermaidChart, Neo, NeoDark, Forest, Dark, Neutral; default: NeoDark)")]
         public Theme Theme { get; set; }
 
-        [Option('l', "layout", Required = false, Default = Layout.Adaptive, HelpText = "Layout of the diagram (Hierarchical or Adaptative; default: Adaptative)")]
+        [Option('l', "layout", Required = false, Default = Layout.Adaptive, HelpText = "Layout of the diagram (Hierarchical, Adaptative; default: Adaptative)")]
         public Layout Layout { get; set; }
 
         public abstract FinderType FinderType { get; }

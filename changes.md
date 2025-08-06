@@ -1,3 +1,15 @@
+## CreateRelationsDiagram - 1.1.14
+
+- Updated version numbers in project files.
+- Added shorthand values to `Direction` enum.
+- Improved `FindPinnedElement` logic in `ElementFinderBase`.
+- Enhanced help text for options in `Options.cs`.
+- Refactored `GetFilteredReferences` in `ProjectFinder`.
+- Introduced `SetInverseReferences` and `GetInverseReferences` methods.
+- Modified `FinderType` logic in `ProjectOptions` to consider `PinnedProject`.
+- Updated `changes.md` and `version.txt` for new versioning.
+
+
 ## CreateRelationsDiagram - 1.1.13
 
 - Options class refactoring

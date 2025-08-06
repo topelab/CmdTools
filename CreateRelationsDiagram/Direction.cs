@@ -6,11 +6,19 @@ namespace CreateRelationsDiagram
     {
         [Description("TD")]
         TopToDown,
+        [Description("TD")]
+        TD,
         [Description("LR")]
         LeftToRight,
+        [Description("LR")]
+        LR,
         [Description("RL")]
         RightToLeft,
+        [Description("RL")]
+        RL,
         [Description("BT")]
-        BottomToTop
+        BottomToTop,
+        [Description("BT")]
+        BT,
     }
 }
