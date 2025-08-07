@@ -1,3 +1,8 @@
+## 1.1.19
+
+- Updating System.CodeDom to 9.0.8
+- Updating Topelab.Core.Resolver.Microsoft to 1.9.1
+
 ## CreateRelationsDiagram - 1.1.15
 
 - Small refactor in `ProjectReferences` and `ProjectFinder` to improve `GetFilteredReferences` method.
