@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Common/">
+    <Project Path="Contracts/Contracts.csproj" />
+    <Project Path="Shared/Shared.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="CreateRelationsDiagram/CreateRelationsDiagram.csproj" />
+    <Project Path="RunCustomTool/RunCustomTool.csproj" />
+    <Project Path="UpdateVersion/UpdateVersion.csproj" />
+  </Folder>
+  <Folder Name="/_Info/">
+    <File Path=".editorconfig" />
+    <File Path="changes.md" />
+    <File Path="inverso.mmd" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+    <File Path="sample.mmd" />
+    <File Path="version.txt" />
+  </Folder>
+</Solution>
