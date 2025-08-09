@@ -1,21 +1,33 @@
-﻿using CommandLine;
-using Topelab.Core.Resolver.Microsoft;
-
 namespace CreateRelationsDiagram
 {
+    using CmdTools.Contracts;
+    using CommandLine;
+    using Topelab.Core.Resolver.Microsoft;
+
     internal class Program
     {
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(Proceed);
+            if (args.Length == 0)
+            {
+                args = ["--help"];
+            }
+
+            if (args.Length == 1)
+            {
+                args = [..args, "--help"];
+            }
+
+            Parser.Default.ParseArguments<ProjectOptions, ClassOptions>(args)
+                .WithParsed<ProjectOptions>(Proceed)
+                .WithParsed<ClassOptions>(Proceed);
         }
 
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var projectFinder = resolver.Get<IProjectFinder>(options.Reverse.ToString());
-            projectFinder.Run(options);
+            var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
+            elementFinder.Run(options);
         }
     }
 }

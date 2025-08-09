@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace UpdateVersion
 {
-    internal class ProjectFinder : IProjectFinder
+    using CmdTools.Contracts;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
+    internal class ProjectFinder : IElementFinder
     {
         private readonly IFileExecutor fileExecutor;
         private readonly IProjectUpdater projectUpdater;
@@ -20,8 +21,13 @@ namespace UpdateVersion
             this.versionBumper = versionBumper ?? throw new ArgumentNullException(nameof(versionBumper));
         }
 
-        public void Run(Options options)
+        public void Run<T>(T args) where T : class
         {
+            if (args is not Options options)
+            {
+                throw new ArgumentException("Invalid options type", nameof(args));
+            }
+
             string basePath = options.BasePath ?? AppContext.BaseDirectory;
             IEnumerable<string> versions = options.Versions;
 

@@ -1,22 +1,28 @@
-﻿using CommandLine;
-
 namespace CreateRelationsDiagram
 {
-    internal class Options
-    {
-        [Option('s', "solution", Required = false, HelpText = "Set solution path")]
-        public string SolutionPath { get; set; }
+    using CmdTools.Contracts;
+    using CommandLine;
 
-        [Option('o', "output", Required = false, Default = Constants.RelationsFileName, HelpText = $"Output file name (default: {Constants.RelationsFileName})")]
+    internal abstract class Options
+    {
+        [Option('o', "output", Required = false, HelpText = $"Output file name (default: output to console)")]
         public string OutputFile { get; set; }
 
-        [Option('p', "project", Required = false, HelpText = "Filter by project (if not set, all projects in the solution will be processed)")]
-        public string ProjectFilter { get; set; }
-
-        [Option('e', "exclude", Required = false, HelpText = "Exclude specific projects from processing (comma-separated list)")]
-        public IEnumerable<string> Exclude { get; set; }
+        [Option('e', "exclude", Required = false, HelpText = "Exclude specific elements from processing (regular expression)")]
+        public string Exclude { get; set; }
 
         [Option('r', "reverse", Required = false, Default = false, HelpText = "Reverse the direction of the relations in the diagram")]
         public bool Reverse { get; set; }
+
+        [Option('d', "direction", Required = false, Default = Direction.TopToDown, HelpText = "Direction of the diagram (TopToDown or TD, LefToRight or LR, RightToLeft or RL, BottomToTop or BT; default: TopToDown)")]
+        public Direction Direction { get; set; }
+
+        [Option('t', "theme", Required = false, Default = Theme.NeoDark, HelpText = "Theme of the diagram (Default, Base, MermaidChart, Neo, NeoDark, Forest, Dark, Neutral; default: NeoDark)")]
+        public Theme Theme { get; set; }
+
+        [Option('l', "layout", Required = false, Default = Layout.Adaptive, HelpText = "Layout of the diagram (Hierarchical, Adaptative; default: Adaptative)")]
+        public Layout Layout { get; set; }
+
+        public abstract FinderType FinderType { get; }
     }
 }

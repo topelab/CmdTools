@@ -1,9 +1,9 @@
-using CommandLine;
-using CommandLine.Text;
-using System.Collections.Generic;
-
 namespace UpdateVersion
 {
+    using CommandLine;
+    using CommandLine.Text;
+    using System.Collections.Generic;
+
     /// <summary>
     /// Arguments options
     /// </summary>

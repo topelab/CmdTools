@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace UpdateVersion
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
     internal class VersionBumper : IVersionBumper
     {
         private readonly IVersionSplitter versionSplitter;

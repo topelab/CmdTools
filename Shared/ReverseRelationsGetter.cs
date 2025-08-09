@@ -1,0 +1,48 @@
+namespace CmdTools.Shared
+{
+    using CmdTools.Contracts;
+    using System.Text;
+
+    internal class ReverseRelationsGetter : RelationsGetter
+    {
+        public override string Get(IReferencesBag references, string elementFilter)
+        {
+            HashSet<string> welcomeElements = [];
+
+            references.Keys
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
+                .ToList()
+                .ForEach(p => welcomeElements.Add(p));
+
+            int count;
+
+            do
+            {
+                count = welcomeElements.Count;
+                welcomeElements
+                    .Where(p => references.ContainsKey(p))
+                    .ToList()
+                    .ForEach(p => references[p].ToList().ForEach(r => welcomeElements.Add(r)));
+            }
+            while (count != welcomeElements.Count);
+
+            var elementsToProcess = welcomeElements
+                .Where(p => references.ContainsKey(p))
+                .ToList();
+
+            var content = new StringBuilder();
+
+            List<(string element, string reference)> contentResult = [];
+            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
+
+            contentResult
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
+                .OrderBy(p => p.reference)
+                .ThenBy(p => p.element)
+                .ToList()
+                .ForEach(p => content.AppendLine($"\t{p.reference} -->\t{p.element} "));
+
+            return content.ToString();
+        }
+    }
+}

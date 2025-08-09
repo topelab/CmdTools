@@ -1,10 +1,10 @@
-﻿using Microsoft.CSharp;
-using System.CodeDom;
-using System.CodeDom.Compiler;
-using System.Resources.Tools;
-
 namespace RunCustomTool
 {
+    using Microsoft.CSharp;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
+    using System.Resources.Tools;
+
     internal class Program
     {
         static void Main(string[] args)

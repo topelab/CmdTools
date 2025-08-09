@@ -1,9 +1,9 @@
-﻿using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-
 namespace UpdateVersion
 {
+    using System.IO;
+    using System.Linq;
+    using System.Xml.Linq;
+
     internal class ProjectUpdater : IProjectUpdater
     {
         private const string VersionNodeName = "Version";

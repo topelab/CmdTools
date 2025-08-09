@@ -1,8 +1,9 @@
-﻿using CommandLine;
-using Topelab.Core.Resolver.Microsoft;
-
 namespace UpdateVersion
 {
+    using CmdTools.Contracts;
+    using CommandLine;
+    using Topelab.Core.Resolver.Microsoft;
+
     internal class Program
     {
         static void Main(string[] args)
@@ -14,7 +15,7 @@ namespace UpdateVersion
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var projectUpdater = resolver.Get<IProjectFinder>();
+            var projectUpdater = resolver.Get<IElementFinder>();
 
             projectUpdater.Run(options.Resolve());
         }
