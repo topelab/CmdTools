@@ -1,8 +1,12 @@
+## 1.1.20
+
+- Changed solution type to `slnx`
+- Replaced nuget package `Topelab.Core.Resolver.Microsoft` with `Topelab.Core.Resolver.Microsoft.csproj`
+
 ## 1.1.19
 
 - Updating System.CodeDom to 9.0.8
 - Updating Topelab.Core.Resolver.Microsoft to 1.9.1
-- Changed solution type to `slnx`
 
 ## CreateRelationsDiagram - 1.1.15
 

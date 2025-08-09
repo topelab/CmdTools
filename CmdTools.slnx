@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/Common/">
+    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver.Microsoft/Topelab.Core.Resolver.Microsoft.csproj" />
+    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver/Topelab.Core.Resolver.csproj" />
     <Project Path="Contracts/Contracts.csproj" />
     <Project Path="Shared/Shared.csproj" />
   </Folder>
