@@ -1,3 +1,7 @@
+## 1.1.21
+
+- Updating System.CodeDom to 9.0.9
+
 ## 1.1.20
 
 - Changed solution type to `slnx`
