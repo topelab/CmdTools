@@ -30,6 +30,11 @@ namespace UpdateVersion
 
             string basePath = options.BasePath ?? AppContext.BaseDirectory;
             IEnumerable<string> versions = options.Versions;
+            if (ExistDirectoryBuildProps(basePath))
+            {
+                Console.WriteLine("Directory.Build.props found. Please, update versions there.");
+                return;
+            }
 
             var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
             fileExecutor.Initialize(basePath, Constants.FilePattern);
@@ -37,6 +42,12 @@ namespace UpdateVersion
             {
                 fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
             }
+        }
+
+        private bool ExistDirectoryBuildProps(string basePath)
+        {
+            var file = Path.Combine(basePath, "Directory.Build.props");
+            return File.Exists(file);
         }
 
         private Dictionary<string, string> TryGetVersions(IEnumerable<string> versions)
