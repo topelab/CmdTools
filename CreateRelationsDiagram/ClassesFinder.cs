@@ -26,7 +26,7 @@ namespace CreateRelationsDiagram
             var assembly = options.Assembly;
             var nameSpace = options.NameSpace;
             var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);
-            var outputFile = options.OutputFile;
+            var outputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
             var className = options.ClassName;
             var excludeClasses = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
 
@@ -46,7 +46,7 @@ namespace CreateRelationsDiagram
                     className);
 
                 content = GetComposition(content, options.Theme, options.Layout, options.Direction);
-                Finalize(content, outputFile);
+                Finalize(content, outputFile, options.OpenOutput);
             }
         }
 

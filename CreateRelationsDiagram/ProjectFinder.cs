@@ -25,10 +25,10 @@ namespace CreateRelationsDiagram
             }
 
             var path = options.RootPath ?? Environment.ProcessPath;
-            var outputFile = options.OutputFile;
+            var outputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
             var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude);
             var projectFilter = options.ProjectFilter;
-            var pinnedProject = options.PinnedProject;
+            var pinnedProject = options.PinnedProject?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
 
             projectReferences.Initialize(options.WithPackages);
             fileExecutor.Initialize(path, Constants.FilePattern, excludeProjects);
@@ -48,7 +48,7 @@ namespace CreateRelationsDiagram
                 content = content.Replace($"\t{selectedElement} ", $"\t{selectedElement}:::pinned");
                 content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
             }
-            Finalize(content, outputFile);
+            Finalize(content, outputFile, options.OpenOutput);
         }
 
         private HashSet<string> GetProjectFiles()

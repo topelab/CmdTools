@@ -23,6 +23,9 @@ namespace CreateRelationsDiagram
         [Option('l', "layout", Required = false, Default = Layout.Adaptive, HelpText = "Layout of the diagram (Hierarchical, Adaptative; default: Adaptative)")]
         public Layout Layout { get; set; }
 
+        [Option("open", Required = false, Default = false, HelpText = "Open the output file after creation (default: false)")]
+        public bool OpenOutput { get; set; }
+
         public abstract FinderType FinderType { get; }
     }
 }
