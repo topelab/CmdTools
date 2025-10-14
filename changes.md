@@ -1,3 +1,7 @@
+## 1.1.22
+
+- Added `--open` option to automatically open the generated diagram after creation.
+
 ## 1.1.21
 
 - Updating System.CodeDom to 9.0.9
