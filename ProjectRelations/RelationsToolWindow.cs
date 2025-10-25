@@ -62,9 +62,23 @@ namespace ProjectRelations
                        "<html>" +
                        "<head>" +
                        "  <meta charset=\"utf-8\">" +
-                       "  <script src=\"https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js\"></script>" +
-                       "  <style>body { margin:10px; padding:0 }</style>" +
-                       "  <script>mermaid.initialize({ startOnLoad:true });</script>" +
+                       """
+                       <script type="module">
+                         import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
+                         import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
+
+                         // Registra el motor ELK con Mermaid
+                         mermaid.registerLayoutLoaders(elkLayouts);
+
+                         // Inicializa Mermaid
+                         mermaid.initialize({
+                            startOnLoad: true,
+                            flowchart: { defaultRenderer: "elk" }
+                            });
+                       </script>
+                       
+                       """ +
+                       "  <style>body { margin:10px; padding:0; background-color: black; }</style>" +
                        "</head>" +
                        "<body>" +
                        "<div class=\"mermaid\">" + encoded + "</div>" +

@@ -17,8 +17,8 @@ namespace CreateRelationsDiagram
                 {content}
 
                 classDef pkg fill:#658;
-                classDef pinned stroke-width:10px;
-                classDef pinnedpkg fill:#658, stroke-width:10px;
+                classDef pinned stroke:orange, stroke-width:2px, stroke-dasharray: 3 2;
+                classDef pinnedpkg fill:#658, stroke:orange, stroke-width:2px, stroke-dasharray: 3 2;
                 """;
         }
 

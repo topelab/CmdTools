@@ -21,7 +21,7 @@
         <Icon guid="ImageCatalogGuid" id="Relationship" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Show projects used by this project</ButtonText>
+          <ButtonText>Projects USED BY this project</ButtonText>
           <LocCanonicalName>.ProjectRelations.OpenUsedByProjectCommand</LocCanonicalName>
         </Strings>
       </Button>
@@ -30,7 +30,7 @@
         <Icon guid="ImageCatalogGuid" id="Relationship" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Show projects using this project</ButtonText>
+          <ButtonText>Projects USING this project</ButtonText>
           <LocCanonicalName>.ProjectRelations.OpenUsingProjectCommand</LocCanonicalName>
         </Strings>
       </Button>
