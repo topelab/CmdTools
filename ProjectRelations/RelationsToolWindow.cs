@@ -12,12 +12,15 @@ namespace ProjectRelations
     public partial class RelationsToolWindow : Form
     {
         private WebView2 webView;
+        private readonly UserSettings userSettings;
+
 
         /// <summary>
         /// Crea una nueva instancia del control de la ToolWindow.
         /// </summary>
-        public RelationsToolWindow(string mmdFile)
+        public RelationsToolWindow(string mmdFile, UserSettings userSettings)
         {
+            this.userSettings = userSettings;
             InitializeComponent();
             _ = InitializeAsync(mmdFile);
         }
@@ -30,8 +33,8 @@ namespace ProjectRelations
 
             try
             {
-                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AppName");
-                Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", path);
+                string webView2UserDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
+                Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", webView2UserDataPath);
                 await webView.EnsureCoreWebView2Async();
                 Generate(mmdFile);
             }
@@ -57,6 +60,7 @@ namespace ProjectRelations
 
         private void RenderMermaid(string mmd)
         {
+            var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
             var encoded = System.Net.WebUtility.HtmlEncode(mmd);
             var html = "<!doctype html>" +
                        "<html>" +
@@ -78,7 +82,7 @@ namespace ProjectRelations
                        </script>
                        
                        """ +
-                       "  <style>body { margin:10px; padding:0; background-color: black; }</style>" +
+                       "  <style>body { margin:10px; padding:0; background-color: " + color + "; }</style>" +
                        "</head>" +
                        "<body>" +
                        "<div class=\"mermaid\">" + encoded + "</div>" +

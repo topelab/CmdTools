@@ -1,5 +1,7 @@
 namespace ProjectRelations
 {
+    using ProjectRelations.Services;
+
     [Command(PackageIds.OpenUsedByProjectCommand)]
     internal sealed class OpenUsedByProjectCommand : BaseCommand<OpenUsedByProjectCommand>
     {
@@ -16,7 +18,7 @@ namespace ProjectRelations
             }
 
             var sel = selectedItems.Item(1);
-            EnvDTE.Project project = sel.Project ?? sel.ProjectItem?.ContainingProject;
+            var project = sel.Project ?? sel.ProjectItem?.ContainingProject;
 
             if (project == null)
             {
@@ -24,7 +26,8 @@ namespace ProjectRelations
                 return;
             }
 
-            new ProjectRelationsOpener().OpenUsedByProject(project.FullName, project.Name);
+            var projectRelationsOpener = SetupDI.Container.GetInstance<IProjectRelationsOpener>();
+            projectRelationsOpener.OpenUsedByProject(project.FullName, project.Name);
         }
     }
 }

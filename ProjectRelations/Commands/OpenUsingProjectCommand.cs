@@ -1,5 +1,7 @@
 namespace ProjectRelations
 {
+    using ProjectRelations.Services;
+
     [Command(PackageIds.OpenUsingProjectCommand)]
     internal sealed class OpenUsingProjectCommand : BaseCommand<OpenUsingProjectCommand>
     {
@@ -35,7 +37,8 @@ namespace ProjectRelations
             // Directorio de la solución
             var solutionDir = System.IO.Path.GetDirectoryName(solutionFullName);
 
-            new ProjectRelationsOpener().OpenUsingProject(solutionDir, project.Name);
+            var projectRelationsOpener = SetupDI.Container.GetInstance<IProjectRelationsOpener>();
+            projectRelationsOpener.OpenUsingProject(solutionDir, project.Name);
         }
     }
 }
