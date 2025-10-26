@@ -26,7 +26,7 @@ namespace ProjectRelations
                 return;
             }
 
-            var projectRelationsOpener = SetupDI.Container.GetInstance<IProjectRelationsOpener>();
+            var projectRelationsOpener = SetupDI.Resolver.Get<IProjectRelationsOpener>();
             projectRelationsOpener.OpenUsedByProject(project.FullName, project.Name);
         }
     }

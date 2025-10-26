@@ -37,7 +37,7 @@ namespace ProjectRelations
             // Directorio de la solución
             var solutionDir = System.IO.Path.GetDirectoryName(solutionFullName);
 
-            var projectRelationsOpener = SetupDI.Container.GetInstance<IProjectRelationsOpener>();
+            var projectRelationsOpener = SetupDI.Resolver.Get<IProjectRelationsOpener>();
             projectRelationsOpener.OpenUsingProject(solutionDir, project.Name);
         }
     }
