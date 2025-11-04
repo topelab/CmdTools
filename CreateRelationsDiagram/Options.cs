@@ -3,7 +3,7 @@ namespace CreateRelationsDiagram
     using CmdTools.Contracts;
     using CommandLine;
 
-    internal abstract class Options
+    public abstract class Options
     {
         [Option('o', "output", Required = false, HelpText = $"Output file name (default: output to console)")]
         public string OutputFile { get; set; }

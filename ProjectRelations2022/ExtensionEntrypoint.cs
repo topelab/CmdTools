@@ -1,7 +1,9 @@
-﻿namespace ProjectRelations2022
+namespace ProjectRelations2022
 {
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.Extensibility;
+    using ProjectRelations2022.Services;
+    using Topelab.Core.Resolver.Microsoft;
 
     /// <summary>
     /// Extension entrypoint for the VisualStudio.Extensibility extension.
@@ -24,8 +26,7 @@
         protected override void InitializeServices(IServiceCollection serviceCollection)
         {
             base.InitializeServices(serviceCollection);
-
-            // You can configure dependency injection here by adding services to the serviceCollection.
+            serviceCollection.AddResolver(SetupDI.GetResolveInfoCollection());
         }
     }
 }

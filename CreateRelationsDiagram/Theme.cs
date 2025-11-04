@@ -2,7 +2,7 @@ namespace CreateRelationsDiagram
 {
     using System.ComponentModel;
 
-    internal enum Theme
+    public enum Theme
     {
         [Description("default")]
         Default,

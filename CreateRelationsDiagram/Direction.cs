@@ -2,7 +2,7 @@ namespace CreateRelationsDiagram
 {
     using System.ComponentModel;
 
-    internal enum Direction
+    public enum Direction
     {
         [Description("TD")]
         TopToDown,

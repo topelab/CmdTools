@@ -4,7 +4,7 @@ namespace CreateRelationsDiagram
     using CommandLine;
 
     [Verb("classes", HelpText = "Manage class options for CreateRelationsDiagram.")]
-    internal class ClassOptions : Options
+    public class ClassOptions : Options
     {
         [Option('a', "assembly", Required = false, HelpText = "Assembly (full path to dll) where classes will be processed")]
         public string Assembly { get; set; }

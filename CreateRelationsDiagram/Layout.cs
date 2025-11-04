@@ -2,7 +2,7 @@ namespace CreateRelationsDiagram
 {
     using System.ComponentModel;
 
-    internal enum Layout
+    public enum Layout
     {
         [Description("dagre")]
         Hierarchical,

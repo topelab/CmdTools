@@ -1,3 +1,4 @@
 {
-  "ProjectRelations2022.Command1.DisplayName": "Sample Remote Command"
+  "ProjectRelations2022.OpenUsedByProjectCommand.DisplayName": "Projects USED BY this project",
+  "ProjectRelations2022.OpenUsingProjectCommand.DisplayName": "Projects USING this project"
 }

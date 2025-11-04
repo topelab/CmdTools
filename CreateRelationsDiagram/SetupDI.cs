@@ -4,9 +4,9 @@ namespace CreateRelationsDiagram
     using CmdTools.Shared;
     using Topelab.Core.Resolver.Entities;
 
-    internal class SetupDI
+    public class SetupDI
     {
-        internal static ResolveInfoCollection Register()
+        public static ResolveInfoCollection Register()
         {
             return new ResolveInfoCollection()
                 .AddCollection(SharedSetupDI.Register())

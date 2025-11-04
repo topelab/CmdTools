@@ -4,7 +4,7 @@ namespace CreateRelationsDiagram
     using CommandLine;
 
     [Verb("projects", isDefault: true, HelpText = "Manage project options for CreateRelationsDiagram.")]
-    internal class ProjectOptions : Options
+    public class ProjectOptions : Options
     {
         [Option('s', "root", Required = false, HelpText = "Set root path")]
         public string RootPath { get; set; }
