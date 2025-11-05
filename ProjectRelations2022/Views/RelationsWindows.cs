@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using Microsoft.VisualStudio.Extensibility.UI;
 using ProjectRelations2022.DTO;
 
 namespace ProjectRelations2022.Views
@@ -7,15 +8,17 @@ namespace ProjectRelations2022.Views
     /// <summary>
     /// Ventana WPF que muestra un diagrama Mermaid usando WebView2.
     /// </summary>
-    public partial class RelationsWindow : Window
+    public class RelationsWindow : RemoteUserControl
     {
+
         private readonly UserSettings userSettings;
 
-        public RelationsWindow(string mmdFile, UserSettings userSettings)
+
+        public RelationsWindow(string mmdFile, UserSettings userSettings) : base(null, null)
         {
             this.userSettings = userSettings;
-            InitializeComponent();
-            this.Loaded += async (s, e) => await InitializeAsync(mmdFile);
+            var inizialer = InitializeAsync(mmdFile);
+            inizialer.Start();
         }
 
         private void RelationsWindow_Loaded(object sender, RoutedEventArgs e)
@@ -29,7 +32,7 @@ namespace ProjectRelations2022.Views
             {
                 var envPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
                 System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", envPath);
-                await webView.EnsureCoreWebView2Async();
+                //await webView.EnsureCoreWebView2Async();
                 Generate(mmdFile);
             }
             catch
@@ -77,7 +80,7 @@ namespace ProjectRelations2022.Views
 
             try
             {
-                webView.CoreWebView2.NavigateToString(html);
+                //webView.CoreWebView2.NavigateToString(html);
             }
             catch
             {

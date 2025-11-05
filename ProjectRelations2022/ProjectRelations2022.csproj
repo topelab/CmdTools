@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" PrivateAssets="all" />
@@ -12,5 +11,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />
     <ProjectReference Include="..\CreateRelationsDiagram\CreateRelationsDiagram.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Views\RelationsWindows.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 </Project>
