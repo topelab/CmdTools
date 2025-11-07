@@ -4,8 +4,8 @@ namespace ProjectRelations2022.Services
     using CreateRelationsDiagram;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Internal.VisualStudio.Extensibility.Framework;
-    using Microsoft.VisualStudio.Threading;
     using ProjectRelations2022.DTO;
+    using ProjectRelations2022.Views;
     using System.IO;
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
@@ -17,20 +17,32 @@ namespace ProjectRelations2022.Services
         public ProjectRelationsOpener(IUserSettingsFactory userSettingsFactory)
         {
             userSettings = userSettingsFactory.Create();
+            var envPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
+            System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", envPath);
         }
 
-        public async Task OpenUsedByProjectAsync(string projectPath, string projectName)
+        public async Task<RelationsWindowsContext> OpenUsedByProjectAsync(string projectPath, string projectName)
         {
+            var relationsWindowsContext = new RelationsWindowsContext();
             var outputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"used-by-{projectName.ToLower()}.mmd");
             var projectOptions = BuildOptions(Path.GetDirectoryName(projectPath), null, null, outputFile);
             await RunAsync($"Projects USED BY {projectName}", projectOptions);
+            relationsWindowsContext.MermaidFile = outputFile;
+            relationsWindowsContext.UserSettings = userSettings;
+            await GenerateAsync(relationsWindowsContext, outputFile);
+            return relationsWindowsContext;
         }
 
-        public async Task OpenUsingProjectAsync(string solutionPah, string projectName)
+        public async Task<RelationsWindowsContext> OpenUsingProjectAsync(string solutionPah, string projectName)
         {
+            var relationsWindowsContext = new RelationsWindowsContext();
             var outputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"using-{projectName.ToLower()}.mmd");
             var projectOptions = BuildOptions(Path.GetDirectoryName(solutionPah), null, projectName, outputFile);
             await RunAsync($"Projects USING {projectName}", projectOptions);
+            relationsWindowsContext.MermaidFile = outputFile;
+            relationsWindowsContext.UserSettings = userSettings;
+            await GenerateAsync(relationsWindowsContext, outputFile);
+            return relationsWindowsContext;
         }
 
         private ProjectOptions BuildOptions(string rootPath, string projectFilter, string pinnedProject, string outputFile)
@@ -52,11 +64,51 @@ namespace ProjectRelations2022.Services
         {
             var resolver = ExtensionContext.ServiceProvider.GetService<IResolver>();
             var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
-            elementFinder.Run(options);
-            var joinableTaskContext = ExtensionContext.ServiceProvider.GetService<JoinableTaskContext>();
-
-            await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-
+            await Task.Run(() => elementFinder.Run(options));
         }
+
+        public async Task GenerateAsync(RelationsWindowsContext relationsWindowsContext, string mmdFile)
+        {
+            var content = File.Exists(mmdFile) ? await File.ReadAllTextAsync(mmdFile) : "graph TD\n\tEmpty";
+            var html = RenderMermaid(content);
+            var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "result.html");
+            await File.WriteAllTextAsync(fileName, html);
+            relationsWindowsContext.Url = new Uri(fileName).AbsoluteUri;
+        }
+
+        private string RenderMermaid(string mmd)
+        {
+            var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
+            var encoded = System.Net.WebUtility.HtmlEncode(mmd);
+            var html = "<!doctype html>" +
+                       "<html>" +
+                       "<head>" +
+                       "  <meta charset=\"utf-8\">" +
+                       """
+                       <script type="module">
+                         import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
+                         import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
+
+                         // Registra el motor ELK con Mermaid
+                         mermaid.registerLayoutLoaders(elkLayouts);
+
+                         // Inicializa Mermaid
+                         mermaid.initialize({
+                            startOnLoad: true,
+                            flowchart: { defaultRenderer: "elk" }
+                            });
+                       </script>
+                       
+                       """ +
+                       "  <style>body { margin:10px; padding:0; background-color: " + color + "; }</style>" +
+                       "</head>" +
+                       "<body>" +
+                       "<div class=\"mermaid\">" + encoded + "</div>" +
+                       "</body>" +
+                       "</html>";
+
+            return html;
+        }
+
     }
 }

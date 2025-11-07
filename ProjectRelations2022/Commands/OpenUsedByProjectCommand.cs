@@ -6,6 +6,7 @@ namespace ProjectRelations2022.Commands
     using Microsoft.VisualStudio.Extensibility;
     using Microsoft.VisualStudio.Extensibility.Commands;
     using ProjectRelations2022.Services;
+    using ProjectRelations2022.Views;
     using System.Diagnostics;
 
     /// <summary>
@@ -50,7 +51,9 @@ namespace ProjectRelations2022.Commands
             var projectInfo = await workspace.GetSelectedProjectDetailsAsync(context, cancellationToken);
             var projectRelationsOpener = ExtensionContext.ServiceProvider.GetService<IProjectRelationsOpener>();
 
-            await projectRelationsOpener.OpenUsedByProjectAsync(projectInfo.Path, projectInfo.Name);
+            var result = await projectRelationsOpener.OpenUsedByProjectAsync(projectInfo.Path, projectInfo.Name);
+            var remoteControl = new RelationsWindow(result);
+            await this.Extensibility.Shell().ShowDialogAsync(remoteControl, cancellationToken);
         }
     }
 }

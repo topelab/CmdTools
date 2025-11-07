@@ -4,6 +4,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\RelationsWindows.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\RelationsWindows.xaml"
+                      LogicalName="ProjectRelations2022.Views.RelationsWindows.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3595.46" />
@@ -11,10 +18,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />
     <ProjectReference Include="..\CreateRelationsDiagram\CreateRelationsDiagram.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Views\RelationsWindows.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
   </ItemGroup>
 </Project>
