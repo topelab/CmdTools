@@ -14,11 +14,12 @@ namespace ProjectRelations2022.Views
         private readonly UserSettings userSettings;
 
 
-        public RelationsWindow(string mmdFile, UserSettings userSettings) : base(null, null)
+        public RelationsWindow(RelationsWindowsContext relationsWindowsContext) : base(relationsWindowsContext, null)
         {
-            this.userSettings = userSettings;
-            var inizialer = InitializeAsync(mmdFile);
-            inizialer.Start();
+            this.userSettings = relationsWindowsContext.UserSettings;
+            var envPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
+            System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", envPath);
+            Generate(relationsWindowsContext, relationsWindowsContext.MermaidFile);
         }
 
         private void RelationsWindow_Loaded(object sender, RoutedEventArgs e)
@@ -26,28 +27,16 @@ namespace ProjectRelations2022.Views
             throw new NotImplementedException();
         }
 
-        private async Task InitializeAsync(string mmdFile)
-        {
-            try
-            {
-                var envPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
-                System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", envPath);
-                //await webView.EnsureCoreWebView2Async();
-                Generate(mmdFile);
-            }
-            catch
-            {
-                // ignore initialization errors at design time
-            }
-        }
-
-        public void Generate(string mmdFile)
+        public void Generate(RelationsWindowsContext relationsWindowsContext, string mmdFile)
         {
             var content = File.Exists(mmdFile) ? File.ReadAllText(mmdFile) : "graph TD\n\tEmpty";
-            RenderMermaid(content);
+            var html = RenderMermaid(content);
+            var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "result.html");
+            File.WriteAllText(fileName, html);
+            relationsWindowsContext.Url = new Uri(fileName).AbsoluteUri;
         }
 
-        private void RenderMermaid(string mmd)
+        private string RenderMermaid(string mmd)
         {
             var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
             var encoded = System.Net.WebUtility.HtmlEncode(mmd);
@@ -78,14 +67,7 @@ namespace ProjectRelations2022.Views
                        "</body>" +
                        "</html>";
 
-            try
-            {
-                //webView.CoreWebView2.NavigateToString(html);
-            }
-            catch
-            {
-                // ignore if not initialized
-            }
+            return html;
         }
     }
 }
