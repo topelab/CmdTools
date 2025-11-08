@@ -53,7 +53,7 @@ namespace ProjectRelations2022.Commands
 
             var result = await projectRelationsOpener.OpenUsedByProjectAsync(projectInfo.Path, projectInfo.Name);
             var remoteControl = new RelationsUserControl(result);
-            await this.Extensibility.Shell().ShowDialogAsync(remoteControl, cancellationToken);
+            await this.Extensibility.Shell().ShowDialogAsync(remoteControl, result.Title, cancellationToken);
         }
     }
 }

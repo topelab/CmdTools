@@ -11,7 +11,7 @@
 				  VerticalAlignment="Stretch"
 				  Source="{Binding Url}">
 		<wv2:WebView2.CreationProperties>
-			<wv2:CoreWebView2CreationProperties UserDataFolder="C:\temp\myFolder" />
+			<wv2:CoreWebView2CreationProperties UserDataFolder="C:\ProgramData\ProjectRelations2022" />
 		</wv2:WebView2.CreationProperties>
 	</wv2:WebView2>
 </DataTemplate>

@@ -9,8 +9,12 @@ namespace ProjectRelations2022.Views
         [DataMember]
         public string Url { get; set; }
         [DataMember]
+        public string UserDataFolder { get; set; }
+        [DataMember]
         public string MermaidFile { get; set; }
         [DataMember]
         public UserSettings UserSettings { get; set; }
+        [DataMember]
+        public string Title { get; set; }
     }
 }
