@@ -52,6 +52,9 @@ namespace ProjectRelations2022.Commands
             var projectRelationsOpener = ExtensionContext.ServiceProvider.GetService<IProjectRelationsOpener>();
 
             var result = await projectRelationsOpener.OpenUsingProjectAsync(projectInfo.SolutionPath, projectInfo.Name);
+            result.Items.Clear();
+            result.Items.AddRange(projectInfo.Projects.OrderBy(s => s));
+            result.SelectedItem = projectInfo.Name;
             var remoteControl = new RelationsUserControl(result);
             await this.Extensibility.Shell().ShowDialogAsync(remoteControl, result.Title, cancellationToken);
         }

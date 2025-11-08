@@ -130,14 +130,17 @@ namespace ProjectRelations2022.Services
                 	</script>
                 	<style>
                 		/* Estilos personalizados para Mermaid */
-                        body {
-                            margin:10px;
+                        html, body {
+                            height: 100%;
+                            margin:0;
                             padding:0;
                             background-color: {{color}};
                         }
                 		.mermaid {
-                			background-color: {{color}};
-                			padding: 0px;
+                            height: 100vh; /* ocupa toda la altura de la ventana */
+                            box-sizing: border-box;
+                            background-color: {{color}};
+                            padding: 0px;
                 		}
                 		.diagram-container {
                 			width: 100%;
@@ -157,32 +160,6 @@ namespace ProjectRelations2022.Services
                 	</body>
                 </html>
                 """;
-            //var html2 = "<!doctype html>" +
-            //           "<html>" +
-            //           "<head>" +
-            //           "  <meta charset=\"utf-8\">" +
-            //           """
-            //           <script type="module">
-            //             import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
-            //             import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
-
-            //             // Registra el motor ELK con Mermaid
-            //             mermaid.registerLayoutLoaders(elkLayouts);
-
-            //             // Inicializa Mermaid
-            //             mermaid.initialize({
-            //                startOnLoad: true,
-            //                flowchart: { defaultRenderer: "elk" }
-            //                });
-            //           </script>
-                       
-            //           """ +
-            //           "  <style>body { margin:10px; padding:0; background-color: " + color + "; }</style>" +
-            //           "</head>" +
-            //           "<body>" +
-            //           "<div class=\"mermaid\">" + encoded + "</div>" +
-            //           "</body>" +
-            //           "</html>";
 
             return html;
         }

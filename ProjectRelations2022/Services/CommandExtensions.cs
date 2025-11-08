@@ -13,6 +13,10 @@ namespace ProjectRelations2022.Services
         {
             var projectPath = await context.GetSelectedPathAsync(cancellationToken);
 
+            var allProjects = await workspace.QueryProjectsAsync(
+                project => project.With(p => new { p.Name, p.Guid, p.Path }),
+                cancellationToken);
+
             var results = await workspace.QueryProjectsAsync(
                 project => project.Where(p => p.Path == projectPath.LocalPath).With(p => new { p.Name, p.Guid, p.Path }),
                 cancellationToken);
@@ -25,7 +29,7 @@ namespace ProjectRelations2022.Services
 
             var solution = solutions.First();
 
-            return new SolutionExplorerItem(projectSnapshot.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path));
+            return new SolutionExplorerItem(projectSnapshot.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), allProjects.Select(p =>p.Name).ToList());
         }
     }
 }

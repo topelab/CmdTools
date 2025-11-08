@@ -4,9 +4,21 @@
 			  xmlns:styles="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
 			  xmlns:colors="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
 			  xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
-	<DockPanel MinHeight="600"
-			   MinWidth="800">
+	<Grid MinWidth="1000"
+		  MinHeight="800">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="20*" />
+			<ColumnDefinition Width="80*" />
+		</Grid.ColumnDefinitions>
+		<Grid Grid.Column="0">
+			<!-- Contenido del panel izquierdo -->
+			<ListBox ItemsSource="{Binding Items}"
+					 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+					 HorizontalAlignment="Stretch"
+					 VerticalAlignment="Stretch" />
+		</Grid>
 		<wv2:WebView2 Name="webView2"
+					  Grid.Column="1"
 					  HorizontalAlignment="Stretch"
 					  VerticalAlignment="Stretch"
 					  Source="{Binding Url}">
@@ -14,5 +26,5 @@
 				<wv2:CoreWebView2CreationProperties UserDataFolder="C:\ProgramData\ProjectRelations2022" />
 			</wv2:WebView2.CreationProperties>
 		</wv2:WebView2>
-	</DockPanel>
+	</Grid>
 </DataTemplate>
