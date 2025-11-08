@@ -89,32 +89,100 @@ namespace ProjectRelations2022.Services
         {
             var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
             var encoded = System.Net.WebUtility.HtmlEncode(mmd);
-            var html = "<!doctype html>" +
-                       "<html>" +
-                       "<head>" +
-                       "  <meta charset=\"utf-8\">" +
-                       """
-                       <script type="module">
-                         import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
-                         import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
+            var html = $$"""
+                <!doctype html>
+                <html>
+                <head>
+                	<meta charset="utf-8">
+                	<script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
+                    <script type="module">
+                		import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
+                		import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
 
-                         // Registra el motor ELK con Mermaid
-                         mermaid.registerLayoutLoaders(elkLayouts);
+                		// Registra el motor ELK con Mermaid
+                		mermaid.registerLayoutLoaders(elkLayouts);
 
-                         // Inicializa Mermaid
-                         mermaid.initialize({
-                            startOnLoad: true,
-                            flowchart: { defaultRenderer: "elk" }
-                            });
-                       </script>
+                		// Inicializa Mermaid
+                		mermaid.initialize({
+                			startOnLoad: false,
+                			flowchart: { defaultRenderer: "elk" }
+                		});
+
+                		await mermaid.run({
+                			querySelector: '.mermaid',
+                			postRenderCallback: (id) => {
+                				const container = document.getElementById("diagram-container");
+                				const svgElement = container.querySelector("svg");
+
+                				// Initialize Panzoom
+                				const panzoomInstance = Panzoom(svgElement, {
+                					maxScale: 5,
+                					minScale: 0.5,
+                					step: 0.5,
+                				});
+
+                				// Add mouse wheel zoom
+                				container.addEventListener("wheel", (event) => {
+                					panzoomInstance.zoomWithWheel(event);
+                				});
+                			}
+                		});
+                	</script>
+                	<style>
+                		/* Estilos personalizados para Mermaid */
+                        body {
+                            margin:10px;
+                            padding:0;
+                            background-color: {{color}};
+                        }
+                		.mermaid {
+                			background-color: {{color}};
+                			padding: 0px;
+                		}
+                		.diagram-container {
+                			width: 100%;
+                			height: 100%;
+                			overflow: hidden;
+                			position: relative;
+                		}
+                		svg {
+                			cursor: grab;
+                		}
+                	</style>
+                	</head>
+                	<body>
+                		<div class="diagram-container" id="diagram-container">
+                			<pre class="mermaid">{{encoded}}</pre>
+                		</div>
+                	</body>
+                </html>
+                """;
+            //var html2 = "<!doctype html>" +
+            //           "<html>" +
+            //           "<head>" +
+            //           "  <meta charset=\"utf-8\">" +
+            //           """
+            //           <script type="module">
+            //             import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
+            //             import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
+
+            //             // Registra el motor ELK con Mermaid
+            //             mermaid.registerLayoutLoaders(elkLayouts);
+
+            //             // Inicializa Mermaid
+            //             mermaid.initialize({
+            //                startOnLoad: true,
+            //                flowchart: { defaultRenderer: "elk" }
+            //                });
+            //           </script>
                        
-                       """ +
-                       "  <style>body { margin:10px; padding:0; background-color: " + color + "; }</style>" +
-                       "</head>" +
-                       "<body>" +
-                       "<div class=\"mermaid\">" + encoded + "</div>" +
-                       "</body>" +
-                       "</html>";
+            //           """ +
+            //           "  <style>body { margin:10px; padding:0; background-color: " + color + "; }</style>" +
+            //           "</head>" +
+            //           "<body>" +
+            //           "<div class=\"mermaid\">" + encoded + "</div>" +
+            //           "</body>" +
+            //           "</html>";
 
             return html;
         }
