@@ -4,7 +4,7 @@ namespace ProjectRelations2022.Views
     using System.Runtime.Serialization;
 
     [DataContract]
-    public class RelationsWindowsContext
+    public class RelationsUserControlContext
     {
         [DataMember]
         public string Url { get; set; }

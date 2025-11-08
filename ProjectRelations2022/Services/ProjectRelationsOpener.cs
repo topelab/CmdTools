@@ -19,13 +19,14 @@ namespace ProjectRelations2022.Services
             userSettings = userSettingsFactory.Create();
             var envPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
             System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", envPath);
+            // System.Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--allow-file-access-from-files");
         }
 
-        public async Task<RelationsWindowsContext> OpenUsedByProjectAsync(string projectPath, string projectName)
+        public async Task<RelationsUserControlContext> OpenUsedByProjectAsync(string projectPath, string projectName)
         {
-            var relationsWindowsContext = new RelationsWindowsContext();
+            var relationsWindowsContext = new RelationsUserControlContext();
             var outputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"used-by-{projectName.ToLower()}.mmd");
-            var projectOptions = BuildOptions(Path.GetDirectoryName(projectPath), null, null, outputFile);
+            var projectOptions = BuildOptions(projectPath, null, null, outputFile);
             await RunAsync($"Projects USED BY {projectName}", projectOptions);
             relationsWindowsContext.MermaidFile = outputFile;
             relationsWindowsContext.UserSettings = userSettings;
@@ -33,11 +34,11 @@ namespace ProjectRelations2022.Services
             return relationsWindowsContext;
         }
 
-        public async Task<RelationsWindowsContext> OpenUsingProjectAsync(string solutionPah, string projectName)
+        public async Task<RelationsUserControlContext> OpenUsingProjectAsync(string solutionPah, string projectName)
         {
-            var relationsWindowsContext = new RelationsWindowsContext();
+            var relationsWindowsContext = new RelationsUserControlContext();
             var outputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"using-{projectName.ToLower()}.mmd");
-            var projectOptions = BuildOptions(Path.GetDirectoryName(solutionPah), null, projectName, outputFile);
+            var projectOptions = BuildOptions(solutionPah, null, projectName, outputFile);
             await RunAsync($"Projects USING {projectName}", projectOptions);
             relationsWindowsContext.MermaidFile = outputFile;
             relationsWindowsContext.UserSettings = userSettings;
@@ -67,7 +68,7 @@ namespace ProjectRelations2022.Services
             await Task.Run(() => elementFinder.Run(options));
         }
 
-        public async Task GenerateAsync(RelationsWindowsContext relationsWindowsContext, string mmdFile)
+        public async Task GenerateAsync(RelationsUserControlContext relationsWindowsContext, string mmdFile)
         {
             var content = File.Exists(mmdFile) ? await File.ReadAllTextAsync(mmdFile) : "graph TD\n\tEmpty";
             var html = RenderMermaid(content);

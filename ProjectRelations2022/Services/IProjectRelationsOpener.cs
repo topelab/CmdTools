@@ -5,7 +5,7 @@ namespace ProjectRelations2022.Services
 
     internal interface IProjectRelationsOpener
     {
-        Task<RelationsWindowsContext> OpenUsedByProjectAsync(string projectPath, string projectName);
-        Task<RelationsWindowsContext> OpenUsingProjectAsync(string solutionPath, string projectName);
+        Task<RelationsUserControlContext> OpenUsedByProjectAsync(string projectPath, string projectName);
+        Task<RelationsUserControlContext> OpenUsingProjectAsync(string solutionPath, string projectName);
     }
 }

@@ -52,7 +52,7 @@ namespace ProjectRelations2022.Commands
             var projectRelationsOpener = ExtensionContext.ServiceProvider.GetService<IProjectRelationsOpener>();
 
             var result = await projectRelationsOpener.OpenUsingProjectAsync(projectInfo.SolutionPath, projectInfo.Name);
-            var remoteControl = new RelationsWindow(result);
+            var remoteControl = new RelationsUserControl(result);
             await this.Extensibility.Shell().ShowDialogAsync(remoteControl, cancellationToken);
         }
     }

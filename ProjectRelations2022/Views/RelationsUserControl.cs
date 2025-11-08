@@ -5,9 +5,9 @@ namespace ProjectRelations2022.Views
     /// <summary>
     /// Ventana WPF que muestra un diagrama Mermaid usando WebView2.
     /// </summary>
-    public class RelationsWindow : RemoteUserControl
+    public class RelationsUserControl : RemoteUserControl
     {
-        public RelationsWindow(RelationsWindowsContext relationsWindowsContext) : base(relationsWindowsContext, null)
+        public RelationsUserControl(RelationsUserControlContext relationsUserControlContext) : base(relationsUserControlContext, null)
         {
         }
     }

@@ -4,8 +4,14 @@
 			  xmlns:styles="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
 			  xmlns:colors="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
 			  xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
-	<Border Padding="5">
-		<wv2:WebView2 x:Name="webView"
-					  Source="{Binding Url}" />
-	</Border>
+	<wv2:WebView2 Name="webView2"
+				  MinHeight="400"
+				  MinWidth="400"
+				  HorizontalAlignment="Stretch"
+				  VerticalAlignment="Stretch"
+				  Source="{Binding Url}">
+		<wv2:WebView2.CreationProperties>
+			<wv2:CoreWebView2CreationProperties UserDataFolder="C:\temp\myFolder" />
+		</wv2:WebView2.CreationProperties>
+	</wv2:WebView2>
 </DataTemplate>

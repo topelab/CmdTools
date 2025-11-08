@@ -4,11 +4,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Views\RelationsWindows.xaml" />
+    <None Remove="Views\RelationsUserControl.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\RelationsWindows.xaml"
-                      LogicalName="ProjectRelations2022.Views.RelationsWindows.xaml" />
+    <EmbeddedResource Include="Views\RelationsUserControl.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" PrivateAssets="all" />
