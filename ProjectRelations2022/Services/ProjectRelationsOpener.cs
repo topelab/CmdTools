@@ -26,13 +26,42 @@ namespace ProjectRelations2022.Services
             {
                 MermaidFile = projectOptions.OutputFile,
                 UserSettings = UserSettings,
-                Title = GetTitle(relationType, solutionExplorerItem.Name),
+                Title = "Project relations",
                 UserDataFolder = GetUserDataFolder(),
-                Items = solutionExplorerItem.Projects,
-                SelectedItem = solutionExplorerItem.Name
+                Items = [.. solutionExplorerItem.Projects.Keys.OrderBy(k => k)],
+                SelectedItem = solutionExplorerItem.Name,
+                IsUsing = relationType == RelationType.Using,
+                IsUsedBy = relationType == RelationType.UsedBy,
+                IncludePackages = projectOptions.WithPackages
             };
             await GenerateAsync(relationsWindowsContext, projectOptions.OutputFile);
+            relationsWindowsContext.PropertyChanged += (s, e) => OnRelationsWindowsContextPropertyChanged(s, e.PropertyName, solutionExplorerItem, relationsWindowsContext);
             return relationsWindowsContext;
+        }
+
+        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsUserControlContext relationsWindowsContext)
+        {
+            _ = OnRelationsWindowsContextPropertyChangedAsync(sender, propertyName, solutionExplorerItem, relationsWindowsContext);
+        }
+
+        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsUserControlContext relationsWindowsContext)
+        {
+            if (sender is RelationsUserControlContext context)
+            {
+                switch (propertyName)
+                {
+                    case nameof(RelationsUserControlContext.RelationType):
+                    case nameof(RelationsUserControlContext.SelectedItem):
+                    case nameof(RelationsUserControlContext.IncludePackages):
+                        var relationType = context.RelationType;
+                        var localSolutionExplorerItem = solutionExplorerItem with { Name = context.SelectedItem, Path = Path.GetDirectoryName(solutionExplorerItem.Projects[context.SelectedItem]) };
+                        var projectOptions = BuildOptions(localSolutionExplorerItem, relationType);
+                        projectOptions.WithPackages = context.IncludePackages;
+                        await RunAsync(projectOptions);
+                        await GenerateAsync(context, projectOptions.OutputFile);
+                        break;
+                }
+            }
         }
 
         private ProjectOptions BuildOptions(SolutionExplorerItem solutionExplorerItem, RelationType relationType)
@@ -64,7 +93,7 @@ namespace ProjectRelations2022.Services
         {
             var content = File.Exists(mmdFile) ? await File.ReadAllTextAsync(mmdFile) : "graph TD\n\tEmpty";
             var html = RenderMermaid(content);
-            var fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "result.html");
+            string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.html");
             await File.WriteAllTextAsync(fileName, html);
             relationsWindowsContext.Url = new Uri(fileName).AbsoluteUri;
         }
@@ -89,7 +118,9 @@ namespace ProjectRelations2022.Services
                 		// Inicializa Mermaid
                 		mermaid.initialize({
                 			startOnLoad: false,
-                			flowchart: { defaultRenderer: "elk" }
+                			flowchart: { defaultRenderer: "elk" },
+                            maxTextSize: {{UserSettings.MaxTextSize}},
+                            maxEdges: {{UserSettings.MaxEdges}}
                 		});
 
                 		await mermaid.run({
@@ -171,18 +202,12 @@ namespace ProjectRelations2022.Services
         private string GetOutputFile(RelationType relationType, string projectName)
         {
             var prefix = relationType.GetDescription().ToLower().Replace(" ", "-");
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"{prefix}-{projectName.ToLower()}.mmd");
+            return Path.Combine(Path.GetTempPath(), $"{prefix}-{projectName.ToLower()}-{Guid.NewGuid()}.mmd");
         }
 
         private string GetUserDataFolder()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
-        }
-
-        private string GetTitle(RelationType relationType, string projectName)
-        {
-            var prefix = relationType.GetDescription().ToUpper();
-            return $"Projects {prefix} {projectName}";
         }
     }
 }

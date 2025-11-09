@@ -8,6 +8,9 @@ namespace ProjectRelations2022.DTO
         public bool ShowPackages { get; set; } = true;
         public string Theme { get; set; } = "Dark";
         public string BackgroundColor { get; set; } = "black";
+        public int MaxEdges { get; set; } = 500;
+        public long MaxTextSize { get; set; } = 50000;
+
 
         [JsonIgnore]
         public bool HasTheme => !string.IsNullOrEmpty(Theme);

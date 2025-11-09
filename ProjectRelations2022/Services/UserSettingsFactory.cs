@@ -28,10 +28,11 @@ namespace ProjectRelations2022.Services
                 var fileContent = $$"""
                     {
                         "{{nameof(UserSettings)}}": {
-                        "{{nameof(UserSettings.CreateRelationsDiagramPath)}}": "C:\\PATH\\TO\\CreateRelationsDiagram.exe",
                         "{{nameof(UserSettings.ShowPackages)}}": true,
                         "{{nameof(UserSettings.Theme)}}": "Dark",
-                        "{{nameof(UserSettings.BackgroundColor)}}": "black"
+                        "{{nameof(UserSettings.BackgroundColor)}}": "black",
+                        "{{nameof(UserSettings.MaxEdges)}}": 500,
+                        "{{nameof(UserSettings.MaxTextSize)}}": 50000
                       }
                     }
                     """;

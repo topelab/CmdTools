@@ -2,7 +2,7 @@ namespace ProjectRelations2022.DTO
 {
     using System.ComponentModel;
 
-    internal enum RelationType
+    public enum RelationType
     {
         [Description("Using")]
         Using,

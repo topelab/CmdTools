@@ -11,8 +11,33 @@
 			<ColumnDefinition Width="80*" />
 		</Grid.ColumnDefinitions>
 		<Grid Grid.Column="0">
-			<!-- Contenido del panel izquierdo -->
-			<ListBox ItemsSource="{Binding Items}"
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<StackPanel Grid.Row="0"
+						Orientation="Vertical"
+						Margin="5">
+				<RadioButton Content="Used By this project"
+							 IsChecked="{Binding IsUsedBy, Mode=TwoWay}"
+							 GroupName="RelationsGroup"
+							 Margin="5" />
+				<RadioButton Content="Using this project"
+							 IsChecked="{Binding IsUsing, Mode=TwoWay}"
+							 GroupName="RelationsGroup"
+							 Margin="5" />
+				<CheckBox Content="Include packages"
+						  Visibility="{Binding IncludePackagesVisibility}"
+						  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
+						  Margin="5" />
+				<TextBlock Text="Projects"
+						   FontWeight="Bold"
+						   Margin="5" />
+				
+			</StackPanel>
+			<ListBox Grid.Row="1"
+					 Margin="5"
+					 ItemsSource="{Binding Items}"
 					 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
 					 HorizontalAlignment="Stretch"
 					 VerticalAlignment="Stretch" />
