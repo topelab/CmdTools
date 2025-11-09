@@ -27,6 +27,7 @@ namespace ProjectRelations2022
         {
             base.InitializeServices(serviceCollection);
             serviceCollection.AddResolver(SetupDI.GetResolveInfoCollection());
+            Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--allow-file-access-from-files");
         }
     }
 }

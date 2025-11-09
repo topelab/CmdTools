@@ -29,7 +29,7 @@ namespace ProjectRelations2022.Services
 
             var solution = solutions.First();
 
-            return new SolutionExplorerItem(projectSnapshot.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), allProjects.Select(p =>p.Name).ToList());
+            return new SolutionExplorerItem(projectSnapshot.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), [.. allProjects.Select(p =>p.Name)]);
         }
     }
 }

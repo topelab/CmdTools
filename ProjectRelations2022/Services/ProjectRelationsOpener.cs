@@ -1,6 +1,7 @@
 namespace ProjectRelations2022.Services
 {
     using CmdTools.Contracts;
+    using CmdTools.Shared;
     using CreateRelationsDiagram;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Internal.VisualStudio.Extensibility.Framework;
@@ -10,61 +11,44 @@ namespace ProjectRelations2022.Services
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class ProjectRelationsOpener : IProjectRelationsOpener
+    internal class ProjectRelationsOpener(IUserSettingsFactory userSettingsFactory) : IProjectRelationsOpener
     {
-        private readonly UserSettings userSettings;
+        private UserSettings userSettings;
+        private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
 
-        public ProjectRelationsOpener(IUserSettingsFactory userSettingsFactory)
-        {
-            userSettings = userSettingsFactory.Create();
-            //var envPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
-            //System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", envPath);
-            //System.Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--allow-file-access-from-files");
-        }
+        private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create();
 
-        public async Task<RelationsUserControlContext> OpenUsedByProjectAsync(string projectPath, string projectName)
+        public async Task<RelationsUserControlContext> OpenAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
         {
-            var outputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"used-by-{projectName.ToLower()}.mmd");
-            var projectOptions = BuildOptions(projectPath, null, null, outputFile);
+            var projectOptions = BuildOptions(solutionExplorerItem, relationType);
             await RunAsync(projectOptions);
             var relationsWindowsContext = new RelationsUserControlContext
             {
-                MermaidFile = outputFile,
-                UserSettings = userSettings,
-                Title = $"Projects USED BY {projectName}",
-                UserDataFolder = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2")
+                MermaidFile = projectOptions.OutputFile,
+                UserSettings = UserSettings,
+                Title = GetTitle(relationType, solutionExplorerItem.Name),
+                UserDataFolder = GetUserDataFolder(),
+                Items = solutionExplorerItem.Projects,
+                SelectedItem = solutionExplorerItem.Name
             };
-            await GenerateAsync(relationsWindowsContext, outputFile);
+            await GenerateAsync(relationsWindowsContext, projectOptions.OutputFile);
             return relationsWindowsContext;
         }
 
-        public async Task<RelationsUserControlContext> OpenUsingProjectAsync(string solutionPah, string projectName)
+        private ProjectOptions BuildOptions(SolutionExplorerItem solutionExplorerItem, RelationType relationType)
         {
-            var outputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"using-{projectName.ToLower()}.mmd");
-            var projectOptions = BuildOptions(solutionPah, null, projectName, outputFile);
-            await RunAsync(projectOptions);
-            var relationsWindowsContext = new RelationsUserControlContext
-            {
-                MermaidFile = outputFile,
-                UserSettings = userSettings,
-                Title = $"Projects USING {projectName}",
-                UserDataFolder = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2")
-            };
-            await GenerateAsync(relationsWindowsContext, outputFile);
-            return relationsWindowsContext;
-        }
+            var rootPath = GetRootPath(relationType, solutionExplorerItem);
+            var pinnedProject = GetPinnedProject(relationType, solutionExplorerItem);
+            var outputFile = GetOutputFile(relationType, solutionExplorerItem.Name);
 
-        private ProjectOptions BuildOptions(string rootPath, string projectFilter, string pinnedProject, string outputFile)
-        {
             return new ProjectOptions
             {
                 RootPath = rootPath,
-                ProjectFilter = projectFilter,
                 PinnedProject = pinnedProject,
                 OutputFile = outputFile,
-                WithPackages = userSettings.ShowPackages,
+                WithPackages = UserSettings.ShowPackages,
                 Direction = Direction.LeftToRight,
-                Theme = userSettings.HasTheme ? Enum.Parse<Theme>(userSettings.Theme) : Theme.Dark,
+                Theme = UserSettings.HasTheme ? Enum.Parse<Theme>(UserSettings.Theme) : Theme.Dark,
                 Layout = Layout.Adaptive
             };
         }
@@ -87,7 +71,7 @@ namespace ProjectRelations2022.Services
 
         private string RenderMermaid(string mmd)
         {
-            var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
+            var color = UserSettings.HasBackgroundColor ? UserSettings.BackgroundColor.ToLower() : "black";
             var encoded = System.Net.WebUtility.HtmlEncode(mmd);
             var html = $$"""
                 <!doctype html>
@@ -164,5 +148,41 @@ namespace ProjectRelations2022.Services
             return html;
         }
 
+        private string GetRootPath(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
+        {
+            return relationType switch
+            {
+                RelationType.Using => solutionExplorerItem.SolutionPath,
+                RelationType.UsedBy => solutionExplorerItem.Path,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        private string GetPinnedProject(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
+        {
+            return relationType switch
+            {
+                RelationType.Using => solutionExplorerItem.Name,
+                RelationType.UsedBy => null,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        private string GetOutputFile(RelationType relationType, string projectName)
+        {
+            var prefix = relationType.GetDescription().ToLower().Replace(" ", "-");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", $"{prefix}-{projectName.ToLower()}.mmd");
+        }
+
+        private string GetUserDataFolder()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
+        }
+
+        private string GetTitle(RelationType relationType, string projectName)
+        {
+            var prefix = relationType.GetDescription().ToUpper();
+            return $"Projects {prefix} {projectName}";
+        }
     }
 }
