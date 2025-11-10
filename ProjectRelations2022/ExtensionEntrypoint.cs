@@ -17,9 +17,9 @@ namespace ProjectRelations2022
             Metadata = new(
                     id: "ProjectRelations2022.d36240c7-3cbc-4ceb-96aa-ce0aee85b8b9",
                     version: this.ExtensionAssemblyVersion,
-                    publisherName: "Publisher name",
-                    displayName: "ProjectRelations2022",
-                    description: "Extension description"),
+                    publisherName: "Joan López",
+                    displayName: "Project Relations 2022",
+                    description: "Shows a diagram of project relations"),
         };
 
         /// <inheritdoc />
