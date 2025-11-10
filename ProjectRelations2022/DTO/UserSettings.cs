@@ -10,6 +10,7 @@ namespace ProjectRelations2022.DTO
         public string BackgroundColor { get; set; } = "black";
         public int MaxEdges { get; set; } = 500;
         public long MaxTextSize { get; set; } = 50000;
+        public string ExcludeProjects { get; set; } = "test";
 
 
         [JsonIgnore]

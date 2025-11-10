@@ -78,7 +78,8 @@ namespace ProjectRelations2022.Services
                 WithPackages = UserSettings.ShowPackages,
                 Direction = Direction.LeftToRight,
                 Theme = UserSettings.HasTheme ? Enum.Parse<Theme>(UserSettings.Theme) : Theme.Dark,
-                Layout = Layout.Adaptive
+                Layout = Layout.Adaptive,
+                Exclude = UserSettings.ExcludeProjects,
             };
         }
 

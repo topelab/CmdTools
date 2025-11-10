@@ -28,11 +28,12 @@ namespace ProjectRelations2022.Services
                 var fileContent = $$"""
                     {
                         "{{nameof(UserSettings)}}": {
-                        "{{nameof(UserSettings.ShowPackages)}}": true,
+                        "{{nameof(UserSettings.ShowPackages)}}": false,
                         "{{nameof(UserSettings.Theme)}}": "Dark",
                         "{{nameof(UserSettings.BackgroundColor)}}": "black",
-                        "{{nameof(UserSettings.MaxEdges)}}": 500,
-                        "{{nameof(UserSettings.MaxTextSize)}}": 50000
+                        "{{nameof(UserSettings.MaxEdges)}}": 5000,
+                        "{{nameof(UserSettings.MaxTextSize)}}": 500000,
+                        "{{nameof(UserSettings.ExcludeProjects)}}": "test"
                       }
                     }
                     """;

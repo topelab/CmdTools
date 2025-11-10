@@ -11,6 +11,8 @@ namespace ProjectRelations2022.Views
         private string selectedItem;
         private bool isUsedBy;
         private bool isUsing;
+        private bool includePackages;
+        private string url;
 
         [DataMember]
         public string Url { get => url; set => SetProperty(ref url, value); }
@@ -30,8 +32,6 @@ namespace ProjectRelations2022.Views
         [DataMember]
         public string SelectedItem { get => selectedItem; set => SetProperty(ref selectedItem, value); }
 
-        private bool includePackages;
-        private string url;
 
         [DataMember]
         public bool IncludePackages

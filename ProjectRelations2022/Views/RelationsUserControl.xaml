@@ -10,11 +10,9 @@
 			<ColumnDefinition Width="20*" />
 			<ColumnDefinition Width="80*" />
 		</Grid.ColumnDefinitions>
-		<Grid Grid.Column="0">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="*" />
-			</Grid.RowDefinitions>
+		<ScrollViewer Grid.Column="0"
+					  VerticalScrollBarVisibility="Auto"
+					  HorizontalScrollBarVisibility="Auto">
 			<StackPanel Grid.Row="0"
 						Orientation="Vertical"
 						Margin="5">
@@ -33,15 +31,11 @@
 				<TextBlock Text="Projects"
 						   FontWeight="Bold"
 						   Margin="5" />
-				
+				<ListBox Margin="5"
+						 ItemsSource="{Binding Items}"
+						 SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
 			</StackPanel>
-			<ListBox Grid.Row="1"
-					 Margin="5"
-					 ItemsSource="{Binding Items}"
-					 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-					 HorizontalAlignment="Stretch"
-					 VerticalAlignment="Stretch" />
-		</Grid>
+		</ScrollViewer>
 		<wv2:WebView2 Name="webView2"
 					  Grid.Column="1"
 					  HorizontalAlignment="Stretch"
