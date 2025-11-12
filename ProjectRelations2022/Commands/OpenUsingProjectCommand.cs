@@ -34,7 +34,7 @@ namespace ProjectRelations2022.Commands
             // Use this object initializer to set optional parameters for the command. The required parameter,
             // displayName, is set above. DisplayName is localized and references an entry in .vsextension\string-resources.json.
             Icon = new(ImageMoniker.KnownValues.Relationship, IconSettings.IconAndText),
-            Placements = [CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x0234, priority: 1)],
+            Placements = [CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x0206, priority: 0x2001)],
         };
 
         /// <inheritdoc />
