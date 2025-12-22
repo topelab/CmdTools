@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.1.22</Version>
+    <Version>1.1.23</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\RelationsUserControl.xaml" />

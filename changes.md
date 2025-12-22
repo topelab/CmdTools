@@ -1,3 +1,8 @@
+## 1.1.23
+
+- Updating System.CodeDom to 10.0.1
+- Updating Microsoft.Web.WebView2 to 1.0.3650.58
+
 ## 1.1.22
 
 - Added `--open` option to automatically open the generated diagram after creation.
