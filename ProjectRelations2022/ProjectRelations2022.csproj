@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.1.23</Version>
+    <Version>$(ProjectExtensionVersion)</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\RelationsUserControl.xaml" />
@@ -11,9 +11,9 @@
     <EmbeddedResource Include="Views\RelationsUserControl.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />

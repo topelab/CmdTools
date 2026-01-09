@@ -3,10 +3,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <Version>1.1.20</Version>
+    <Version>$(ToolsVersion)</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="CommandLineParser" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />

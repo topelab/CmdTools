@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- Configuraciones comunes para todos los proyectos -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Asegura que se usen referencias de paquete en proyectos SDK-style -->
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+
+    <!-- Versiones de proyectos -->
+    <ProjectExtensionVersion>1.0.6</ProjectExtensionVersion>
+    <ToolsVersion>1.1.23</ToolsVersion>
+    
+  </PropertyGroup>
+</Project>

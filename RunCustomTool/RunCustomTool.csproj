@@ -4,9 +4,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.1.23</Version>
+    <Version>$(ToolsVersion)</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.CodeDom" Version="10.0.1" />
+    <PackageReference Include="System.CodeDom" />
   </ItemGroup>
 </Project>

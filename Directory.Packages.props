@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <!-- Centralizar versiones de paquetes usados en la solución -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+    <PackageVersion Include="Topelab.Core.Resolver" Version="1.9.1" />
+    <PackageVersion Include="System.CodeDom" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
+    <PackageVersion Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" />
+    <PackageVersion Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" />
+  </ItemGroup>
+</Project>

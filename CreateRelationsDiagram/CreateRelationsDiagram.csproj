@@ -3,10 +3,10 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.1.20</Version>
+    <Version>$(ToolsVersion)</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.CodeDom" Version="10.0.1" />
+    <PackageReference Include="System.CodeDom" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />

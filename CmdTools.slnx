@@ -15,10 +15,11 @@
   <Folder Name="/_Info/">
     <File Path=".editorconfig" />
     <File Path="changes.md" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Directory.Build.props" />
     <File Path="inverso.mmd" />
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
     <File Path="sample.mmd" />
-    <File Path="version.txt" />
   </Folder>
 </Solution>
