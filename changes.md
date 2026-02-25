@@ -1,3 +1,9 @@
+## 1.1.25
+
+- Updating Microsoft.Web.WebView2 to 1.0.3800.47
+- Updating System.CodeDom to 10.0.3
+- Updating Topelab.Core.Resolver to 2.0.3
+
 ## 1.1.24
 
 - Updating Topelab.Core.Resolver to 2.0.2
