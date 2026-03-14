@@ -33,7 +33,9 @@ namespace ProjectRelations2022.Services
                         "{{nameof(UserSettings.BackgroundColor)}}": "black",
                         "{{nameof(UserSettings.MaxEdges)}}": 5000,
                         "{{nameof(UserSettings.MaxTextSize)}}": 500000,
-                        "{{nameof(UserSettings.ExcludeProjects)}}": "test"
+                        "{{nameof(UserSettings.ExcludeProjects)}}": "test",
+                        "{{nameof(UserSettings.MaxZoomLevel)}}": 5.0,
+                        "{{nameof(UserSettings.MinZoomLevel)}}": 0.5
                       }
                     }
                     """;

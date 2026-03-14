@@ -3,6 +3,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>$(ProjectExtensionVersion)</Version>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\RelationsUserControl.xaml" />

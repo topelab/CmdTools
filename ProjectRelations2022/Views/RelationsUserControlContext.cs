@@ -4,6 +4,7 @@ namespace ProjectRelations2022.Views
     using ProjectRelations2022.DTO;
     using System.Runtime.Serialization;
     using System.Windows;
+    using System.Windows.Forms;
 
     [DataContract]
     public class RelationsUserControlContext : NotifyPropertyChangedObject
@@ -13,6 +14,20 @@ namespace ProjectRelations2022.Views
         private bool isUsing;
         private bool includePackages;
         private string url;
+        private bool showListOnly;
+        private double windowWidth;
+        private double windowHeight;
+
+        public RelationsUserControlContext()
+        {
+            // Inicializar con el tamaño de la pantalla actual
+            var screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            var screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+            // Usar el 80% del tamaño de la pantalla para dejar espacio a VS
+            windowWidth = screenWidth * 0.80;
+            windowHeight = screenHeight * 0.80;
+        }
 
         [DataMember]
         public string Url { get => url; set => SetProperty(ref url, value); }
@@ -38,6 +53,13 @@ namespace ProjectRelations2022.Views
         {
             get { return includePackages; }
             set { SetProperty(ref includePackages, value); }
+        }
+
+        [DataMember]
+        public bool ShowListOnly
+        {
+            get => showListOnly;
+            set => SetProperty(ref showListOnly, value);
         }
 
         [DataMember]
@@ -67,5 +89,25 @@ namespace ProjectRelations2022.Views
 
         [DataMember]
         public RelationType RelationType => IsUsedBy ? RelationType.UsedBy : RelationType.Using;
+
+        /// <summary>
+        /// Ancho de la ventana del diálogo.
+        /// </summary>
+        [DataMember]
+        public double WindowWidth 
+        { 
+            get => windowWidth; 
+            set => SetProperty(ref windowWidth, value); 
+        }
+
+        /// <summary>
+        /// Alto de la ventana del diálogo.
+        /// </summary>
+        [DataMember]
+        public double WindowHeight 
+        { 
+            get => windowHeight; 
+            set => SetProperty(ref windowHeight, value); 
+        }
     }
 }

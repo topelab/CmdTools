@@ -7,6 +7,7 @@ namespace ProjectRelations2022.Services
     using Microsoft.Internal.VisualStudio.Extensibility.Framework;
     using ProjectRelations2022.DTO;
     using ProjectRelations2022.Views;
+    using System.Globalization;
     using System.IO;
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
@@ -132,8 +133,8 @@ namespace ProjectRelations2022.Services
 
                 				// Initialize Panzoom
                 				const panzoomInstance = Panzoom(svgElement, {
-                					maxScale: 5,
-                					minScale: 0.5,
+                					maxScale: {{UserSettings.MaxZoomLevel.ToString("0.0", CultureInfo.InvariantCulture)}},
+                					minScale: {{UserSettings.MinZoomLevel.ToString("0.0", CultureInfo.InvariantCulture)}},
                 					step: 0.5,
                 				});
 
