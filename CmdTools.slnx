@@ -8,7 +8,7 @@
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="CreateRelationsDiagram/CreateRelationsDiagram.csproj" />
-    <Project Path="ProjectRelations2022/ProjectRelations2022.csproj" Id="0e3a446e-08bc-41ef-92e2-5e7d9f602797" />
+    <Project Path="ProjectRelations2026/ProjectRelations2026.csproj" />
     <Project Path="RunCustomTool/RunCustomTool.csproj" />
     <Project Path="UpdateVersion/UpdateVersion.csproj" />
   </Folder>

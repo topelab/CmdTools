@@ -1,27 +1,27 @@
-namespace ProjectRelations2022.Commands
+namespace ProjectRelations2026.Commands
 {
     using Microsoft;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Internal.VisualStudio.Extensibility.Framework;
     using Microsoft.VisualStudio.Extensibility;
     using Microsoft.VisualStudio.Extensibility.Commands;
-    using ProjectRelations2022.Services;
-    using ProjectRelations2022.Views;
+    using ProjectRelations2026.Services;
+    using ProjectRelations2026.Views;
     using System.Diagnostics;
 
     /// <summary>
-    /// OpenUsedByProjectCommand handler.
+    /// ShowProjectRelationsCommand handler.
     /// </summary>
     [VisualStudioContribution]
-    internal class OpenUsedByProjectCommand : Command
+    internal class ShowProjectRelationsCommand : Command
     {
         private readonly TraceSource logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenUsedByProjectCommand"/> class.
+        /// Initializes a new instance of the <see cref="ShowProjectRelationsCommand"/> class.
         /// </summary>
         /// <param name="traceSource">Trace source instance to utilize.</param>
-        public OpenUsedByProjectCommand(TraceSource traceSource)
+        public ShowProjectRelationsCommand(TraceSource traceSource)
         {
             // This optional TraceSource can be used for logging in the command. You can use dependency injection to access
             // other services here as well.
@@ -29,12 +29,13 @@ namespace ProjectRelations2022.Commands
         }
 
         /// <inheritdoc />
-        public override CommandConfiguration CommandConfiguration => new("%ProjectRelations2022.OpenUsedByProjectCommand.DisplayName%")
+        public override CommandConfiguration CommandConfiguration => new("%ProjectRelations2026.ShowProjectRelationsCommand.DisplayName%")
         {
             // Use this object initializer to set optional parameters for the command. The required parameter,
             // displayName, is set above. DisplayName is localized and references an entry in .vsextension\string-resources.json.
             Icon = new(ImageMoniker.KnownValues.Relationship, IconSettings.IconAndText),
-            Placements = [CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x0206, priority: 0x2000)],
+            Placements = [CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x014D, priority: 0x0000)],
+            EnabledWhen = ActivationConstraint.And(ActivationConstraint.SolutionState(SolutionState.MultipleProject), ActivationConstraint.SolutionState(SolutionState.FullyLoaded))
         };
 
         /// <inheritdoc />

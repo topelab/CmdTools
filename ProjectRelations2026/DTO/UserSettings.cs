@@ -1,4 +1,4 @@
-namespace ProjectRelations2022.DTO
+namespace ProjectRelations2026.DTO
 {
     using Newtonsoft.Json;
 

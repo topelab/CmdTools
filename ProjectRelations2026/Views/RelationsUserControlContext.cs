@@ -1,7 +1,7 @@
-namespace ProjectRelations2022.Views
+namespace ProjectRelations2026.Views
 {
     using Microsoft.VisualStudio.Extensibility.UI;
-    using ProjectRelations2022.DTO;
+    using ProjectRelations2026.DTO;
     using System.Runtime.Serialization;
     using System.Windows;
     using System.Windows.Forms;
@@ -63,7 +63,7 @@ namespace ProjectRelations2022.Views
         }
 
         [DataMember]
-        public Visibility IncludePackagesVisibility => IsUsedBy ? Visibility.Visible : Visibility.Collapsed; 
+        public Visibility IncludePackagesVisibility => IsUsedBy ? Visibility.Visible : Visibility.Collapsed;
 
 
         [DataMember]
@@ -94,20 +94,20 @@ namespace ProjectRelations2022.Views
         /// Ancho de la ventana del diálogo.
         /// </summary>
         [DataMember]
-        public double WindowWidth 
-        { 
-            get => windowWidth; 
-            set => SetProperty(ref windowWidth, value); 
+        public double WindowWidth
+        {
+            get => windowWidth;
+            set => SetProperty(ref windowWidth, value);
         }
 
         /// <summary>
         /// Alto de la ventana del diálogo.
         /// </summary>
         [DataMember]
-        public double WindowHeight 
-        { 
-            get => windowHeight; 
-            set => SetProperty(ref windowHeight, value); 
+        public double WindowHeight
+        {
+            get => windowHeight;
+            set => SetProperty(ref windowHeight, value);
         }
     }
 }

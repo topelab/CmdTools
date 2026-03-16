@@ -1,8 +1,8 @@
-namespace ProjectRelations2022.Services
+namespace ProjectRelations2026.Services
 {
     using Microsoft.VisualStudio.Extensibility;
     using Microsoft.VisualStudio.ProjectSystem.Query;
-    using ProjectRelations2022.DTO;
+    using ProjectRelations2026.DTO;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -21,7 +21,7 @@ namespace ProjectRelations2022.Services
                 project => project.Where(p => p.Path == projectPath.LocalPath).With(p => new { p.Name, p.Guid, p.Path }),
                 cancellationToken);
 
-            var projectSnapshot = results.FirstOrDefault();
+            var projectSnapshot = allProjects.FirstOrDefault();
 
             var solutions = await workspace.QuerySolutionAsync(
                 solution => solution.With(s => new { s.BaseName, s.Path, s.Projects }),
@@ -29,7 +29,7 @@ namespace ProjectRelations2022.Services
 
             var solution = solutions.First();
 
-            return new SolutionExplorerItem(projectSnapshot.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), allProjects.ToDictionary(p => p.Name, p => p.Path));
+            return new SolutionExplorerItem(projectSnapshot?.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), allProjects.ToDictionary(p => p.Name, p => p.Path));
         }
     }
 }

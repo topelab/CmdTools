@@ -1,12 +1,12 @@
-namespace ProjectRelations2022.Services
+namespace ProjectRelations2026.Services
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
     using CreateRelationsDiagram;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Internal.VisualStudio.Extensibility.Framework;
-    using ProjectRelations2022.DTO;
-    using ProjectRelations2022.Views;
+    using ProjectRelations2026.DTO;
+    using ProjectRelations2026.Views;
     using System.Globalization;
     using System.IO;
     using System.Threading.Tasks;

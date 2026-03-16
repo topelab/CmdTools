@@ -1,8 +1,8 @@
-namespace ProjectRelations2022.Services
+namespace ProjectRelations2026.Services
 {
     using CreateRelationsDiagram;
-    using ProjectRelations2022.DTO;
-    using ProjectRelations2022.Views;
+    using ProjectRelations2026.DTO;
+    using ProjectRelations2026.Views;
 
     internal interface IProjectRelationsOpener
     {

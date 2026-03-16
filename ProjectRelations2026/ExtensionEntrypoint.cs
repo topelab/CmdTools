@@ -1,8 +1,8 @@
-namespace ProjectRelations2022
+namespace ProjectRelations2026
 {
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.Extensibility;
-    using ProjectRelations2022.Services;
+    using ProjectRelations2026.Services;
     using Topelab.Core.Resolver.Microsoft;
 
     /// <summary>
@@ -15,10 +15,10 @@ namespace ProjectRelations2022
         public override ExtensionConfiguration ExtensionConfiguration => new()
         {
             Metadata = new(
-                    id: "ProjectRelations2022.d36240c7-3cbc-4ceb-96aa-ce0aee85b8b9",
+                    id: "ProjectRelations2026.496f101e-be17-4727-9b84-c0381ed0e400",
                     version: this.ExtensionAssemblyVersion,
                     publisherName: "Joan López",
-                    displayName: "Project Relations 2022",
+                    displayName: "Project Relations 2026",
                     description: "Shows a diagram of project relations"),
         };
 
