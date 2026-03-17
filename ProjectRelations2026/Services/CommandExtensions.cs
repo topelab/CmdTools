@@ -11,25 +11,57 @@ namespace ProjectRelations2026.Services
     {
         public static async Task<SolutionExplorerItem> GetSelectedProjectDetailsAsync(this WorkspacesExtensibility workspace, IClientContext context, CancellationToken cancellationToken)
         {
-            var projectPath = await context.GetSelectedPathAsync(cancellationToken);
+            try
+            {
+                var projectPath = await context.GetSelectedPathAsync(cancellationToken);
 
-            var allProjects = await workspace.QueryProjectsAsync(
-                project => project.With(p => new { p.Name, p.Guid, p.Path }),
-                cancellationToken);
+                // Validar que la ruta seleccionada no sea nula
+                if (projectPath?.LocalPath == null)
+                {
+                    throw new InvalidOperationException("No se seleccionó ningún proyecto. Por favor, selecciona un proyecto en el Solution Explorer.");
+                }
 
-            var results = await workspace.QueryProjectsAsync(
-                project => project.Where(p => p.Path == projectPath.LocalPath).With(p => new { p.Name, p.Guid, p.Path }),
-                cancellationToken);
+                var itemPath = Path.GetDirectoryName(projectPath.LocalPath);
 
-            var projectSnapshot = allProjects.FirstOrDefault();
+                var allProjects = await workspace.QueryProjectsAsync(
+                    project => project.With(p => new { p.Name, p.Guid, p.Path }),
+                    cancellationToken);
 
-            var solutions = await workspace.QuerySolutionAsync(
-                solution => solution.With(s => new { s.BaseName, s.Path, s.Projects }),
-                cancellationToken);
+                var results = allProjects.ToList().Where(
+                    project => itemPath.Contains(Path.GetDirectoryName(project.Path), StringComparison.InvariantCultureIgnoreCase))
+                    .Select(p => new { p.Name, p.Guid, p.Path })
+                    .ToList();
 
-            var solution = solutions.First();
+                var projectSnapshot = results.FirstOrDefault();
 
-            return new SolutionExplorerItem(projectSnapshot?.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), allProjects.ToDictionary(p => p.Name, p => p.Path));
+                // Validar que se encontró el proyecto
+                if (projectSnapshot == null)
+                {
+                    throw new InvalidOperationException($"No se encontró el proyecto en la ruta: {projectPath.LocalPath}");
+                }
+
+                var solutions = await workspace.QuerySolutionAsync(
+                    solution => solution.With(s => new { s.BaseName, s.Path, s.Projects }),
+                    cancellationToken);
+
+                var solution = solutions.FirstOrDefault();
+
+                // Validar que se encontró la solución
+                if (solution == null)
+                {
+                    throw new InvalidOperationException("No se encontró la solución actual.");
+                }
+
+                return new SolutionExplorerItem(projectSnapshot.Name, Path.GetDirectoryName(projectSnapshot.Path), Path.GetDirectoryName(solution.Path), allProjects.ToDictionary(p => p.Name, p => p.Path));
+            }
+            catch (OperationCanceledException)
+            {
+                throw new InvalidOperationException("La operación fue cancelada por el usuario.");
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error al obtener los detalles del proyecto: {ex.Message}", ex);
+            }
         }
     }
 }

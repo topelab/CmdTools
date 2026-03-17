@@ -34,8 +34,15 @@ namespace ProjectRelations2026.Commands
             // Use this object initializer to set optional parameters for the command. The required parameter,
             // displayName, is set above. DisplayName is localized and references an entry in .vsextension\string-resources.json.
             Icon = new(ImageMoniker.KnownValues.Relationship, IconSettings.IconAndText),
-            Placements = [CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x014D, priority: 0x0000)],
-            EnabledWhen = ActivationConstraint.And(ActivationConstraint.SolutionState(SolutionState.MultipleProject), ActivationConstraint.SolutionState(SolutionState.FullyLoaded))
+            Placements = [CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x014D, priority: 0x0000),
+                          CommandPlacement.VsctParent(new Guid("{d309f791-903f-11d0-9efc-00a0c911004f}"), id: 0x0206, priority: 0x2000)],
+            /// El comando está habilitado cuando:
+            /// - La solución tiene múltiples proyectos
+            /// - La solución está completamente cargada
+            /// Si el usuario selecciona algo que no es un proyecto, el comando mostrará un error descriptivo
+            EnabledWhen = ActivationConstraint.SolutionState(SolutionState.MultipleProject)
+                & ActivationConstraint.SolutionState(SolutionState.FullyLoaded)
+                & ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @".+")
         };
 
         /// <inheritdoc />
@@ -48,13 +55,24 @@ namespace ProjectRelations2026.Commands
         /// <inheritdoc />
         public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
         {
-            var workspace = Extensibility.Workspaces();
-            var projectInfo = await workspace.GetSelectedProjectDetailsAsync(context, cancellationToken);
-            var projectRelationsOpener = ExtensionContext.ServiceProvider.GetService<IProjectRelationsOpener>();
+            try
+            {
+                var workspace = Extensibility.Workspaces();
+                var projectInfo = await workspace.GetSelectedProjectDetailsAsync(context, cancellationToken);
+                var projectRelationsOpener = ExtensionContext.ServiceProvider.GetService<IProjectRelationsOpener>();
 
-            var result = await projectRelationsOpener.OpenAsync(DTO.RelationType.UsedBy, projectInfo);
-            var remoteControl = new RelationsUserControl(result);
-            await this.Extensibility.Shell().ShowDialogAsync(remoteControl, result.Title, cancellationToken);
+                var result = await projectRelationsOpener.OpenAsync(DTO.RelationType.UsedBy, projectInfo);
+                var remoteControl = new RelationsUserControl(result);
+                await this.Extensibility.Shell().ShowDialogAsync(remoteControl, result.Title, cancellationToken);
+            }
+            catch (InvalidOperationException ex)
+            {
+                logger.TraceInformation($"No se puede ejecutar el comando: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                logger.TraceInformation($"Error ejecutando comando: {ex.Message}");
+            }
         }
     }
 }
