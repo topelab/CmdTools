@@ -67,7 +67,7 @@ namespace ProjectRelations2026.Commands
             }
             catch (InvalidOperationException ex)
             {
-                logger.TraceInformation($"No se puede ejecutar el comando: {ex.Message}");
+                logger.TraceInformation(ex.Message);
             }
             catch (Exception ex)
             {
