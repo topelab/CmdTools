@@ -6,41 +6,48 @@
 			  xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
 	<Grid x:Name="RootGrid"
 		  MaxWidth="{Binding WindowWidth}"
-		  MaxHeight="{Binding WindowHeight}"
-		  MinWidth="1000"
-		  MinHeight="800">
+		  MaxHeight="{Binding WindowHeight}">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="20*" />
 			<ColumnDefinition Width="80*" />
 		</Grid.ColumnDefinitions>
-		<ScrollViewer Grid.Column="0"
-					  VerticalScrollBarVisibility="Auto"
-					  HorizontalScrollBarVisibility="Auto">
-			<StackPanel Grid.Row="0"
-						Orientation="Vertical"
-						Margin="5">
-				<RadioButton Content="Used By this project"
-							 IsChecked="{Binding IsUsedBy, Mode=TwoWay}"
-							 GroupName="RelationsGroup"
-							 Margin="5" />
-				<RadioButton Content="Using this project"
-							 IsChecked="{Binding IsUsing, Mode=TwoWay}"
-							 GroupName="RelationsGroup"
-							 Margin="5" />
-				<CheckBox Content="Include packages"
-						  Visibility="{Binding IncludePackagesVisibility}"
-						  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
-						  Margin="5" />
-				<TextBlock Text="Projects"
-						   FontWeight="Bold"
-						   Margin="5" />
-				<ListBox Margin="5"
-						 ItemsSource="{Binding Items}"
-						 SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
-			</StackPanel>
-		</ScrollViewer>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<StackPanel Grid.Row="0"
+					Orientation="Vertical"
+					Margin="5">
+			<RadioButton Content="Used By this project"
+						 IsChecked="{Binding IsUsedBy, Mode=TwoWay}"
+						 GroupName="RelationsGroup"
+						 Margin="5" />
+			<RadioButton Content="Using this project"
+						 IsChecked="{Binding IsUsing, Mode=TwoWay}"
+						 GroupName="RelationsGroup"
+						 Margin="5" />
+			<CheckBox Content="Include packages"
+					  Visibility="{Binding IncludePackagesVisibility}"
+					  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
+					  Margin="5" />
+			<TextBlock Text="Projects"
+					   FontWeight="Bold"
+					   Margin="5" />
+		</StackPanel>
+
+		<ListBox Grid.Row="1"
+				 Margin="5"
+				 ItemsSource="{Binding Items}"
+				 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+				 VerticalAlignment="Stretch"
+				 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+
 		<wv2:WebView2 Name="webView2"
 					  Grid.Column="1"
+					  Grid.RowSpan="2"
+					  MinWidth="800"
+					  MinHeight="800"
 					  HorizontalAlignment="Stretch"
 					  VerticalAlignment="Stretch"
 					  Source="{Binding Url}">
