@@ -24,9 +24,9 @@ namespace ProjectRelations2026.Views
             var screenWidth = Screen.PrimaryScreen.Bounds.Width;
             var screenHeight = Screen.PrimaryScreen.Bounds.Height;
 
-            // Usar el 80% del tamaño de la pantalla para dejar espacio a VS
-            windowWidth = screenWidth * 0.80;
-            windowHeight = screenHeight * 0.80;
+            // Usar el tamaño de la pantalla menos un margen para dejar espacio a VS
+            windowWidth = screenWidth - 50;
+            windowHeight = screenHeight - 50;
         }
 
         [DataMember]
