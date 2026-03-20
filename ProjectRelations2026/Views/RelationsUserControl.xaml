@@ -8,8 +8,8 @@
 		  MaxWidth="{Binding WindowWidth}"
 		  MaxHeight="{Binding WindowHeight}">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="20*" />
-			<ColumnDefinition Width="80*" />
+			<ColumnDefinition Width="20*" MinWidth="200" />
+			<ColumnDefinition Width="80*" MinWidth="800" />
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
@@ -40,20 +40,21 @@
 				 Margin="5"
 				 ItemsSource="{Binding Items}"
 				 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-				 VerticalAlignment="Stretch"
+				 MaxHeight="600"
+				 VerticalAlignment="Top"
 				 ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-		<wv2:WebView2 Name="webView2"
-					  Grid.Column="1"
-					  Grid.RowSpan="2"
-					  MinWidth="800"
-					  MinHeight="800"
-					  HorizontalAlignment="Stretch"
-					  VerticalAlignment="Stretch"
-					  Source="{Binding Url}">
-			<wv2:WebView2.CreationProperties>
-				<wv2:CoreWebView2CreationProperties UserDataFolder="C:\ProgramData\ProjectRelations2026" />
-			</wv2:WebView2.CreationProperties>
-		</wv2:WebView2>
+		<Grid Grid.Column="1"
+			  Grid.RowSpan="2">
+			<wv2:WebView2 Name="webView2"
+						  HorizontalAlignment="Stretch"
+						  VerticalAlignment="Stretch"
+						  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+						  Source="{Binding Url}">
+				<wv2:WebView2.CreationProperties>
+					<wv2:CoreWebView2CreationProperties UserDataFolder="C:\ProgramData\ProjectRelations2026" />
+				</wv2:WebView2.CreationProperties>
+			</wv2:WebView2>
+		</Grid>
 	</Grid>
 </DataTemplate>
