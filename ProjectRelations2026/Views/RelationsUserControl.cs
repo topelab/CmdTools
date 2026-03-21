@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.Extensibility.UI;
+using RelationsShared.DTO;
 
 namespace ProjectRelations2026.Views
 {

@@ -1,13 +1,10 @@
-namespace ProjectRelations2026.Views
+namespace RelationsShared.DTO
 {
-    using Microsoft.VisualStudio.Extensibility.UI;
-    using ProjectRelations2026.DTO;
+    using ReactiveUI;
     using System.Runtime.Serialization;
-    using System.Windows;
-    using System.Windows.Forms;
 
     [DataContract]
-    public class RelationsUserControlContext : NotifyPropertyChangedObject
+    public class RelationsUserControlContext : ReactiveObject
     {
         private string selectedItem;
         private bool isUsedBy;
@@ -15,22 +12,11 @@ namespace ProjectRelations2026.Views
         private bool includePackages;
         private string url;
         private bool showListOnly;
-        private double windowWidth;
-        private double windowHeight;
-
-        public RelationsUserControlContext()
-        {
-            // Inicializar con el tamaño de la pantalla actual
-            var screenWidth = Screen.PrimaryScreen.Bounds.Width;
-            var screenHeight = Screen.PrimaryScreen.Bounds.Height;
-
-            // Usar el tamaño de la pantalla menos un margen para dejar espacio a VS
-            windowWidth = screenWidth - 50;
-            windowHeight = screenHeight - 50;
-        }
+        private double windowWidth = 1920;
+        private double windowHeight = 1080;
 
         [DataMember]
-        public string Url { get => url; set => SetProperty(ref url, value); }
+        public string Url { get => url; set => this.RaiseAndSetIfChanged(ref url, value); }
 
         [DataMember]
         public string UserDataFolder { get; set; }
@@ -45,25 +31,25 @@ namespace ProjectRelations2026.Views
         public List<string> Items { get; set; } = [];
 
         [DataMember]
-        public string SelectedItem { get => selectedItem; set => SetProperty(ref selectedItem, value); }
+        public string SelectedItem { get => selectedItem; set => this.RaiseAndSetIfChanged(ref selectedItem, value); }
 
 
         [DataMember]
         public bool IncludePackages
         {
             get { return includePackages; }
-            set { SetProperty(ref includePackages, value); }
+            set { this.RaiseAndSetIfChanged(ref includePackages, value); }
         }
 
         [DataMember]
         public bool ShowListOnly
         {
             get => showListOnly;
-            set => SetProperty(ref showListOnly, value);
+            set => this.RaiseAndSetIfChanged(ref showListOnly, value);
         }
 
         [DataMember]
-        public Visibility IncludePackagesVisibility => IsUsedBy ? Visibility.Visible : Visibility.Collapsed;
+        public bool IncludePackagesVisibility => IsUsedBy;
 
 
         [DataMember]
@@ -72,11 +58,11 @@ namespace ProjectRelations2026.Views
             get { return isUsedBy; }
             set
             {
-                if (SetProperty(ref isUsedBy, value))
-                {
-                    RaiseNotifyPropertyChangedEvent(nameof(IncludePackagesVisibility));
-                    RaiseNotifyPropertyChangedEvent(nameof(RelationType));
-                }
+                if (isUsedBy == value) return;
+                isUsedBy = value;
+                this.RaisePropertyChanged(nameof(IsUsedBy));
+                this.RaisePropertyChanged(nameof(IncludePackagesVisibility));
+                this.RaisePropertyChanged(nameof(RelationType));
             }
         }
 
@@ -84,7 +70,7 @@ namespace ProjectRelations2026.Views
         public bool IsUsing
         {
             get { return isUsing; }
-            set { SetProperty(ref isUsing, value); }
+            set { this.RaiseAndSetIfChanged(ref isUsing, value); }
         }
 
         [DataMember]
@@ -97,7 +83,7 @@ namespace ProjectRelations2026.Views
         public double WindowWidth
         {
             get => windowWidth;
-            set => SetProperty(ref windowWidth, value);
+            set => this.RaiseAndSetIfChanged(ref windowWidth, value);
         }
 
         /// <summary>
@@ -107,7 +93,7 @@ namespace ProjectRelations2026.Views
         public double WindowHeight
         {
             get => windowHeight;
-            set => SetProperty(ref windowHeight, value);
+            set => this.RaiseAndSetIfChanged(ref windowHeight, value);
         }
     }
 }

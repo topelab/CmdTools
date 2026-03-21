@@ -2,7 +2,7 @@ namespace ProjectRelations2026.Services
 {
     using Microsoft.VisualStudio.Extensibility;
     using Microsoft.VisualStudio.ProjectSystem.Query;
-    using ProjectRelations2026.DTO;
+    using RelationsShared.DTO;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;

@@ -1,4 +1,4 @@
-namespace CreateRelationsDiagram
+namespace RelationsShared.Services
 {
     using CmdTools.Shared;
     using System.Collections.Generic;

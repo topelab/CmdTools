@@ -1,4 +1,4 @@
-namespace CreateRelationsDiagram
+namespace CmdTools.Shared
 {
     using CmdTools.Contracts;
     using CommandLine;

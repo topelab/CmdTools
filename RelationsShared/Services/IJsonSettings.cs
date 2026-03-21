@@ -1,4 +1,4 @@
-namespace ProjectRelations2026.Services
+namespace RelationsShared.Services
 {
     using Newtonsoft.Json.Linq;
 

@@ -18,6 +18,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />
-    <ProjectReference Include="..\CreateRelationsDiagram\CreateRelationsDiagram.csproj" />
+    <ProjectReference Include="..\RelationsShared\RelationsShared.csproj" />
   </ItemGroup>
 </Project>

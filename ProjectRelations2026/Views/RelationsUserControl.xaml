@@ -4,9 +4,7 @@
 			  xmlns:styles="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
 			  xmlns:colors="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
 			  xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
-	<Grid x:Name="RootGrid"
-		  MaxWidth="{Binding WindowWidth}"
-		  MaxHeight="{Binding WindowHeight}">
+	<Grid x:Name="RootGrid">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="20*" MinWidth="200" />
 			<ColumnDefinition Width="80*" MinWidth="800" />

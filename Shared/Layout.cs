@@ -1,4 +1,4 @@
-namespace CreateRelationsDiagram
+namespace CmdTools.Shared
 {
     using System.ComponentModel;
 

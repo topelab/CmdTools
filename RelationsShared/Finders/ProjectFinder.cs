@@ -1,7 +1,9 @@
-namespace CreateRelationsDiagram
+namespace RelationsShared.Finders
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
+    using RelationsShared.DTO;
+    using RelationsShared.Services;
     using System.Text.RegularExpressions;
 
     internal class ProjectFinder : ElementFinderBase, IElementFinder

@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 
-namespace ProjectRelations2026.Services
+namespace RelationsShared.Services
 {
     public class JsonSettings : IJsonSettings
     {

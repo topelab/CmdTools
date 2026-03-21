@@ -1,6 +1,6 @@
-namespace ProjectRelations2026.Services
+namespace RelationsShared.Services
 {
-    using ProjectRelations2026.DTO;
+    using RelationsShared.DTO;
     using System;
     using System.IO;
 

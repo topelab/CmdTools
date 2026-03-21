@@ -1,4 +1,4 @@
-namespace CreateRelationsDiagram
+namespace RelationsShared.Finders
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;

@@ -1,21 +1,18 @@
-namespace ProjectRelations2026.Services
+namespace RelationsShared.Services
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
-    using CreateRelationsDiagram;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Internal.VisualStudio.Extensibility.Framework;
-    using ProjectRelations2026.DTO;
-    using ProjectRelations2026.Views;
+    using RelationsShared.DTO;
     using System.Globalization;
     using System.IO;
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class ProjectRelationsOpener(IUserSettingsFactory userSettingsFactory) : IProjectRelationsOpener
+    internal class ProjectRelationsOpener(IUserSettingsFactory userSettingsFactory, IResolver resolver) : IProjectRelationsOpener
     {
         private UserSettings userSettings;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
+        private readonly IResolver resolver = resolver;
 
         private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create();
 
@@ -86,7 +83,6 @@ namespace ProjectRelations2026.Services
 
         private async Task RunAsync(ProjectOptions options)
         {
-            var resolver = ExtensionContext.ServiceProvider.GetService<IResolver>();
             var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
             await Task.Run(() => elementFinder.Run(options));
         }

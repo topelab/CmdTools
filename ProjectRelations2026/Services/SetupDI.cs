@@ -7,10 +7,7 @@ namespace ProjectRelations2026.Services
         public static ResolveInfoCollection GetResolveInfoCollection()
         {
             return new ResolveInfoCollection()
-                .AddCollection(CreateRelationsDiagram.SetupDI.Register())
-                .AddSingleton<IJsonSettings, JsonSettings>()
-                .AddSingleton<IUserSettingsFactory, UserSettingsFactory>()
-                .AddTransient<IProjectRelationsOpener, ProjectRelationsOpener>();
+                .AddCollection(RelationsShared.SetupDI.Register());
         }
     }
 }
