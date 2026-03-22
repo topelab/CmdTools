@@ -8,9 +8,9 @@ namespace RelationsShared.Services
     {
         private readonly IJsonSettings jsonSetting = jsonSetting;
 
-        public UserSettings Create()
+        public UserSettings Create(string name)
         {
-            var settingsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "appsettings.json");
+            var settingsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), name, "appsettings.json");
             EnsureSettingsFileExists(settingsFile);
             jsonSetting.Initialize(settingsFile);
 

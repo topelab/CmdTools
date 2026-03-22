@@ -2,15 +2,18 @@ namespace RelationsShared.Services
 {
     using CmdTools.Shared;
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
     internal class ProjectReferences : IProjectReferences
     {
         private bool withPackages;
+        private Regex excludeProjects;
 
-        public void Initialize(bool withPackages)
+        public void Initialize(bool withPackages, Regex excludeProjects)
         {
             this.withPackages = withPackages;
+            this.excludeProjects = excludeProjects;
         }
 
         public IEnumerable<string> Get(string projectPath)
@@ -33,6 +36,7 @@ namespace RelationsShared.Services
                 .Select(d => $"{d.Name}{(string.IsNullOrEmpty(d.Version) ? string.Empty : "-")}{d.Version}:::pkg") : [];
 
             return projectReferences
+                .Where(r => excludeProjects == null || !excludeProjects.IsMatch(r))
                 .Select(r => Path.GetFileNameWithoutExtension(r))
                 .Where(v => !string.IsNullOrEmpty(v))
                 .Union(packageReferences);
@@ -84,6 +88,7 @@ namespace RelationsShared.Services
                     .Where(d => d.Attribute("Include") != null)
                     .Select(d => GetFullPath(Path.GetDirectoryName(localBasePath), d.Attribute("Include").Value))
                     .Where(p => !currentProjects.Contains(p))
+                    .Where(r => excludeProjects == null || !excludeProjects.IsMatch(r))
                     .ToList();
 
                 projectReferences.ForEach(reference => currentProjects.Add(reference));

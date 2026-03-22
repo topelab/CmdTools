@@ -4,6 +4,6 @@ namespace RelationsShared.Services
 
     public interface IUserSettingsFactory
     {
-        UserSettings Create();
+        UserSettings Create(string name);
     }
 }

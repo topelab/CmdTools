@@ -28,11 +28,11 @@ namespace RelationsShared.Finders
 
             var path = options.RootPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
-            var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude);
+            var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
             var projectFilter = options.ProjectFilter;
             var pinnedProject = options.PinnedProject?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
 
-            projectReferences.Initialize(options.WithPackages);
+            projectReferences.Initialize(options.WithPackages, excludeProjects);
             fileExecutor.Initialize(path, Constants.FilePattern, excludeProjects);
 
             var projectFiles = GetProjectFiles();

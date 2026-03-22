@@ -1,32 +1,35 @@
-namespace RelationsShared.Services
+using RelationsShared.Services;
+
+namespace ProjectRelations2026.Services
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
     using RelationsShared.DTO;
     using System.Globalization;
     using System.IO;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class ProjectRelationsOpener(IUserSettingsFactory userSettingsFactory, IResolver resolver) : IProjectRelationsOpener
+    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory, IResolver resolver) : IRelationsContextFactory
     {
         private UserSettings userSettings;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
         private readonly IResolver resolver = resolver;
 
-        private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create();
+        private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
 
-        public async Task<RelationsUserControlContext> OpenAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
+        public async Task<RelationsContext> CreateAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
         {
             var projectOptions = BuildOptions(solutionExplorerItem, relationType);
             await RunAsync(projectOptions);
-            var relationsWindowsContext = new RelationsUserControlContext
+            var relationsWindowsContext = new RelationsContext
             {
                 MermaidFile = projectOptions.OutputFile,
                 UserSettings = UserSettings,
                 Title = "Project relations",
                 UserDataFolder = GetUserDataFolder(),
-                Items = [.. solutionExplorerItem.Projects.Keys.OrderBy(k => k)],
+                Items = [.. GetFilteredProjects(solutionExplorerItem, projectOptions.Exclude)],
                 SelectedItem = solutionExplorerItem.Name,
                 IsUsing = relationType == RelationType.Using,
                 IsUsedBy = relationType == RelationType.UsedBy,
@@ -37,20 +40,26 @@ namespace RelationsShared.Services
             return relationsWindowsContext;
         }
 
-        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsUserControlContext relationsWindowsContext)
+        private IEnumerable<string> GetFilteredProjects(SolutionExplorerItem solutionExplorerItem, string excludeProjectsOption)
+        {
+            var excludeProjects = string.IsNullOrEmpty(excludeProjectsOption) ? null : new Regex(excludeProjectsOption, RegexOptions.IgnoreCase);
+            return solutionExplorerItem.Projects.Keys.Where(k => excludeProjects == null || !excludeProjects.IsMatch(k)).OrderBy(k => k);
+        }
+
+        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsContext relationsWindowsContext)
         {
             _ = OnRelationsWindowsContextPropertyChangedAsync(sender, propertyName, solutionExplorerItem, relationsWindowsContext);
         }
 
-        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsUserControlContext relationsWindowsContext)
+        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsContext relationsWindowsContext)
         {
-            if (sender is RelationsUserControlContext context)
+            if (sender is RelationsContext context)
             {
                 switch (propertyName)
                 {
-                    case nameof(RelationsUserControlContext.RelationType):
-                    case nameof(RelationsUserControlContext.SelectedItem):
-                    case nameof(RelationsUserControlContext.IncludePackages):
+                    case nameof(RelationsContext.RelationType):
+                    case nameof(RelationsContext.SelectedItem):
+                    case nameof(RelationsContext.IncludePackages):
                         var relationType = context.RelationType;
                         var localSolutionExplorerItem = solutionExplorerItem with { Name = context.SelectedItem, Path = Path.GetDirectoryName(solutionExplorerItem.Projects[context.SelectedItem]) };
                         var projectOptions = BuildOptions(localSolutionExplorerItem, relationType);
@@ -87,7 +96,7 @@ namespace RelationsShared.Services
             await Task.Run(() => elementFinder.Run(options));
         }
 
-        public async Task GenerateAsync(RelationsUserControlContext relationsWindowsContext, string mmdFile)
+        public async Task GenerateAsync(RelationsContext relationsWindowsContext, string mmdFile)
         {
             var content = File.Exists(mmdFile) ? await File.ReadAllTextAsync(mmdFile) : "graph TD\n\tEmpty";
             var html = RenderMermaid(content);
@@ -105,7 +114,7 @@ namespace RelationsShared.Services
                 <html>
                 <head>
                 	<meta charset="utf-8">
-                	<script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
+                	<script src="https://unpkg.com/@panzoom/panzoom@4.6.1/dist/panzoom.min.js"></script>
                     <script type="module">
                 		import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
                 		import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";

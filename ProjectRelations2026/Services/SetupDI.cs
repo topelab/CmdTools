@@ -7,7 +7,9 @@ namespace ProjectRelations2026.Services
         public static ResolveInfoCollection GetResolveInfoCollection()
         {
             return new ResolveInfoCollection()
-                .AddCollection(RelationsShared.SetupDI.Register());
+                .AddCollection(RelationsShared.SetupDI.Register())
+                .AddTransient<IRelationsContextFactory, RelationsContextFactory>()
+                ;
         }
     }
 }

@@ -4,7 +4,7 @@ namespace RelationsShared.DTO
     using System.Runtime.Serialization;
 
     [DataContract]
-    public class RelationsUserControlContext : ReactiveObject
+    public class RelationsContext : ReactiveObject
     {
         private string selectedItem;
         private bool isUsedBy;

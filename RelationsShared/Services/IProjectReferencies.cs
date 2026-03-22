@@ -1,6 +1,7 @@
 namespace RelationsShared.Services
 {
     using CmdTools.Shared;
+    using System.Text.RegularExpressions;
 
     internal interface IProjectReferences
     {
@@ -8,6 +9,6 @@ namespace RelationsShared.Services
         ReferencesBag GetInverseReferences(HashSet<string> projectFiles);
         IEnumerable<string> GetProjects(string file, HashSet<string> currentProjects = null, string basePath = null);
         ReferencesBag GetReferences(HashSet<string> projectFiles);
-        void Initialize(bool withPackages);
+        void Initialize(bool withPackages, Regex excludeProjects);
     }
 }

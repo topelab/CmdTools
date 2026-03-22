@@ -11,7 +11,7 @@
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
+			<RowDefinition Height="*" MinHeight="800" />
 		</Grid.RowDefinitions>
 
 		<StackPanel Grid.Row="0"
@@ -26,7 +26,7 @@
 						 GroupName="RelationsGroup"
 						 Margin="5" />
 			<CheckBox Content="Include packages"
-					  Visibility="{Binding IncludePackagesVisibility}"
+					  Visibility="{Binding IncludePackagesVisibility, Converter={StaticResource BooleanToVisibilityConverter}}"
 					  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
 					  Margin="5" />
 			<TextBlock Text="Projects"

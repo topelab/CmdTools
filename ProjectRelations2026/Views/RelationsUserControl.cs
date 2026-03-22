@@ -8,7 +8,7 @@ namespace ProjectRelations2026.Views
     /// </summary>
     public class RelationsUserControl : RemoteUserControl
     {
-        public RelationsUserControl(RelationsUserControlContext relationsUserControlContext) : base(relationsUserControlContext, null)
+        public RelationsUserControl(RelationsContext relationsContext) : base(relationsContext, null)
         {
         }
     }

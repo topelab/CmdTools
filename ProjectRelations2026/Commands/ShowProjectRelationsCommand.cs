@@ -8,7 +8,6 @@ namespace ProjectRelations2026.Commands
     using ProjectRelations2026.Services;
     using ProjectRelations2026.Views;
     using RelationsShared.DTO;
-    using RelationsShared.Services;
     using System.Diagnostics;
 
     /// <summary>
@@ -61,9 +60,9 @@ namespace ProjectRelations2026.Commands
             {
                 var workspace = Extensibility.Workspaces();
                 var projectInfo = await workspace.GetSelectedProjectDetailsAsync(context, cancellationToken);
-                var projectRelationsOpener = ExtensionContext.ServiceProvider.GetService<IProjectRelationsOpener>();
+                var relationsContextFactory = ExtensionContext.ServiceProvider.GetService<IRelationsContextFactory>();
 
-                var result = await projectRelationsOpener.OpenAsync(RelationType.UsedBy, projectInfo);
+                var result = await relationsContextFactory.CreateAsync(RelationType.UsedBy, projectInfo);
                 var remoteControl = new RelationsUserControl(result);
                 await this.Extensibility.Shell().ShowDialogAsync(remoteControl, result.Title, cancellationToken);
             }

@@ -14,7 +14,6 @@ namespace RelationsShared
                 .AddCollection(SharedSetupDI.Register())
                 .AddSingleton<IJsonSettings, JsonSettings>()
                 .AddSingleton<IUserSettingsFactory, UserSettingsFactory>()
-                .AddTransient<IProjectRelationsOpener, ProjectRelationsOpener>()
                 .AddTransient<IProjectReferences, ProjectReferences>()
                 .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.Projects))
                 .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.ReverseProjects))
