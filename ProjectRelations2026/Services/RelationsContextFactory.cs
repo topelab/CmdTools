@@ -5,37 +5,36 @@ namespace ProjectRelations2026.Services
     using CmdTools.Contracts;
     using CmdTools.Shared;
     using RelationsShared.DTO;
-    using System.Globalization;
     using System.IO;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory, IResolver resolver) : IRelationsContextFactory
+    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory, IResolver resolver, IMermaidFactory mermaidFactory) : IRelationsContextFactory
     {
         private UserSettings userSettings;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
         private readonly IResolver resolver = resolver;
+        private readonly IMermaidFactory mermaidFactory = mermaidFactory;
 
         private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
 
         public async Task<RelationsContext> CreateAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
         {
             var projectOptions = BuildOptions(solutionExplorerItem, relationType);
-            await RunAsync(projectOptions);
+            var content = await RunAsync(projectOptions);
             var relationsWindowsContext = new RelationsContext
             {
                 MermaidFile = projectOptions.OutputFile,
                 UserSettings = UserSettings,
                 Title = "Project relations",
-                UserDataFolder = GetUserDataFolder(),
                 Items = [.. GetFilteredProjects(solutionExplorerItem, projectOptions.Exclude)],
                 SelectedItem = solutionExplorerItem.Name,
                 IsUsing = relationType == RelationType.Using,
                 IsUsedBy = relationType == RelationType.UsedBy,
                 IncludePackages = projectOptions.WithPackages
             };
-            await GenerateAsync(relationsWindowsContext, projectOptions.OutputFile);
+            await GenerateAsync(relationsWindowsContext, content);
             relationsWindowsContext.PropertyChanged += (s, e) => OnRelationsWindowsContextPropertyChanged(s, e.PropertyName, solutionExplorerItem, relationsWindowsContext);
             return relationsWindowsContext;
         }
@@ -64,8 +63,8 @@ namespace ProjectRelations2026.Services
                         var localSolutionExplorerItem = solutionExplorerItem with { Name = context.SelectedItem, Path = Path.GetDirectoryName(solutionExplorerItem.Projects[context.SelectedItem]) };
                         var projectOptions = BuildOptions(localSolutionExplorerItem, relationType);
                         projectOptions.WithPackages = context.IncludePackages;
-                        await RunAsync(projectOptions);
-                        await GenerateAsync(context, projectOptions.OutputFile);
+                        var content = await RunAsync(projectOptions);
+                        await GenerateAsync(context, content);
                         break;
                 }
             }
@@ -90,100 +89,19 @@ namespace ProjectRelations2026.Services
             };
         }
 
-        private async Task RunAsync(ProjectOptions options)
+        private async Task<string> RunAsync(ProjectOptions options)
         {
             var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
-            await Task.Run(() => elementFinder.Run(options));
+            return await Task.Run(() => elementFinder.Get(options));
         }
 
-        public async Task GenerateAsync(RelationsContext relationsWindowsContext, string mmdFile)
+        public async Task GenerateAsync(RelationsContext relationsWindowsContext, string content)
         {
-            var content = File.Exists(mmdFile) ? await File.ReadAllTextAsync(mmdFile) : "graph TD\n\tEmpty";
-            var html = RenderMermaid(content);
+            content = string.IsNullOrEmpty(content) ? "graph TD\n\tEmpty" : content;
+            var html = mermaidFactory.Render(content, UserSettings);
             string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.html");
             await File.WriteAllTextAsync(fileName, html);
             relationsWindowsContext.Url = new Uri(fileName).AbsoluteUri;
-        }
-
-        private string RenderMermaid(string mmd)
-        {
-            var color = UserSettings.HasBackgroundColor ? UserSettings.BackgroundColor.ToLower() : "black";
-            var encoded = System.Net.WebUtility.HtmlEncode(mmd);
-            var html = $$"""
-                <!doctype html>
-                <html>
-                <head>
-                	<meta charset="utf-8">
-                	<script src="https://unpkg.com/@panzoom/panzoom@4.6.1/dist/panzoom.min.js"></script>
-                    <script type="module">
-                		import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
-                		import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
-
-                		// Registra el motor ELK con Mermaid
-                		mermaid.registerLayoutLoaders(elkLayouts);
-
-                		// Inicializa Mermaid
-                		mermaid.initialize({
-                			startOnLoad: false,
-                			flowchart: { defaultRenderer: "elk" },
-                            maxTextSize: {{UserSettings.MaxTextSize}},
-                            maxEdges: {{UserSettings.MaxEdges}}
-                		});
-
-                		await mermaid.run({
-                			querySelector: '.mermaid',
-                			postRenderCallback: (id) => {
-                				const container = document.getElementById("diagram-container");
-                				const svgElement = container.querySelector("svg");
-
-                				// Initialize Panzoom
-                				const panzoomInstance = Panzoom(svgElement, {
-                					maxScale: {{UserSettings.MaxZoomLevel.ToString("0.0", CultureInfo.InvariantCulture)}},
-                					minScale: {{UserSettings.MinZoomLevel.ToString("0.0", CultureInfo.InvariantCulture)}},
-                					step: 0.5,
-                				});
-
-                				// Add mouse wheel zoom
-                				container.addEventListener("wheel", (event) => {
-                					panzoomInstance.zoomWithWheel(event);
-                				});
-                			}
-                		});
-                	</script>
-                	<style>
-                		/* Estilos personalizados para Mermaid */
-                        html, body {
-                            height: 100%;
-                            margin:0;
-                            padding:0;
-                            background-color: {{color}};
-                        }
-                		.mermaid {
-                            height: 100vh; /* ocupa toda la altura de la ventana */
-                            box-sizing: border-box;
-                            background-color: {{color}};
-                            padding: 0px;
-                		}
-                		.diagram-container {
-                			width: 100%;
-                			height: 100%;
-                			overflow: hidden;
-                			position: relative;
-                		}
-                		svg {
-                			cursor: grab;
-                		}
-                	</style>
-                	</head>
-                	<body>
-                		<div class="diagram-container" id="diagram-container">
-                			<pre class="mermaid">{{encoded}}</pre>
-                		</div>
-                	</body>
-                </html>
-                """;
-
-            return html;
         }
 
         private string GetRootPath(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
@@ -210,11 +128,6 @@ namespace ProjectRelations2026.Services
         {
             var prefix = relationType.GetDescription().ToLower().Replace(" ", "-");
             return Path.Combine(Path.GetTempPath(), $"{prefix}-{projectName.ToLower()}-{Guid.NewGuid()}.mmd");
-        }
-
-        private string GetUserDataFolder()
-        {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "WebView2");
         }
     }
 }

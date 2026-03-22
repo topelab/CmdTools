@@ -5,6 +5,8 @@ namespace CmdTools.Contracts
     /// </summary>
     public interface IElementFinder
     {
+        string Get<T>(T args) where T : class;
+
         /// <summary>
         /// Ejecuta la lógica de búsqueda de elementos utilizando las opciones proporcionadas.
         /// </summary>

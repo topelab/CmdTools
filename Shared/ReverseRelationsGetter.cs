@@ -5,7 +5,7 @@ namespace CmdTools.Shared
 
     internal class ReverseRelationsGetter : RelationsGetter
     {
-        public override string Get(IReferencesBag references, string elementFilter)
+        public override IEnumerable<TRelation> Get<TRelation>(IReferencesBag references, string elementFilter)
         {
             HashSet<string> welcomeElements = [];
 
@@ -32,17 +32,13 @@ namespace CmdTools.Shared
 
             var content = new StringBuilder();
 
-            List<(string element, string reference)> contentResult = [];
-            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
+            List<TRelation> contentResult = [];
+            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => new TRelation { Element = reference, Reference = element })));
 
-            contentResult
-                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
-                .OrderBy(p => p.reference)
-                .ThenBy(p => p.element)
-                .ToList()
-                .ForEach(p => content.AppendLine($"\t{p.reference} -->\t{p.element} "));
-
-            return content.ToString();
+            return contentResult
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.Reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
+                .OrderBy(p => p.Element)
+                .ThenBy(p => p.Reference);
         }
     }
 }

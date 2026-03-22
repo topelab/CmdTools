@@ -3,6 +3,8 @@ namespace RelationsShared.Finders
     using CmdTools.Contracts;
     using CmdTools.Shared;
     using Microsoft.CSharp;
+    using RelationsShared.DTO;
+    using RelationsShared.Services;
     using System.CodeDom;
     using System.Reflection;
     using System.Text.RegularExpressions;
@@ -10,10 +12,12 @@ namespace RelationsShared.Finders
     internal class ClassesFinder : ElementFinderBase, IElementFinder
     {
         protected readonly IRelationGetterFactory relationGetterFactory;
+        private readonly IMermaidFactory mermaidFactory;
 
-        public ClassesFinder(IRelationGetterFactory relationGetterFactory)
+        public ClassesFinder(IRelationGetterFactory relationGetterFactory, IMermaidFactory mermaidFactory)
         {
             this.relationGetterFactory = relationGetterFactory;
+            this.mermaidFactory = mermaidFactory;
         }
 
         public void Run<T>(T args) where T : class
@@ -23,31 +27,42 @@ namespace RelationsShared.Finders
                 throw new ArgumentException("Invalid options type", nameof(args));
             }
 
-            var assembly = options.Assembly;
-            var nameSpace = options.NameSpace;
-            var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);
             var outputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
-            var className = options.ClassName;
-            var excludeClasses = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
+            var content = Get(args);
+            if (!string.IsNullOrEmpty(content))
+            {
+                Finalize(content, outputFile, options.OpenOutput);
+            }
+        }
 
+        public string Get<T>(T args) where T : class
+        {
+            string result = string.Empty;
+
+            if (args is not ClassOptions options)
+            {
+                throw new ArgumentException("Invalid options type", nameof(args));
+            }
+            var assembly = options.Assembly;
             if (string.IsNullOrEmpty(assembly))
             {
-                Console.WriteLine("Assembly (-a --assembly) is mandatory when classes option is set");
-                return;
+                throw new InvalidOperationException("Assembly (-a --assembly) is mandatory when classes option is set");
             }
+
+            var nameSpace = options.NameSpace;
+            var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);
+            var className = options.ClassName;
+            var excludeClasses = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
 
             var classes = GetClasses(assembly, nameSpace, nameSpaceToClean, excludeClasses);
             if (classes.Count > 0)
             {
                 var relationsGetter = relationGetterFactory.Create(options.FinderType);
-
-                var content = relationsGetter.Get(
-                    classes,
-                    className);
-
-                content = GetComposition(content, options.Theme, options.Layout, options.Direction);
-                Finalize(content, outputFile, options.OpenOutput);
+                var relations = relationsGetter.Get<MermaidRelation>(classes, className);
+                result = mermaidFactory.Create(relations, options.Theme, options.Layout, options.Direction);
             }
+
+            return result;
         }
 
         protected ReferencesBag GetClasses(string assembly, string nameSpace, string nameSpaceToClean, Regex excludeClasses)

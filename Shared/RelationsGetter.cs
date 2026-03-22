@@ -1,11 +1,11 @@
 namespace CmdTools.Shared
 {
     using CmdTools.Contracts;
-    using System.Text;
+    using CmdTools.Contracts.DTO;
 
     internal class RelationsGetter : IRelationsGetter
     {
-        public virtual string Get(IReferencesBag references, string elementFilter)
+        public virtual IEnumerable<TRelation> Get<TRelation>(IReferencesBag references, string elementFilter) where TRelation : Relation, new()
         {
             HashSet<string> welcomeElements = [];
 
@@ -30,19 +30,13 @@ namespace CmdTools.Shared
                 .Where(p => references.ContainsKey(p))
                 .ToList();
 
-            var content = new StringBuilder();
+            List<TRelation> contentResult = [];
+            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => new TRelation { Element = element, Reference = reference })));
 
-            List<(string element, string reference)> contentResult = [];
-            elementsToProcess.ForEach(element => contentResult.AddRange(references[element].Select(reference => (element, reference))));
-
-            contentResult
-                .Where(p => string.IsNullOrEmpty(elementFilter) || p.element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
-                .OrderBy(p => p.element)
-                .ThenBy(p => p.reference)
-                .ToList()
-                .ForEach(p => content.AppendLine($"\t{p.element} -->\t{p.reference} "));
-
-            return content.ToString();
+            return contentResult
+                .Where(p => string.IsNullOrEmpty(elementFilter) || p.Element.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase) || p.Reference.Contains(elementFilter, StringComparison.CurrentCultureIgnoreCase))
+                .OrderBy(p => p.Element)
+                .ThenBy(p => p.Reference);
         }
     }
 }

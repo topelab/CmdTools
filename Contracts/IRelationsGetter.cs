@@ -1,7 +1,9 @@
 namespace CmdTools.Contracts
 {
+    using CmdTools.Contracts.DTO;
+
     public interface IRelationsGetter
     {
-        string Get(IReferencesBag references, string elementFilter);
+        IEnumerable<TRelation> Get<TRelation>(IReferencesBag references, string elementFilter) where TRelation : Relation, new();
     }
 }

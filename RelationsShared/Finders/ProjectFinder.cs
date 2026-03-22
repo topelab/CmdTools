@@ -11,12 +11,14 @@ namespace RelationsShared.Finders
         private readonly IProjectReferences projectReferences;
         private readonly IFileExecutor fileExecutor;
         private readonly IRelationGetterFactory relationGetterFactory;
+        private readonly IMermaidFactory mermaidFactory;
 
-        public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory)
+        public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory, IMermaidFactory mermaidFactory)
         {
             this.projectReferences = projectReferences ?? throw new ArgumentNullException(nameof(projectReferences));
             this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
             this.relationGetterFactory = relationGetterFactory ?? throw new ArgumentNullException(nameof(relationGetterFactory));
+            this.mermaidFactory = mermaidFactory ?? throw new ArgumentNullException(nameof(mermaidFactory));
         }
 
         public void Run<T>(T args) where T : class
@@ -26,9 +28,21 @@ namespace RelationsShared.Finders
                 throw new ArgumentException("Invalid options type", nameof(args));
             }
 
-            var path = options.RootPath ?? Environment.ProcessPath;
             var outputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
-            var excludeProjects =string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
+            var content = Get(args);
+
+            Finalize(content, outputFile, options.OpenOutput);
+        }
+
+        public string Get<T>(T args) where T : class
+        {
+            if (args is not ProjectOptions options)
+            {
+                throw new ArgumentException("Invalid options type", nameof(args));
+            }
+
+            var path = options.RootPath ?? Environment.ProcessPath;
+            var excludeProjects = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
             var projectFilter = options.ProjectFilter;
             var pinnedProject = options.PinnedProject?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
 
@@ -39,18 +53,8 @@ namespace RelationsShared.Finders
             var filteredRefeferences = GetFilteredReferences(pinnedProject, projectFiles, out var selectedElement);
 
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
-
-            var content = relationsGetter.Get(
-                filteredRefeferences,
-                projectFilter);
-
-            content = GetComposition(content, options.Theme, options.Layout, options.Direction);
-            if (!string.IsNullOrEmpty(selectedElement))
-            {
-                content = content.Replace($"\t{selectedElement} ", $"\t{selectedElement}:::pinned");
-                content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
-            }
-            Finalize(content, outputFile, options.OpenOutput);
+            var relations = relationsGetter.Get<MermaidRelation>(filteredRefeferences, projectFilter);
+            return mermaidFactory.Create(relations, options.Theme, options.Layout, options.Direction, selectedElement);
         }
 
         private HashSet<string> GetProjectFiles()

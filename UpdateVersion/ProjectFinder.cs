@@ -44,6 +44,11 @@ namespace UpdateVersion
             }
         }
 
+        public string Get<T>(T args) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
         private bool ExistDirectoryBuildProps(string basePath)
         {
             var file = Path.Combine(basePath, "Directory.Build.props");
