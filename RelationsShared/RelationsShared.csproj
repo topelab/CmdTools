@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="ReactiveUI" />
     <PackageReference Include="System.CodeDom" />
   </ItemGroup>
 

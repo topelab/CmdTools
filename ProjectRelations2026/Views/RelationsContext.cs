@@ -1,10 +1,13 @@
-namespace RelationsShared.DTO
+namespace ProjectRelations2026.Views
 {
-    using ReactiveUI;
+    using Microsoft.VisualStudio.Extensibility.UI;
+    using RelationsShared.DTO;
     using System.Runtime.Serialization;
+    using System.Windows;
+    using System.Windows.Forms;
 
     [DataContract]
-    public class RelationsContext : ReactiveObject
+    public class RelationsContext : NotifyPropertyChangedObject
     {
         private string selectedItem;
         private bool isUsedBy;
@@ -12,11 +15,22 @@ namespace RelationsShared.DTO
         private bool includePackages;
         private string url;
         private bool showListOnly;
-        private double windowWidth = 1920;
-        private double windowHeight = 1080;
+        private double windowWidth;
+        private double windowHeight;
+
+        public RelationsContext()
+        {
+            // Inicializar con el tamaño de la pantalla actual
+            var screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            var screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+            // Usar el tamaño de la pantalla menos un margen para dejar espacio a VS
+            windowWidth = screenWidth - 50;
+            windowHeight = screenHeight - 50;
+        }
 
         [DataMember]
-        public string Url { get => url; set => this.RaiseAndSetIfChanged(ref url, value); }
+        public string Url { get => url; set => SetProperty(ref url, value); }
 
         [DataMember]
         public string UserDataFolder { get; set; }
@@ -31,21 +45,21 @@ namespace RelationsShared.DTO
         public List<string> Items { get; set; } = [];
 
         [DataMember]
-        public string SelectedItem { get => selectedItem; set => this.RaiseAndSetIfChanged(ref selectedItem, value); }
+        public string SelectedItem { get => selectedItem; set => SetProperty(ref selectedItem, value); }
 
 
         [DataMember]
         public bool IncludePackages
         {
             get { return includePackages; }
-            set { this.RaiseAndSetIfChanged(ref includePackages, value); }
+            set { SetProperty(ref includePackages, value); }
         }
 
         [DataMember]
         public bool ShowListOnly
         {
             get => showListOnly;
-            set => this.RaiseAndSetIfChanged(ref showListOnly, value);
+            set => SetProperty(ref showListOnly, value);
         }
 
         [DataMember]
@@ -58,11 +72,11 @@ namespace RelationsShared.DTO
             get { return isUsedBy; }
             set
             {
-                if (isUsedBy == value) return;
-                isUsedBy = value;
-                this.RaisePropertyChanged(nameof(IsUsedBy));
-                this.RaisePropertyChanged(nameof(IncludePackagesVisibility));
-                this.RaisePropertyChanged(nameof(RelationType));
+                if (SetProperty(ref isUsedBy, value))
+                {
+                    RaiseNotifyPropertyChangedEvent(nameof(IncludePackagesVisibility));
+                    RaiseNotifyPropertyChangedEvent(nameof(RelationType));
+                }
             }
         }
 
@@ -70,7 +84,7 @@ namespace RelationsShared.DTO
         public bool IsUsing
         {
             get { return isUsing; }
-            set { this.RaiseAndSetIfChanged(ref isUsing, value); }
+            set { SetProperty(ref isUsing, value); }
         }
 
         [DataMember]
@@ -83,7 +97,7 @@ namespace RelationsShared.DTO
         public double WindowWidth
         {
             get => windowWidth;
-            set => this.RaiseAndSetIfChanged(ref windowWidth, value);
+            set => SetProperty(ref windowWidth, value);
         }
 
         /// <summary>
@@ -93,7 +107,7 @@ namespace RelationsShared.DTO
         public double WindowHeight
         {
             get => windowHeight;
-            set => this.RaiseAndSetIfChanged(ref windowHeight, value);
+            set => SetProperty(ref windowHeight, value);
         }
     }
 }
