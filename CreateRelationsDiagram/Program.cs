@@ -1,6 +1,7 @@
 namespace CreateRelationsDiagram
 {
     using CmdTools.Contracts;
+    using CmdTools.Shared;
     using CommandLine;
     using Topelab.Core.Resolver.Microsoft;
 

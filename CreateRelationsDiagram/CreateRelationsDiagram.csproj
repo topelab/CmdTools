@@ -6,9 +6,6 @@
     <Version>$(ToolsVersion)</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.CodeDom" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\RelationsShared\RelationsShared.csproj" />
   </ItemGroup>
 </Project>
