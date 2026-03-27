@@ -9,7 +9,7 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
     <!-- Versiones de proyectos -->
-    <ProjectExtensionVersion>1.1.1</ProjectExtensionVersion>
+    <ProjectExtensionVersion>1.1.2</ProjectExtensionVersion>
     <ToolsVersion>1.1.25</ToolsVersion>
     
   </PropertyGroup>

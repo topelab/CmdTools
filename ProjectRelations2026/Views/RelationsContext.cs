@@ -62,7 +62,7 @@ namespace ProjectRelations2026.Views
             set => SetProperty(ref showListOnly, value);
         }
 
-        [DataMember]
+        [DataMember]    
         public bool IncludePackagesVisibility => IsUsedBy;
 
 

@@ -1,6 +1,7 @@
 namespace RelationsShared.Finders
 {
     using CmdTools.Contracts;
+    using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using RelationsShared.DTO;
     using RelationsShared.Services;
@@ -11,14 +12,14 @@ namespace RelationsShared.Finders
         private readonly IProjectReferences projectReferences;
         private readonly IFileExecutor fileExecutor;
         private readonly IRelationGetterFactory relationGetterFactory;
-        private readonly IMermaidFactory mermaidFactory;
+        private readonly IOutputRenderFactory outputRenderFactory;
 
-        public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory, IMermaidFactory mermaidFactory)
+        public ProjectFinder(IProjectReferences projectReferences, IFileExecutor fileExecutor, IRelationGetterFactory relationGetterFactory, IOutputRenderFactory outputRenderFactory)
         {
             this.projectReferences = projectReferences ?? throw new ArgumentNullException(nameof(projectReferences));
             this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
             this.relationGetterFactory = relationGetterFactory ?? throw new ArgumentNullException(nameof(relationGetterFactory));
-            this.mermaidFactory = mermaidFactory ?? throw new ArgumentNullException(nameof(mermaidFactory));
+            this.outputRenderFactory = outputRenderFactory ?? throw new ArgumentNullException(nameof(outputRenderFactory));
         }
 
         public void Run<T>(T args) where T : class
@@ -53,8 +54,9 @@ namespace RelationsShared.Finders
             var filteredRefeferences = GetFilteredReferences(pinnedProject, projectFiles, out var selectedElement);
 
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
-            var relations = relationsGetter.Get<MermaidRelation>(filteredRefeferences, projectFilter);
-            return mermaidFactory.Create(relations, options.Theme, options.Layout, options.Direction, selectedElement);
+            var relations = relationsGetter.Get<Relation>(filteredRefeferences, projectFilter);
+            var outputRender = outputRenderFactory.Create(options.RenderType);
+            return outputRender.Create(relations, options, selectedElement);
         }
 
         private HashSet<string> GetProjectFiles()

@@ -1,9 +1,9 @@
 namespace RelationsShared.Finders
 {
     using CmdTools.Contracts;
+    using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using Microsoft.CSharp;
-    using RelationsShared.DTO;
     using RelationsShared.Services;
     using System.CodeDom;
     using System.Reflection;
@@ -12,12 +12,12 @@ namespace RelationsShared.Finders
     internal class ClassesFinder : ElementFinderBase, IElementFinder
     {
         protected readonly IRelationGetterFactory relationGetterFactory;
-        private readonly IMermaidFactory mermaidFactory;
+        private readonly IOutputRenderFactory outputRenderFactory;
 
-        public ClassesFinder(IRelationGetterFactory relationGetterFactory, IMermaidFactory mermaidFactory)
+        public ClassesFinder(IRelationGetterFactory relationGetterFactory, IOutputRenderFactory outputRenderFactory)
         {
             this.relationGetterFactory = relationGetterFactory;
-            this.mermaidFactory = mermaidFactory;
+            this.outputRenderFactory = outputRenderFactory;
         }
 
         public void Run<T>(T args) where T : class
@@ -58,8 +58,9 @@ namespace RelationsShared.Finders
             if (classes.Count > 0)
             {
                 var relationsGetter = relationGetterFactory.Create(options.FinderType);
-                var relations = relationsGetter.Get<MermaidRelation>(classes, className);
-                result = mermaidFactory.Create(relations, options.Theme, options.Layout, options.Direction);
+                var relations = relationsGetter.Get<Relation>(classes, className);
+                var outputRender = outputRenderFactory.Create(options.RenderType);
+                result = outputRender.Create(relations, options);
             }
 
             return result;

@@ -29,6 +29,9 @@
 					  Visibility="{Binding IncludePackagesVisibility, Converter={StaticResource BooleanToVisibilityConverter}}"
 					  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
 					  Margin="5" />
+			<CheckBox Content="Show list only"
+					  IsChecked="{Binding ShowListOnly, Mode=TwoWay}"
+					  Margin="5" />
 			<TextBlock Text="Projects"
 					   FontWeight="Bold"
 					   Margin="5" />

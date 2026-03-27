@@ -19,7 +19,9 @@ namespace RelationsShared
                 .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.ReverseProjects))
                 .AddTransient<IElementFinder, ClassesFinder>(nameof(FinderType.Classes))
                 .AddTransient<IElementFinder, ClassesFinder>(nameof(FinderType.ReverseClasses))
-                .AddTransient<IMermaidFactory, MermaidFactory>()
+                .AddTransient<IOutputRender, MermaidRender>(nameof(RenderType.Mermaid))
+                .AddTransient<IOutputRender, TextRender>(nameof(RenderType.Text))
+                .AddTransient<IOutputRenderFactory, OutputRenderFactory>()
                 ;
         }
     }

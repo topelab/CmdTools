@@ -1,5 +1,6 @@
 namespace RelationsShared.Services
 {
+    using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using RelationsShared.DTO;
     using System.Collections.Generic;
@@ -7,12 +8,12 @@ namespace RelationsShared.Services
     using System.Linq;
     using System.Text;
 
-    internal class MermaidFactory : IMermaidFactory
+    internal class MermaidRender : IOutputRender
     {
-        public string Create(IEnumerable<MermaidRelation> relations, Theme theme, Layout layout, Direction direction, string pinnedElement = null)
+        public string Create(IEnumerable<Relation> relations, Options options, string pinnedElement = null)
         {
             var contentBag = new StringBuilder();
-            relations.ToList().ForEach(r => contentBag.AppendLine(r.ToString()));
+            relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} "));
             var content = contentBag.ToString();
 
             if (!string.IsNullOrEmpty(pinnedElement))
@@ -21,30 +22,39 @@ namespace RelationsShared.Services
                 content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
             }
 
-            return GetComposition(content, theme, layout, direction);
+            return GetComposition(content, options.Theme, options.Layout, options.Direction);
         }
 
         protected string GetComposition(string content, Theme theme, Layout layout, Direction direction)
         {
-            return $"""
-                ---
-                config:
-                  theme: {theme.GetDescription()}
-                  layout: {layout.GetDescription()}
-                ---
-                flowchart {direction.GetDescription()}
-                {content}
+            if (string.IsNullOrEmpty(content))
+            {
+                content = "graph TD\n\tEmpty";
+            }
+            else
+            {
+                content = $"""
+                    ---
+                    config:
+                      theme: {theme.GetDescription()}
+                      layout: {layout.GetDescription()}
+                    ---
+                    flowchart {direction.GetDescription()}
+                    {content}
 
-                classDef pkg fill:#658;
-                classDef pinned stroke:orange, stroke-width:2px, stroke-dasharray: 3 2;
-                classDef pinnedpkg fill:#658, stroke:orange, stroke-width:2px, stroke-dasharray: 3 2;
-                """;
+                    classDef pkg fill:#658;
+                    classDef pinned stroke:orange, stroke-width:2px, stroke-dasharray: 3 2;
+                    classDef pinnedpkg fill:#658, stroke:orange, stroke-width:2px, stroke-dasharray: 3 2;
+                    """;
+            }
+
+            return content;
         }
 
-        public string Render(string mmd, UserSettings userSettings)
+        public string Render(string input, UserSettings userSettings)
         {
             var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
-            var encoded = System.Net.WebUtility.HtmlEncode(mmd);
+            var encoded = System.Net.WebUtility.HtmlEncode(input);
             var html = $$"""
                 <!doctype html>
                 <html>

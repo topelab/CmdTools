@@ -11,12 +11,12 @@ namespace ProjectRelations2026.Services
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory, IResolver resolver, IMermaidFactory mermaidFactory) : IRelationsContextFactory
+    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory, IResolver resolver, IOutputRenderFactory outputRenderFactory) : IRelationsContextFactory
     {
         private UserSettings userSettings;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
         private readonly IResolver resolver = resolver;
-        private readonly IMermaidFactory mermaidFactory = mermaidFactory;
+        private readonly IOutputRenderFactory outputRenderFactory = outputRenderFactory;
 
         private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
 
@@ -33,7 +33,8 @@ namespace ProjectRelations2026.Services
                 SelectedItem = solutionExplorerItem.Name,
                 IsUsing = relationType == RelationType.Using,
                 IsUsedBy = relationType == RelationType.UsedBy,
-                IncludePackages = projectOptions.WithPackages
+                IncludePackages = projectOptions.WithPackages,
+                ShowListOnly = projectOptions.RenderType == RenderType.Text,
             };
             await GenerateAsync(relationsWindowsContext, content);
             relationsWindowsContext.PropertyChanged += (s, e) => OnRelationsWindowsContextPropertyChanged(s, e.PropertyName, solutionExplorerItem, relationsWindowsContext);
@@ -60,10 +61,12 @@ namespace ProjectRelations2026.Services
                     case nameof(RelationsContext.RelationType):
                     case nameof(RelationsContext.SelectedItem):
                     case nameof(RelationsContext.IncludePackages):
+                    case nameof(RelationsContext.ShowListOnly):
                         var relationType = context.RelationType;
                         var localSolutionExplorerItem = solutionExplorerItem with { Name = context.SelectedItem, Path = Path.GetDirectoryName(solutionExplorerItem.Projects[context.SelectedItem]) };
                         var projectOptions = BuildOptions(localSolutionExplorerItem, relationType);
                         projectOptions.WithPackages = context.IncludePackages;
+                        projectOptions.RenderType = context.ShowListOnly ? RenderType.Text : RenderType.Mermaid;
                         var content = await RunAsync(projectOptions);
                         await GenerateAsync(context, content);
                         break;
@@ -87,6 +90,7 @@ namespace ProjectRelations2026.Services
                 Theme = UserSettings.HasTheme ? Enum.Parse<Theme>(UserSettings.Theme) : Theme.Dark,
                 Layout = Layout.Adaptive,
                 Exclude = UserSettings.ExcludeProjects,
+                RenderType = RenderType.Text,
             };
         }
 
@@ -98,8 +102,8 @@ namespace ProjectRelations2026.Services
 
         public async Task GenerateAsync(RelationsContext relationsWindowsContext, string content)
         {
-            content = string.IsNullOrEmpty(content) ? "graph TD\n\tEmpty" : content;
-            var html = mermaidFactory.Render(content, UserSettings);
+            var outputRender = outputRenderFactory.Create(relationsWindowsContext.ShowListOnly ? RenderType.Text : RenderType.Mermaid);
+            var html = outputRender.Render(content, UserSettings);
             string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.html");
             await File.WriteAllTextAsync(fileName, html);
             relationsWindowsContext.Url = new Uri(fileName).AbsoluteUri;

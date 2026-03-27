@@ -26,6 +26,9 @@ namespace CmdTools.Shared
         [Option("open", Required = false, Default = false, HelpText = "Open the output file after creation (default: false)")]
         public bool OpenOutput { get; set; }
 
+        [Option("render", Required = false, Default = RenderType.Mermaid, HelpText = "Render type for the diagram (Mermaid, Text; default: Mermaid)")]
+        public RenderType RenderType { get; set; }
+
         public abstract FinderType FinderType { get; }
     }
 }
