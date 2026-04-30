@@ -21,18 +21,18 @@ namespace ProjectRelations2026.Services
             var selectedItemPath = Path.GetDirectoryName(selectedItem.LocalPath);
 
             var allProjects = (await workspace.QueryProjectsAsync(
-                project => project.With(p => new { p.Name, p.Guid, p.Path }),
+                project => project.With(p => new { p.Name, p.Path }),
                 cancellationToken)).ToList();
 
             var results = allProjects.Where(
                 project => selectedItemPath.Contains(Path.GetDirectoryName(project.Path), StringComparison.InvariantCultureIgnoreCase))
-                .Select(p => new { p.Name, p.Guid, p.Path })
+                .Select(p => new { p.Name, p.Path })
                 .ToList();
 
             var projectSnapshot = results.FirstOrDefault() ?? throw new InvalidOperationException($"No se encontró el proyecto en la ruta: {selectedItem.LocalPath}");
 
             var solutions = await workspace.QuerySolutionAsync(
-                solution => solution.With(s => new { s.BaseName, s.Path, s.Projects }),
+                solution => solution.With(s => new { s.BaseName, s.Path }),
                 cancellationToken);
 
             var solution = solutions.FirstOrDefault() ?? throw new InvalidOperationException("No se encontró la solución actual.");

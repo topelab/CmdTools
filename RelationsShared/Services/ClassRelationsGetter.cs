@@ -1,43 +1,23 @@
-namespace RelationsShared.Finders
+namespace RelationsShared.Services
 {
     using CmdTools.Contracts;
     using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using Microsoft.CSharp;
-    using RelationsShared.Services;
+    using System;
     using System.CodeDom;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
 
-    internal class ClassesFinder : ElementFinderBase, IElementFinder
+    internal class ClassRelationsGetter(IRelationGetterFactory relationGetterFactory) : IElementRelationsGetter
     {
-        protected readonly IRelationGetterFactory relationGetterFactory;
-        private readonly IOutputRenderFactory outputRenderFactory;
+        private readonly IRelationGetterFactory relationGetterFactory = relationGetterFactory;
 
-        public ClassesFinder(IRelationGetterFactory relationGetterFactory, IOutputRenderFactory outputRenderFactory)
+        public IEnumerable<Relation> Get<T>(T args) where T : class
         {
-            this.relationGetterFactory = relationGetterFactory;
-            this.outputRenderFactory = outputRenderFactory;
-        }
-
-        public void Run<T>(T args) where T : class
-        {
-            if (args is not ClassOptions options)
-            {
-                throw new ArgumentException("Invalid options type", nameof(args));
-            }
-
-            var outputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
-            var content = Get(args);
-            if (!string.IsNullOrEmpty(content))
-            {
-                Finalize(content, outputFile, options.OpenOutput);
-            }
-        }
-
-        public string Get<T>(T args) where T : class
-        {
-            string result = string.Empty;
+            List<Relation> relations = [];
 
             if (args is not ClassOptions options)
             {
@@ -58,15 +38,13 @@ namespace RelationsShared.Finders
             if (classes.Count > 0)
             {
                 var relationsGetter = relationGetterFactory.Create(options.FinderType);
-                var relations = relationsGetter.Get<Relation>(classes, className);
-                var outputRender = outputRenderFactory.Create(options.RenderType);
-                result = outputRender.Create(relations, options);
+                relations.AddRange(relationsGetter.Get<Relation>(classes, className));
             }
 
-            return result;
+            return relations;
         }
 
-        protected ReferencesBag GetClasses(string assembly, string nameSpace, string nameSpaceToClean, Regex excludeClasses)
+        private ReferencesBag GetClasses(string assembly, string nameSpace, string nameSpaceToClean, Regex excludeClasses)
         {
             ReferencesBag result = [];
             try
@@ -89,7 +67,7 @@ namespace RelationsShared.Finders
             return result;
         }
 
-        protected HashSet<string> GetProperties(string nameSpace, Type type, Regex excludeClasses)
+        private HashSet<string> GetProperties(string nameSpace, Type type, Regex excludeClasses)
         {
             HashSet<string> properties = [];
             foreach (var item in type.GetProperties().Where(p => CanGet(p.PropertyType)))
@@ -104,14 +82,14 @@ namespace RelationsShared.Finders
         }
 
 
-        protected IEnumerable<Type> GetTypesFromAssembly(string assemblyPath, string nameSpace = null)
+        private IEnumerable<Type> GetTypesFromAssembly(string assemblyPath, string nameSpace = null)
         {
             var assembly = Assembly.LoadFrom(assemblyPath);
             var types = assembly.GetTypes().Where(t => !t.Name.StartsWith('<') && (nameSpace == null || (t.Namespace != null && t.Namespace.StartsWith(nameSpace, StringComparison.CurrentCultureIgnoreCase))));
             return types;
         }
 
-        protected bool CanGet(Type type)
+        private bool CanGet(Type type)
         {
             var typeCode = Type.GetTypeCode(type);
             return typeCode == TypeCode.Object
@@ -124,7 +102,7 @@ namespace RelationsShared.Finders
                 && type.Name != typeof(Type).Name;
         }
 
-        protected string GetFriendlyTypeName(Type t, string nameSpace)
+        private string GetFriendlyTypeName(Type t, string nameSpace)
         {
             string typeName;
             using (CSharpCodeProvider provider = new())

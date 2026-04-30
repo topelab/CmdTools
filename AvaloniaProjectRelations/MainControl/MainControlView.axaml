@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="clr-namespace:AvaloniaProjectRelations.MainControl;assembly=AvaloniaProjectRelations"
+	xmlns:wv="clr-namespace:AvaloniaProjectRelations.Browser"
+	x:DataType="vm:MainControlVM"
+	mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+	x:Class="AvaloniaProjectRelations.MainControl.MainControlView"
+	xmlns:res="using:AvaloniaProjectRelations.Resources"
+	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+	<Design.DataContext>
+		<vm:MainControlVM/>
+	</Design.DataContext>
+
+	<Grid x:Name="RootGrid">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="20*" MinWidth="200" />
+			<ColumnDefinition Width="80*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<StackPanel Grid.Row="0"
+					Orientation="Vertical"
+					Margin="5">
+			<RadioButton Content="Used By this project"
+						 IsChecked="{Binding IsUsedBy, Mode=TwoWay}"
+						 GroupName="RelationsGroup"
+						 Margin="5" />
+			<RadioButton Content="Using this project"
+						 IsChecked="{Binding IsUsing, Mode=TwoWay}"
+						 GroupName="RelationsGroup"
+						 Margin="5" />
+			<CheckBox Content="Include packages"
+					  IsVisible="{Binding IncludePackagesVisibility}"
+					  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
+					  Margin="5" />
+			<CheckBox Content="Show list only"
+					  IsChecked="{Binding ShowListOnly, Mode=TwoWay}"
+					  Margin="5" />
+			<TextBlock Text="Projects"
+					   FontWeight="Bold"
+					   Margin="5" />
+		</StackPanel>
+
+		<AutoCompleteBox Grid.Row="1"
+				 Margin="5"
+				 ItemsSource="{Binding Projects}"
+				 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+				 FilterMode="Contains"
+				 MinimumPrefixLength="0"
+				 MaxHeight="600"
+				 VerticalAlignment="Top"
+				 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+
+		<Grid Grid.Column="1"
+			  Grid.RowSpan="2">
+			<Border BorderBrush="{StaticResource SystemChromeMediumColor}" BorderThickness="2" Margin="10">
+				<wv:HtmlViewerUserControl DataContext="{Binding HtmlViewerVM}" Padding="5" />
+			</Border>
+		</Grid>
+	</Grid>
+
+</UserControl>

@@ -1,8 +1,11 @@
-namespace RelationsShared.Finders
+namespace RelationsShared.Services
 {
-    internal class ElementFinderBase
+    using CmdTools.Contracts;
+    using System;
+
+    internal class ElementRelationWriter : IElementRelationWriter
     {
-        protected void Finalize(string content, string outputFile, bool openOutput)
+        public void Write(string content, string outputFile, bool openOutput)
         {
             if (string.IsNullOrEmpty(outputFile))
             {

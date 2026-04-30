@@ -12,14 +12,13 @@ namespace CmdTools.Shared
         [Option('f', "filter", Required = false, HelpText = "Filter by project (if not set, all projects in the solution will be processed)")]
         public string ProjectFilter { get; set; }
 
-        [Option('p', "depends-on", Required = false, HelpText = "Get projects that depends on project")]
-        public string PinnedProject { get; set; }
-
         [Option('w', "with-packages", Required = false, Default = false, HelpText = "Nuget packages will be collected")]
         public bool WithPackages { get; set; }
 
-        public override FinderType FinderType => string.IsNullOrEmpty(PinnedProject)
+        public override FinderType FinderType => string.IsNullOrEmpty(PinnedElement)
             ? Reverse ? FinderType.ReverseProjects : FinderType.Projects
             : Reverse ? FinderType.Projects : FinderType.ReverseProjects;
+
+        public List<string> ProjectPaths { get; init; } = [];
     }
 }

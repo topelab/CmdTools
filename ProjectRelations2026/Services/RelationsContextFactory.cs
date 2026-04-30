@@ -83,7 +83,7 @@ namespace ProjectRelations2026.Services
             return new ProjectOptions
             {
                 RootPath = rootPath,
-                PinnedProject = pinnedProject,
+                PinnedElement = pinnedProject,
                 OutputFile = outputFile,
                 WithPackages = UserSettings.ShowPackages,
                 Direction = Direction.LeftToRight,
@@ -91,19 +91,22 @@ namespace ProjectRelations2026.Services
                 Layout = Layout.Adaptive,
                 Exclude = UserSettings.ExcludeProjects,
                 RenderType = RenderType.Text,
+                SelectedElement = solutionExplorerItem.Name,
             };
         }
 
         private async Task<string> RunAsync(ProjectOptions options)
         {
-            var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
-            return await Task.Run(() => elementFinder.Get(options));
+            var elementRelationsGetter = resolver.Get<IElementRelationsGetter>(options.FinderType.ToString());
+            var relations = elementRelationsGetter.Get(options);
+            var outputRender = outputRenderFactory.Create(options.RenderType);
+            return await Task.Run(() => outputRender.Create(relations, options));
         }
 
         public async Task GenerateAsync(RelationsContext relationsWindowsContext, string content)
         {
             var outputRender = outputRenderFactory.Create(relationsWindowsContext.ShowListOnly ? RenderType.Text : RenderType.Mermaid);
-            var html = outputRender.Render(content, UserSettings);
+            var html = outputRender.RenderToHtml(content, UserSettings);
             string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.html");
             await File.WriteAllTextAsync(fileName, html);
             relationsWindowsContext.Url = new Uri(fileName).AbsoluteUri;

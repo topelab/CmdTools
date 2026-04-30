@@ -3,6 +3,7 @@ namespace CreateRelationsDiagram
     using CmdTools.Contracts;
     using CmdTools.Shared;
     using CommandLine;
+    using RelationsShared.Services;
     using Topelab.Core.Resolver.Microsoft;
 
     internal class Program
@@ -27,8 +28,15 @@ namespace CreateRelationsDiagram
         private static void Proceed(Options options)
         {
             var resolver = ResolverFactory.Create(SetupDI.Register());
-            var elementFinder = resolver.Get<IElementFinder>(options.FinderType.ToString());
-            elementFinder.Run(options);
+            var elementRelationsGetter = resolver.Get<IElementRelationsGetter>(options.FinderType.ToString());
+            var outputRenderFactory = resolver.Get<IOutputRenderFactory>();
+            var elementRelationWriter = resolver.Get<IElementRelationWriter>();
+
+            var relations = elementRelationsGetter.Get(options);
+            var outputRender = outputRenderFactory.Create(options.RenderType);
+
+            var content = outputRender.Create(relations, options);
+            elementRelationWriter.Write(content, options.OutputFile, options.OpenOutput);
         }
     }
 }

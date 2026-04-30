@@ -5,6 +5,9 @@ namespace CmdTools.Shared
 
     public abstract class Options
     {
+        [Option('p', "depends-on", Required = false, HelpText = "Get elements that depends on element")]
+        public string PinnedElement { get; set; }
+
         [Option('o', "output", Required = false, HelpText = $"Output file name (default: output to console)")]
         public string OutputFile { get; set; }
 
@@ -30,5 +33,7 @@ namespace CmdTools.Shared
         public RenderType RenderType { get; set; }
 
         public abstract FinderType FinderType { get; }
+
+        public string SelectedElement { get; set; }
     }
 }

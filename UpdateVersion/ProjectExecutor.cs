@@ -6,20 +6,15 @@ namespace UpdateVersion
     using System.IO;
     using System.Linq;
 
-    internal class ProjectFinder : IElementFinder
+    internal class ProjectExecutor(IFileExecutor fileExecutor,
+                                   IProjectUpdater projectUpdater,
+                                   IVersionSplitter versionSplitter,
+                                   IVersionBumper versionBumper) : IProjectExecutor
     {
-        private readonly IFileExecutor fileExecutor;
-        private readonly IProjectUpdater projectUpdater;
-        private readonly IVersionSplitter versionSplitter;
-        private readonly IVersionBumper versionBumper;
-
-        public ProjectFinder(IFileExecutor fileExecutor, IProjectUpdater projectUpdater, IVersionSplitter versionSplitter, IVersionBumper versionBumper)
-        {
-            this.fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
-            this.projectUpdater = projectUpdater ?? throw new ArgumentNullException(nameof(projectUpdater));
-            this.versionSplitter = versionSplitter ?? throw new ArgumentNullException(nameof(versionSplitter));
-            this.versionBumper = versionBumper ?? throw new ArgumentNullException(nameof(versionBumper));
-        }
+        private readonly IFileExecutor fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
+        private readonly IProjectUpdater projectUpdater = projectUpdater ?? throw new ArgumentNullException(nameof(projectUpdater));
+        private readonly IVersionSplitter versionSplitter = versionSplitter ?? throw new ArgumentNullException(nameof(versionSplitter));
+        private readonly IVersionBumper versionBumper = versionBumper ?? throw new ArgumentNullException(nameof(versionBumper));
 
         public void Run<T>(T args) where T : class
         {
@@ -100,7 +95,6 @@ namespace UpdateVersion
                 versionsMap.Add(Constants.AnyProjectSelector, Constants.DefaultVersion);
             }
         }
-
 
         private void TryUpdate(string file, Dictionary<string, string> versionsMap)
         {

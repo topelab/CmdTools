@@ -89,6 +89,7 @@ namespace RelationsShared.Services
                     .Select(d => GetFullPath(Path.GetDirectoryName(localBasePath), d.Attribute("Include").Value))
                     .Where(p => !currentProjects.Contains(p))
                     .Where(r => excludeProjects == null || !excludeProjects.IsMatch(r))
+                    .Where(p => File.Exists(p))
                     .ToList();
 
                 projectReferences.ForEach(reference => currentProjects.Add(reference));

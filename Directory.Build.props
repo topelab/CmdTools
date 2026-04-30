@@ -9,8 +9,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
     <!-- Versiones de proyectos -->
-    <ProjectExtensionVersion>1.1.2</ProjectExtensionVersion>
-    <ToolsVersion>1.1.25</ToolsVersion>
+    <ProjectExtensionVersion>1.1.3</ProjectExtensionVersion>
+    <ToolsVersion>1.1.26</ToolsVersion>
+    <AvaloniaProjectRelations>1.0.0</AvaloniaProjectRelations>
     
   </PropertyGroup>
 </Project>

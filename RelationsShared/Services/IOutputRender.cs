@@ -6,7 +6,7 @@ namespace RelationsShared.Services
 
     public interface IOutputRender
     {
-        string Create(IEnumerable<Relation> relations, Options options, string pinnedElement = null);
-        string Render(string input, UserSettings userSettings);
+        string Create(IEnumerable<Relation> relations, Options options);
+        string RenderToHtml(string input, UserSettings userSettings);
     }
 }

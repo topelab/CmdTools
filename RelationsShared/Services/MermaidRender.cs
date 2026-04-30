@@ -10,14 +10,15 @@ namespace RelationsShared.Services
 
     internal class MermaidRender : IOutputRender
     {
-        public string Create(IEnumerable<Relation> relations, Options options, string pinnedElement = null)
+        public string Create(IEnumerable<Relation> relations, Options options)
         {
             var contentBag = new StringBuilder();
             relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} "));
             var content = contentBag.ToString();
 
-            if (!string.IsNullOrEmpty(pinnedElement))
+            if (!string.IsNullOrEmpty(options.PinnedElement))
             {
+                var pinnedElement = options.PinnedElement;
                 content = content.Replace($"\t{pinnedElement} ", $"\t{pinnedElement}:::pinned");
                 content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
             }
@@ -51,7 +52,7 @@ namespace RelationsShared.Services
             return content;
         }
 
-        public string Render(string input, UserSettings userSettings)
+        public string RenderToHtml(string input, UserSettings userSettings)
         {
             var color = userSettings.HasBackgroundColor ? userSettings.BackgroundColor.ToLower() : "black";
             var encoded = System.Net.WebUtility.HtmlEncode(input);
@@ -70,7 +71,7 @@ namespace RelationsShared.Services
 
                 		// Inicializa Mermaid
                 		mermaid.initialize({
-                			startOnLoad: false,
+                			startOnLoad: true,
                 			flowchart: { defaultRenderer: "elk" },
                             maxTextSize: {{userSettings.MaxTextSize}},
                             maxEdges: {{userSettings.MaxEdges}}
@@ -93,6 +94,8 @@ namespace RelationsShared.Services
                 				container.addEventListener("wheel", (event) => {
                 					panzoomInstance.zoomWithWheel(event);
                 				});
+
+                                container.style.top = "0px";
                 			}
                 		});
                 	</script>
@@ -112,9 +115,10 @@ namespace RelationsShared.Services
                 		}
                 		.diagram-container {
                 			width: 100%;
-                			height: 100%;
+                			height: 98%;
                 			overflow: hidden;
                 			position: relative;
+                            top: -10000px;
                 		}
                 		svg {
                 			cursor: grab;
