@@ -1,5 +1,6 @@
 namespace RelationsShared.Services
 {
+    using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
@@ -9,11 +10,18 @@ namespace RelationsShared.Services
     {
         private bool withPackages;
         private Regex excludeProjects;
+        private Dictionary<string, string> packageVersions = [];
 
         public void Initialize(bool withPackages, Regex excludeProjects)
         {
             this.withPackages = withPackages;
             this.excludeProjects = excludeProjects;
+            InitializePackageVersions();
+        }
+
+        private void InitializePackageVersions()
+        {
+            packageVersions.Clear();
         }
 
         public IEnumerable<string> Get(string projectPath)
@@ -40,6 +48,43 @@ namespace RelationsShared.Services
                 .Select(r => Path.GetFileNameWithoutExtension(r))
                 .Where(v => !string.IsNullOrEmpty(v))
                 .Union(packageReferences);
+        }
+
+        public IEnumerable<ProjectRelation> GetRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        {
+            List<ProjectRelation> projectRelations = [];
+            currentProjects ??= [];
+            var localBasePath = GetFullPath(basePath, projectPath);
+            if (File.Exists(localBasePath))
+            {
+                XDocument document = XDocument.Load(localBasePath);
+                var projectReferences = document.Descendants()
+                    .Where(node => node.Name.LocalName == "ProjectReference")
+                    .Where(node => node.Attribute("Include") != null)
+                    .Select(node => GetFullPath(Path.GetDirectoryName(localBasePath), node.Attribute("Include").Value))
+                    .Where(path => !currentProjects.Contains(path))
+                    .Where(path => excludeProjects == null || !excludeProjects.IsMatch(path))
+                    .Where(path => File.Exists(path))
+                    .Select(path => new ProjectRelation(ProjectRelationType.ProjectReference, Path.GetFileNameWithoutExtension(path), path))
+                    .ToList();
+
+                var packageReferences = withPackages ? document.Descendants()
+                    .Where(node => node.Name.LocalName == "PackageReference")
+                    .Where(node => node.Attribute("Include") != null)
+                    .Select(node => new { Name = node.Attribute("Include").Value, Version = ExtractVersion(node) })
+                    .Where(e => e.Name != null)
+                    .Select(e => new ProjectRelation(ProjectRelationType.PackageReference, e.Name, $"{e.Version} [📦]"))
+                    .ToList() : [];
+
+
+                projectReferences.ForEach(projectRelation => currentProjects.Add(projectRelation.AdditionalInfo));
+                projectReferences.ForEach(projectRelation => projectRelations.AddRange(GetRelations(projectRelation.AdditionalInfo, currentProjects, Path.GetDirectoryName(localBasePath))));
+
+                projectRelations.AddRange(projectReferences
+                    .Union(packageReferences));
+            }
+
+            return projectRelations.Distinct();
         }
 
         public ReferencesBag GetReferences(HashSet<string> projectFiles)

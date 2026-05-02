@@ -27,9 +27,8 @@ namespace RelationsShared.Services
             options.PinnedElement = options.PinnedElement?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
 
             projectReferences.Initialize(options.WithPackages, excludeProjects);
-            fileExecutor.Initialize(path, Constants.FilePattern, excludeProjects);
 
-            var projectFiles = GetProjectFiles();
+            var projectFiles = GetProjectFiles(path, excludeProjects);
             options.ProjectPaths.Clear();
             options.ProjectPaths.AddRange(projectFiles);
             var filteredReferences = GetFilteredReferences(options.PinnedElement, projectFiles);
@@ -48,8 +47,10 @@ namespace RelationsShared.Services
             return options;
         }
 
-        private HashSet<string> GetProjectFiles()
+        private HashSet<string> GetProjectFiles(string path, Regex excludeProjects)
         {
+            fileExecutor.Initialize(path, Constants.FilePattern, excludeProjects);
+
             HashSet<string> projectFiles = [];
             fileExecutor.RunOnFiles(file =>
             {
