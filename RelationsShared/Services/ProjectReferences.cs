@@ -1,60 +1,57 @@
 namespace RelationsShared.Services
 {
+    using CmdTools.Contracts;
     using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
+    using RelationsShared.DTO;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
-    internal class ProjectReferences : IProjectReferences
+    internal class ProjectReferences(IFileExecutor fileExecutor) : IProjectReferences
     {
+        private readonly IFileExecutor fileExecutor = fileExecutor;
+
         private bool withPackages;
         private Regex excludeProjects;
-        private Dictionary<string, string> packageVersions = [];
+        private readonly Dictionary<string, string> packageVersions = [];
+        private readonly List<ProjectRelation> projectRelations = [];
 
-        public void Initialize(bool withPackages, Regex excludeProjects)
+        public void Initialize(bool withPackages, Regex excludeProjects, string path)
         {
             this.withPackages = withPackages;
             this.excludeProjects = excludeProjects;
-            InitializePackageVersions();
+            InitializePackageVersions(path);
+            projectRelations.Clear();
         }
 
-        private void InitializePackageVersions()
+        private void InitializePackageVersions(string path)
         {
             packageVersions.Clear();
-        }
-
-        public IEnumerable<string> Get(string projectPath)
-        {
-            if (!File.Exists(projectPath))
+            fileExecutor.Initialize(path, Constants.PackagesFilePattern);
+            fileExecutor.RunOnFiles(file =>
             {
-                return [];
-            }
+                XDocument document = XDocument.Load(file);
+                var packageReferences = document.Descendants()
+                    .Where(d => d.Name.LocalName == "PackageVersion")
+                    .Where(d => d.Attribute("Include") != null)
+                    .Select(d => new { Name = d.Attribute("Include").Value, Version = ExtractVersion(d) })
+                    .Where(e => e.Name != null);
 
-            XDocument document = XDocument.Load(projectPath);
-            var projectReferences = document.Descendants()
-                .Where(d => d.Name.LocalName == "ProjectReference")
-                .Where(d => d.Attribute("Include") != null)
-                .Select(d => d.Attribute("Include").Value);
+                foreach (var package in packageReferences)
+                {
+                    packageVersions[package.Name] = package.Version;
+                }
+            });
 
-            var packageReferences = withPackages ? document.Descendants()
-                .Where(d => d.Name.LocalName == "PackageReference")
-                .Where(d => d.Attribute("Include") != null)
-                .Select(d => new { Name = d.Attribute("Include").Value, Version = ExtractVersion(d) })
-                .Select(d => $"{d.Name}{(string.IsNullOrEmpty(d.Version) ? string.Empty : "-")}{d.Version}:::pkg") : [];
-
-            return projectReferences
-                .Where(r => excludeProjects == null || !excludeProjects.IsMatch(r))
-                .Select(r => Path.GetFileNameWithoutExtension(r))
-                .Where(v => !string.IsNullOrEmpty(v))
-                .Union(packageReferences);
         }
 
-        public IEnumerable<ProjectRelation> GetRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        public IEnumerable<ProjectRelation> GetProjectRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
         {
-            List<ProjectRelation> projectRelations = [];
+            List<ProjectRelation> currentProjectRelations = [];
             currentProjects ??= [];
             var localBasePath = GetFullPath(basePath, projectPath);
+            var projectName = Path.GetFileNameWithoutExtension(projectPath);
             if (File.Exists(localBasePath))
             {
                 XDocument document = XDocument.Load(localBasePath);
@@ -65,26 +62,52 @@ namespace RelationsShared.Services
                     .Where(path => !currentProjects.Contains(path))
                     .Where(path => excludeProjects == null || !excludeProjects.IsMatch(path))
                     .Where(path => File.Exists(path))
-                    .Select(path => new ProjectRelation(ProjectRelationType.ProjectReference, Path.GetFileNameWithoutExtension(path), path))
+                    .Select(path => new ProjectRelation(projectName, new ProjectElement(Path.GetFileNameWithoutExtension(path), path)))
                     .ToList();
 
                 var packageReferences = withPackages ? document.Descendants()
                     .Where(node => node.Name.LocalName == "PackageReference")
                     .Where(node => node.Attribute("Include") != null)
-                    .Select(node => new { Name = node.Attribute("Include").Value, Version = ExtractVersion(node) })
+                    .Select(node => new { Name = node.Attribute("Include").Value, Version = GetPackageVersion(node) })
                     .Where(e => e.Name != null)
-                    .Select(e => new ProjectRelation(ProjectRelationType.PackageReference, e.Name, $"{e.Version} [📦]"))
+                    .Select(e => new ProjectRelation(projectName, new PackageElement(e.Name, e.Version, "📦")))
                     .ToList() : [];
 
-
-                projectReferences.ForEach(projectRelation => currentProjects.Add(projectRelation.AdditionalInfo));
-                projectReferences.ForEach(projectRelation => projectRelations.AddRange(GetRelations(projectRelation.AdditionalInfo, currentProjects, Path.GetDirectoryName(localBasePath))));
-
-                projectRelations.AddRange(projectReferences
+                projectReferences.ForEach(projectRelation => currentProjects.Add(projectRelation.Child.Name));
+                projectReferences.ForEach(projectRelation => currentProjectRelations.AddRange(GetProjectRelations(projectRelation.Child.Name, currentProjects, Path.GetDirectoryName(localBasePath))));
+                currentProjectRelations.AddRange(projectReferences
                     .Union(packageReferences));
             }
 
-            return projectRelations.Distinct();
+            if (basePath == null)
+            {
+                projectRelations.Clear();
+                projectRelations.AddRange(currentProjectRelations);
+            }
+
+            return currentProjectRelations;
+        }
+
+        public IEnumerable<string> GetProjects(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        {
+            List<string> result = [];
+            currentProjects ??= [];
+            var projectName = Path.GetFileNameWithoutExtension(projectPath);
+
+            var projectReferences = projectRelations
+                .Where(r => r.Parent == projectName)
+                .Select(r => r.Child)
+                .OfType<ProjectElement>()
+                .Where(r => !currentProjects.Contains(r.Path))
+                .Select(r => r.Path)
+                .ToList();
+
+            projectReferences.ForEach(reference => currentProjects.Add(reference));
+            projectReferences.ForEach(reference => result.AddRange(GetProjects(reference, currentProjects, Path.GetDirectoryName(GetFullPath(basePath, projectPath)))));
+
+            result.AddRange(projectReferences);
+
+            return result.Distinct();
         }
 
         public ReferencesBag GetReferences(HashSet<string> projectFiles)
@@ -110,40 +133,41 @@ namespace RelationsShared.Services
         }
 
 
-        private static string ExtractVersion(XElement d)
+        private IEnumerable<string> Get(string projectPath)
         {
-            var version = d.Attribute("Version")?.Value ?? d.Attribute("version")?.Value;
-            if (string.IsNullOrEmpty(version))
+            return projectRelations
+                .Where(r => r.Parent == Path.GetFileNameWithoutExtension(projectPath))
+                .Select(r => $"{r.Child}")
+                .Distinct();
+        }
+
+        private string GetPackageVersion(XElement node)
+        {
+            string packageName = node.Attribute("Include").Value;
+            string originalVersion = ExtractVersion(node);
+            string version;
+            if (!string.IsNullOrEmpty(originalVersion))
             {
-                version = d.Descendants().FirstOrDefault(e => e.Name.LocalName == "Version")?.Value;
+                version = originalVersion;
+            }
+            else
+            {
+                if (!packageVersions.TryGetValue(packageName, out version))
+                {
+                    version = string.Empty;
+                }
             }
             return version;
         }
 
-        public IEnumerable<string> GetProjects(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        private static string ExtractVersion(XElement node)
         {
-            List<string> result = [];
-            currentProjects ??= [];
-            var localBasePath = GetFullPath(basePath, projectPath);
-            if (File.Exists(localBasePath))
+            var version = node.Attribute("Version")?.Value ?? node.Attribute("version")?.Value;
+            if (string.IsNullOrEmpty(version))
             {
-                XDocument document = XDocument.Load(localBasePath);
-                var projectReferences = document.Descendants()
-                    .Where(d => d.Name.LocalName == "ProjectReference")
-                    .Where(d => d.Attribute("Include") != null)
-                    .Select(d => GetFullPath(Path.GetDirectoryName(localBasePath), d.Attribute("Include").Value))
-                    .Where(p => !currentProjects.Contains(p))
-                    .Where(r => excludeProjects == null || !excludeProjects.IsMatch(r))
-                    .Where(p => File.Exists(p))
-                    .ToList();
-
-                projectReferences.ForEach(reference => currentProjects.Add(reference));
-                projectReferences.ForEach(reference => result.AddRange(GetProjects(reference, currentProjects, Path.GetDirectoryName(GetFullPath(basePath, projectPath)))));
-
-                result.AddRange(projectReferences);
+                version = node.Descendants().FirstOrDefault(e => e.Name.LocalName == "Version")?.Value;
             }
-
-            return result.Distinct();
+            return version;
         }
 
         private static string GetFullPath(string basePath, string projectPath)

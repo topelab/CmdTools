@@ -30,7 +30,6 @@ namespace AvaloniaProjectRelations.MainControl
             {
                 var htmlViewerVM = htmlViewerVMFactory.Create(string.Empty);
                 vm.HtmlViewerVM = htmlViewerVM;
-                vm.SolutionPath = options.RootPath;
                 vm.UserSettings = UserSettings;
                 vm.IsUsedBy = true;
                 vm.IsUsing = !vm.IsUsedBy;

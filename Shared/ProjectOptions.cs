@@ -20,5 +20,6 @@ namespace CmdTools.Shared
             : Reverse ? FinderType.Projects : FinderType.ReverseProjects;
 
         public List<string> ProjectPaths { get; init; } = [];
+        public string InitialPath { get; set; }
     }
 }

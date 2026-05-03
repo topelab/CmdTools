@@ -20,13 +20,15 @@ namespace RelationsShared.Services
         public IEnumerable<Relation> Get<T>(T args) where T : class
         {
             var options = GetOptions(args);
-            var path = options.RootPath ?? Environment.ProcessPath;
+            options.RootPath ??= Environment.ProcessPath;
+            options.InitialPath ??= options.RootPath;
+            var path = options.RootPath;
             var excludeProjects = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
             var projectFilter = options.ProjectFilter;
             options.OutputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
             options.PinnedElement = options.PinnedElement?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
 
-            projectReferences.Initialize(options.WithPackages, excludeProjects);
+            projectReferences.Initialize(options.WithPackages, excludeProjects, options.InitialPath);
 
             var projectFiles = GetProjectFiles(path, excludeProjects);
             options.ProjectPaths.Clear();
@@ -55,7 +57,10 @@ namespace RelationsShared.Services
             fileExecutor.RunOnFiles(file =>
             {
                 projectFiles.Add(file);
-                projectReferences.GetProjects(file).ToList().ForEach(p => projectFiles.Add(p));
+                projectReferences.GetProjectRelations(file, projectFiles)
+                    .Select(r => r.Child)
+                    .OfType<ProjectElement>()
+                    .ToList().ForEach(p => projectFiles.Add(p.Path));
             });
             return projectFiles;
         }
