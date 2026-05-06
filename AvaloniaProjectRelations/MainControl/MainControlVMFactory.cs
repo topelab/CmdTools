@@ -32,7 +32,14 @@ namespace AvaloniaProjectRelations.MainControl
             var vm = new MainControlVM(options) { Title = App.MainTitle };
             mainControlVMInitializer.Initialize(vm, true);
             mainControlVMChangeListener.Start(vm);
-            vm.SelectedItem = args.Length > 2 ? vm.Projects.FirstOrDefault(p => p.Equals(args[2], StringComparison.CurrentCultureIgnoreCase)) : vm.Projects.FirstOrDefault();
+
+            if (args.Length > 2)
+            {
+                var selectedProject = Path.GetFileName(args[2]).Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
+                vm.SelectedItem = vm.Projects.FirstOrDefault(p => p.Equals(selectedProject, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            vm.SelectedItem ??= vm.Projects.FirstOrDefault();
 
             return vm;
         }

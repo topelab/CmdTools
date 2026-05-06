@@ -2,7 +2,7 @@
   "profiles": {
     "AvaloniaProjectRelations": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\arc\\src\\github\\topelab\" calendarcreator"
+      "commandLineArgs": "\"C:\\arc\\src\\tmp\\client\\src\\Agn\" \"agn.shell\""
     }
   }
 }
