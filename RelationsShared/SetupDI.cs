@@ -2,6 +2,7 @@ namespace RelationsShared
 {
     using CmdTools.Contracts;
     using CmdTools.Shared;
+    using RelationsShared.DTO;
     using RelationsShared.Services;
     using Topelab.Core.Resolver.Entities;
 
@@ -24,6 +25,7 @@ namespace RelationsShared
                 .AddTransient<IOutputRender, TextRender>(nameof(RenderType.Text))
                 .AddTransient<IOutputRenderFactory, OutputRenderFactory>()
                 .AddTransient<IProjectsServiceFactory, ProjectsServiceFactory>()
+                .AddTransient<IElementRelationsInitializer<ProjectRelationsContext>, ProjectRelationsInitializer>()
                 ;
         }
     }

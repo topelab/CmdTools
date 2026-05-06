@@ -10,24 +10,27 @@ namespace AvaloniaProjectRelations.MainControl
                                             IHtmlViewerVMFactory htmlViewerVMFactory,
                                             IUserSettingsFactory userSettingsFactory,
                                             IOutputRenderFactory outputRenderFactory,
-                                            IProjectsServiceFactory projectsServiceFactory) : IMainControlVMInitializer
+                                            IProjectsServiceFactory projectsServiceFactory,
+                                            IElementRelationsInitializer<ProjectRelationsContext> elementRelationsInitializer) : IMainControlVMInitializer
     {
         private readonly IElementRelationsGetterFactory elementRelationsGetterFactory = elementRelationsGetterFactory;
         private readonly IHtmlViewerVMFactory htmlViewerVMFactory = htmlViewerVMFactory;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
         private readonly IOutputRenderFactory outputRenderFactory = outputRenderFactory;
         private readonly IProjectsServiceFactory projectsServiceFactory = projectsServiceFactory;
+        private readonly IElementRelationsInitializer<ProjectRelationsContext> elementRelationsInitializer = elementRelationsInitializer;
 
         private UserSettings UserSettings => field ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+        private readonly ProjectRelationsContext context = new();
 
         public void Initialize(MainControlVM vm, bool isFirstInitialization = false)
         {
             var options = vm.Model;
-            var elementRelationsGetter = elementRelationsGetterFactory.Create(options.FinderType);
-            var relations = elementRelationsGetter.Get(options);
+            context.Options = options;
 
             if (isFirstInitialization)
             {
+                elementRelationsInitializer.Initialize(context);
                 var htmlViewerVM = htmlViewerVMFactory.Create(string.Empty);
                 vm.HtmlViewerVM = htmlViewerVM;
                 vm.UserSettings = UserSettings;
@@ -39,6 +42,8 @@ namespace AvaloniaProjectRelations.MainControl
             }
             else
             {
+                var elementRelationsGetter = elementRelationsGetterFactory.Create(options.FinderType);
+                var relations = elementRelationsGetter.GetFromContext(context);
                 var outputRender = outputRenderFactory.Create(options.RenderType);
                 var content = outputRender.Create(relations, options);
                 var html = outputRender.RenderToHtml(content, UserSettings);

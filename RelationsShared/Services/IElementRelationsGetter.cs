@@ -1,10 +1,12 @@
-namespace CmdTools.Contracts
+namespace RelationsShared.Services
 {
     using CmdTools.Contracts.DTO;
+    using RelationsShared.DTO;
     using System.Collections.Generic;
 
     public interface IElementRelationsGetter
     {
         IEnumerable<Relation> Get<T>(T args) where T : class;
+        IEnumerable<Relation> GetFromContext(ProjectRelationsContext context);
     }
 }

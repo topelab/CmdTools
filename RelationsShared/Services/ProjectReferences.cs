@@ -25,6 +25,16 @@ namespace RelationsShared.Services
             projectRelations.Clear();
         }
 
+        public void Initialize(ProjectRelationsContext context)
+        {
+            withPackages = context.Options.WithPackages;
+            excludeProjects = context.ExcludeProjects;
+            projectRelations.Clear();
+            context.ProjectRelations.Keys.ToList().ForEach(r => projectRelations.AddRange(context.ProjectRelations[r].Select(pr => new ProjectRelation(r, pr))));
+            packageVersions.Clear();
+            context.PackageVersions.Keys.ToList().ForEach(k => packageVersions[k] = context.PackageVersions[k]);
+        }
+
         private void InitializePackageVersions(string path)
         {
             packageVersions.Clear();
@@ -46,9 +56,9 @@ namespace RelationsShared.Services
 
         }
 
-        public IEnumerable<ProjectRelation> GetProjectRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        public IEnumerable<ElementRelation> GetProjectRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
         {
-            List<ProjectRelation> currentProjectRelations = [];
+            List<ElementRelation> currentProjectRelations = [];
             currentProjects ??= [];
             var localBasePath = GetFullPath(basePath, projectPath);
             var projectName = Path.GetFileNameWithoutExtension(projectPath);
@@ -62,27 +72,23 @@ namespace RelationsShared.Services
                     .Where(path => !currentProjects.Contains(path))
                     .Where(path => excludeProjects == null || !excludeProjects.IsMatch(path))
                     .Where(path => File.Exists(path))
-                    .Select(path => new ProjectRelation(projectName, new ProjectElement(Path.GetFileNameWithoutExtension(path), path)))
+                    .Select(path => new ProjectElement(Path.GetFileNameWithoutExtension(path), path))
                     .ToList();
 
-                var packageReferences = withPackages ? document.Descendants()
-                    .Where(node => node.Name.LocalName == "PackageReference")
-                    .Where(node => node.Attribute("Include") != null)
-                    .Select(node => new { Name = node.Attribute("Include").Value, Version = GetPackageVersion(node) })
-                    .Where(e => e.Name != null)
-                    .Select(e => new ProjectRelation(projectName, new PackageElement(e.Name, e.Version, "📦")))
-                    .ToList() : [];
+                var packageReferences = withPackages
+                    ? document.Descendants()
+                        .Where(node => node.Name.LocalName == "PackageReference")
+                        .Where(node => node.Attribute("Include") != null)
+                        .Select(node => new { Name = node.Attribute("Include").Value, Version = GetPackageVersion(node) })
+                        .Where(e => e.Name != null)
+                        .Select(e => new PackageElement(e.Name, e.Version, "📦"))
+                        .ToList()
+                    : [];
 
-                projectReferences.ForEach(projectRelation => currentProjects.Add(projectRelation.Child.Name));
-                projectReferences.ForEach(projectRelation => currentProjectRelations.AddRange(GetProjectRelations(projectRelation.Child.Name, currentProjects, Path.GetDirectoryName(localBasePath))));
-                currentProjectRelations.AddRange(projectReferences
-                    .Union(packageReferences));
-            }
+                projectReferences.ForEach(projectRelation => currentProjectRelations.AddRange(GetProjectRelations(projectRelation.Path, currentProjects, Path.GetDirectoryName(localBasePath))));
 
-            if (basePath == null)
-            {
-                projectRelations.Clear();
-                projectRelations.AddRange(currentProjectRelations);
+                currentProjectRelations.AddRange(projectReferences);
+                currentProjectRelations.AddRange(packageReferences);
             }
 
             return currentProjectRelations;
@@ -136,7 +142,7 @@ namespace RelationsShared.Services
         private IEnumerable<string> Get(string projectPath)
         {
             return projectRelations
-                .Where(r => r.Parent == Path.GetFileNameWithoutExtension(projectPath))
+                .Where(r => r.Parent == projectPath)
                 .Select(r => $"{r.Child}")
                 .Distinct();
         }

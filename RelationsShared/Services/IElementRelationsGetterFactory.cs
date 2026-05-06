@@ -1,4 +1,6 @@
-namespace CmdTools.Contracts
+using CmdTools.Contracts;
+
+namespace RelationsShared.Services
 {
     public interface IElementRelationsGetterFactory
     {

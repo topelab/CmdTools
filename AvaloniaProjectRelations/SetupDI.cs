@@ -28,7 +28,7 @@ namespace AvaloniaProjectRelations
 
                 .AddTransient<IMainControlVMFactory, MainControlVMFactory>()
                 .AddTransient<IMainControlVMChangeListener, MainControlVMChangeListener>()
-                .AddTransient<IMainControlVMInitializer, MainControlVMInitializer>()
+                .AddSingleton<IMainControlVMInitializer, MainControlVMInitializer>()
 
                 .AddFactory(resolver => App.Current.ApplicationLifetime);
         }

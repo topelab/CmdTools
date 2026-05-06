@@ -39,6 +39,15 @@ namespace RelationsShared.Services
             return relationsGetter.Get<Relation>(filteredReferences, projectFilter);
         }
 
+        public IEnumerable<Relation> GetFromContext(ProjectRelationsContext context)
+        {
+            var options = context.Options;
+            projectReferences.Initialize(context);
+            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Options.ProjectPaths.ToHashSet());
+            var relationsGetter = relationGetterFactory.Create(options.FinderType);
+            return relationsGetter.Get<Relation>(filteredReferences, options.ProjectFilter);
+        }
+
         private ProjectOptions GetOptions<T>(T args) where T : class
         {
             if (args is not ProjectOptions options)
@@ -58,7 +67,6 @@ namespace RelationsShared.Services
             {
                 projectFiles.Add(file);
                 projectReferences.GetProjectRelations(file, projectFiles)
-                    .Select(r => r.Child)
                     .OfType<ProjectElement>()
                     .ToList().ForEach(p => projectFiles.Add(p.Path));
             });

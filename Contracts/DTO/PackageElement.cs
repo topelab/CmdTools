@@ -1,6 +1,6 @@
 namespace CmdTools.Contracts.DTO
 {
-    public record PackageElement(string Name, string Version, string Icon) : Element(Name, ProjectRelationType.PackageReference)
+    public record PackageElement(string Name, string Version, string Icon) : ElementRelation(Name, ProjectRelationType.PackageReference)
     {
         public override string ToString()
         {

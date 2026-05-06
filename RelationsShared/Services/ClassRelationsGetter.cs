@@ -4,6 +4,7 @@ namespace RelationsShared.Services
     using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using Microsoft.CSharp;
+    using RelationsShared.DTO;
     using System;
     using System.CodeDom;
     using System.Collections.Generic;
@@ -149,6 +150,11 @@ namespace RelationsShared.Services
             }
 
             return typeName;
+        }
+
+        public IEnumerable<Relation> GetFromContext(ProjectRelationsContext context)
+        {
+            throw new NotImplementedException();
         }
     }
 }
