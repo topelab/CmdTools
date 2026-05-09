@@ -2,7 +2,7 @@
   "profiles": {
     "AvaloniaProjectRelations": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\arc\\src\\github\\topelab\\Topelab.Calendar\\src\" calendarcreator"
+      "commandLineArgs": "\"C:\\arc\\src\\github\\topelab\\CmdTools\" AvaloniaProjectrelations"
     }
   }
 }

@@ -45,10 +45,10 @@ namespace RelationsShared.Services
                 {
                     continue;
                 }
-                context.ProjectRelations.AddReferences(project, GetProjectRelations(project, currentProjects));
                 currentProjects.Add(project);
+                SetRelations(context.ProjectRelations, project, currentProjects);
             }
-            context.Projects = [.. currentProjects.Select(p => Path.GetFileNameWithoutExtension(p)).OrderBy(p => p)];
+            context.Projects = [.. currentProjects.Distinct()];
         }
 
         public IEnumerable<ElementRelation> GetProjectRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
@@ -80,13 +80,25 @@ namespace RelationsShared.Services
                         .ToList()
                     : [];
 
-                projectReferences.ForEach(projectRelation => currentProjectRelations.AddRange(GetProjectRelations(projectRelation.Path, currentProjects, Path.GetDirectoryName(localBasePath))));
-
                 currentProjectRelations.AddRange(projectReferences);
                 currentProjectRelations.AddRange(packageReferences);
             }
 
             return currentProjectRelations;
+        }
+
+        private void SetRelations(ElementsRelations elementRelations, string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        {
+            var references = GetProjectRelations(projectPath, currentProjects, basePath);
+            elementRelations.AddReferences(projectPath, references);
+            foreach (var reference in references)
+            {
+                if (reference is ProjectElement projectReference && !currentProjects.Contains(projectReference.Path))
+                {
+                    currentProjects.Add(projectReference.Path);
+                    SetRelations(elementRelations, projectReference.Path, currentProjects, Path.GetDirectoryName(GetFullPath(basePath, projectPath)));
+                }
+            }
         }
 
 

@@ -27,12 +27,34 @@ namespace RelationsShared.Services
 
         public void Initialize(ProjectRelationsContext context)
         {
-            withPackages = context.Options.WithPackages;
             excludeProjects = context.ExcludeProjects;
-            projectRelations.Clear();
-            context.ProjectRelations.Keys.ToList().ForEach(r => projectRelations.AddRange(context.ProjectRelations[r].Select(pr => new ProjectRelation(r, pr))));
+            InitializeProjectsRelations(context);
+            InitializePackages(context);
+        }
+
+        private void InitializePackages(ProjectRelationsContext context)
+        {
+            withPackages = context.Options.WithPackages;
             packageVersions.Clear();
-            context.PackageVersions.Keys.ToList().ForEach(k => packageVersions[k] = context.PackageVersions[k]);
+            if (withPackages)
+            {
+                context.PackageVersions.Keys.ToList().ForEach(k => packageVersions[k] = context.PackageVersions[k]);
+            }
+        }
+
+        private void InitializeProjectsRelations(ProjectRelationsContext context)
+        {
+            projectRelations.Clear();
+            context.ProjectRelations.Keys
+                .ToList()
+                .ForEach(r =>
+                {
+                    var relations = context.ProjectRelations[r]
+                        .Where(pr => withPackages || pr.RelationType != ProjectRelationType.PackageReference)
+                        .Select(pr => new ProjectRelation(r, pr));
+
+                    projectRelations.AddRange(relations);
+                });
         }
 
         private void InitializePackageVersions(string path)

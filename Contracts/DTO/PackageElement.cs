@@ -4,7 +4,7 @@ namespace CmdTools.Contracts.DTO
     {
         public override string ToString()
         {
-            return $"{Name}-{Version}";
+            return $"{Name}-{Version}:::pkg";
         }
 
         public string ToString(bool withIcon)

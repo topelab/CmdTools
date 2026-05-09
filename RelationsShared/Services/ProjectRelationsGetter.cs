@@ -43,7 +43,7 @@ namespace RelationsShared.Services
         {
             var options = context.Options;
             projectReferences.Initialize(context);
-            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Options.ProjectPaths.ToHashSet());
+            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Projects.ToHashSet());
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
             return relationsGetter.Get<Relation>(filteredReferences, options.ProjectFilter);
         }
