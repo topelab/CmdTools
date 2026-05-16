@@ -1,3 +1,16 @@
+## 1.1.5 (ProjectRelations2026), 1.1.27 (Tools), 1.0.2 (AvaloniaProjectRelations)
+
+- Upgrade ReactiveUI.Avalonia to 12.0.1
+- Upgrade Microsoft.Web.WebView2 to 1.0.3967.48
+- Upgrade NLog.Extensions.Logging to 6.1.3
+- Upgrade Avalonia.Desktop to 12.0.3
+- Upgrade System.CodeDom to 10.0.8
+- Upgrade Topelab.Core.Resolver to 2.0.7
+- Upgrade Avalonia.Controls.WebView to 12.0.1
+- Upgrade Topelab.Core.Adapters to 1.12.8
+- Upgrade Topelab.Core.Avalonia to 1.2.9
+
+
 ## 1.1.25
 
 - Updating Microsoft.Web.WebView2 to 1.0.3800.47
