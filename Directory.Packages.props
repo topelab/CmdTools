@@ -6,19 +6,16 @@
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="Topelab.Core.Resolver" Version="2.0.3" />
     <PackageVersion Include="System.CodeDom" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3967.48" />
     <PackageVersion Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" />
     <PackageVersion Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" />
     <PackageVersion Include="AngleSharp" Version="1.4.0" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.2" />
     <PackageVersion Include="Topelab.Core.Adapters" Version="1.12.8" />
     <!-- AvaloniaUI-->
     <PackageVersion Include="Topelab.Core.Avalonia" Version="1.2.9" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
     <PackageVersion Include="Avalonia.Desktop" Version="12.0.3" />
-    <PackageVersion Include="ReactiveUI.Avalonia" Version="11.4.12" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />
     <PackageVersion Include="Material.Icons.Avalonia" Version="3.0.2" />
     <!-- WebView-->
