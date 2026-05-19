@@ -13,18 +13,62 @@ namespace RelationsShared.Services
         public string Create(IEnumerable<Relation> relations, Options options)
         {
             var contentBag = new StringBuilder();
-            relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} "));
-            var content = contentBag.ToString();
+            string content = string.Empty;
 
-            if (!string.IsNullOrEmpty(options.PinnedElement))
+            var pinnedElement = options.PinnedElement;
+            var rootElement = options.SelectedElement;
+
+            if (!string.IsNullOrEmpty(pinnedElement))
             {
-                var pinnedElement = options.PinnedElement;
+                relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} "));
+                content = contentBag.ToString();
                 content = content.Replace($"\t{pinnedElement} ", $"\t{pinnedElement}:::pinned");
                 content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
+            }
+            else
+            {
+                GetRelationsWithLevels(rootElement, relations)
+                    .OrderBy(r => r.Level)
+                    .ThenBy(r => r.Element)
+                    .ThenBy(r => r.Reference)
+                    .Distinct()
+                    .ToList()
+                    .ForEach(r =>
+                    {
+                        contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} ");
+                    });
+                content = contentBag.ToString();
             }
 
             return GetComposition(content, options.Theme, options.Layout, options.Direction);
         }
+
+        private List<Relation> GetRelationsWithLevels(string element, IEnumerable<Relation> relations, HashSet<string> visitedElements = null, int level = 0)
+        {
+            List<Relation> result = [];
+            visitedElements ??= [];
+            bool isNew = visitedElements.Add(element);
+
+            if (isNew)
+            {
+                result = relations
+                    .Where(r => r.Element == element)
+                    .Select(r => new Relation { Element = element, Reference = r.Reference, Level = level + 1 })
+                    .ToList();
+
+                List<Relation> newRelations = [];
+
+
+                foreach (Relation relation in result)
+                {
+                    newRelations.AddRange(GetRelationsWithLevels(relation.Reference, relations, visitedElements, level + 1));
+                }
+                result.AddRange(newRelations);
+            }
+
+            return result;
+        }
+
 
         protected string GetComposition(string content, Theme theme, Layout layout, Direction direction)
         {
