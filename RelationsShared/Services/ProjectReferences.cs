@@ -28,8 +28,8 @@ namespace RelationsShared.Services
         public void Initialize(ProjectRelationsContext context)
         {
             excludeProjects = context.ExcludeProjects;
-            InitializeProjectsRelations(context);
             InitializePackages(context);
+            InitializeProjectsRelations(context);
         }
 
         private void InitializePackages(ProjectRelationsContext context)

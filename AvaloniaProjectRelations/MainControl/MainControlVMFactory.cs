@@ -29,6 +29,8 @@ namespace AvaloniaProjectRelations.MainControl
                 RenderType = RenderType.Text,
             };
 
+            options.InitialPath = TryFindInitialPath(options.RootPath);
+
             var vm = new MainControlVM(options) { Title = App.MainTitle };
             mainControlVMInitializer.Initialize(vm, true);
             mainControlVMChangeListener.Start(vm);
@@ -42,6 +44,33 @@ namespace AvaloniaProjectRelations.MainControl
             vm.SelectedItem ??= vm.Projects.FirstOrDefault();
 
             return vm;
+        }
+
+        private string TryFindInitialPath(string rootPath)
+        {
+            string currentPath = rootPath;
+            string solutionPath = rootPath;
+
+            if (!IsSolutionPath(currentPath))
+            {
+                currentPath = Path.GetFullPath(currentPath);
+                if (!IsSolutionPath(currentPath))
+                {
+                    solutionPath = rootPath;
+                }
+                else
+                {
+                    solutionPath = currentPath;
+                }
+            }
+
+            return solutionPath;
+        }
+
+        private bool IsSolutionPath(string path)
+        {
+            var solutionPaths = Directory.EnumerateFiles(path, "*.sln*");
+            return solutionPaths.Any();
         }
     }
 }

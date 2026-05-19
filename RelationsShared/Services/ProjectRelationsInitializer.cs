@@ -29,7 +29,8 @@ namespace RelationsShared.Services
 
             var path = options.RootPath;
             context.ExcludeProjects = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
-            context.PackageVersions = GetPackageVersions(options.InitialPath);
+            context.PackageSets.Clear();
+            context.PackageVersions = GetPackageVersions(options.InitialPath, context.PackageSets);
 
             options.OutputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
             options.PinnedElement = options.PinnedElement?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
@@ -56,6 +57,7 @@ namespace RelationsShared.Services
             List<ElementRelation> currentProjectRelations = [];
             currentProjects ??= [];
             var localBasePath = GetFullPath(basePath, projectPath);
+            var localPackageVersions = GetPackageVersions(Path.GetDirectoryName(Path.GetDirectoryName(localBasePath)), context.PackageSets);
             var projectName = Path.GetFileNameWithoutExtension(projectPath);
             if (File.Exists(localBasePath))
             {
@@ -64,7 +66,6 @@ namespace RelationsShared.Services
                     .Where(node => node.Name.LocalName == "ProjectReference")
                     .Where(node => node.Attribute("Include") != null)
                     .Select(node => GetFullPath(Path.GetDirectoryName(localBasePath), node.Attribute("Include").Value))
-                    .Where(path => !currentProjects.Contains(path))
                     .Where(path => context.ExcludeProjects == null || !context.ExcludeProjects.IsMatch(path))
                     .Where(path => File.Exists(path))
                     .Select(path => new ProjectElement(Path.GetFileNameWithoutExtension(path), path))
@@ -101,7 +102,6 @@ namespace RelationsShared.Services
             }
         }
 
-
         private HashSet<string> GetProjectFiles()
         {
             fileExecutor.Initialize(context.Options.RootPath, Constants.FilePattern, context.ExcludeProjects);
@@ -111,24 +111,29 @@ namespace RelationsShared.Services
             return projectFiles;
         }
 
-        private Dictionary<string, string> GetPackageVersions(string path)
+        private Dictionary<string, string> GetPackageVersions(string path, HashSet<string> packageSets)
         {
             Dictionary<string, string> packageVersions = [];
-            fileExecutor.Initialize(path, Constants.PackagesFilePattern);
-            fileExecutor.RunOnFiles(file =>
-            {
-                XDocument document = XDocument.Load(file);
-                var packageReferences = document.Descendants()
-                    .Where(d => d.Name.LocalName == "PackageVersion")
-                    .Where(d => d.Attribute("Include") != null)
-                    .Select(d => new { Name = d.Attribute("Include").Value, Version = ExtractVersion(d) })
-                    .Where(e => e.Name != null);
 
-                foreach (var package in packageReferences)
+            if (!packageSets.Contains(path))
+            {
+                fileExecutor.Initialize(path, Constants.PackagesFilePattern);
+                fileExecutor.RunOnFiles(file =>
                 {
-                    packageVersions[package.Name] = package.Version;
-                }
-            });
+                    XDocument document = XDocument.Load(file);
+                    var packageReferences = document.Descendants()
+                        .Where(d => d.Name.LocalName == "PackageVersion")
+                        .Where(d => d.Attribute("Include") != null)
+                        .Select(d => new { Name = d.Attribute("Include").Value, Version = ExtractVersion(d) })
+                        .Where(e => e.Name != null);
+
+                    foreach (var package in packageReferences)
+                    {
+                        packageVersions[package.Name] = package.Version;
+                    }
+                });
+                packageSets.Add(path);
+            }
 
             return packageVersions;
         }

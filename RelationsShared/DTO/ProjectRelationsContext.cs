@@ -10,6 +10,7 @@ namespace RelationsShared.DTO
         public ProjectOptions Options { get; set; }
         public ElementsRelations ProjectRelations { get; set; } = [];
         public Dictionary<string, string> PackageVersions { get; set; } = [];
+        public HashSet<string> PackageSets { get; internal set; } = [];
         public HashSet<string> Projects { get; set; } = [];
         public Regex ExcludeProjects { get; internal set; }
     }

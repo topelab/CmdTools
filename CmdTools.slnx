@@ -1,27 +1,29 @@
 <Solution>
-  <Folder Name="/Common/">
-    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver.Microsoft/Topelab.Core.Resolver.Microsoft.csproj" />
-    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver.Unity/Topelab.Core.Resolver.Unity.csproj" />
-    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver/Topelab.Core.Resolver.csproj" />
+  <Folder Name="/00 Solution folder/">
+    <File Path=".editorconfig" />
+    <File Path="changes.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="inverso.mmd" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+    <File Path="sample.mmd" />
+  </Folder>
+  <Folder Name="/10 - Common/">
     <Project Path="Contracts/Contracts.csproj" />
     <Project Path="RelationsShared/RelationsShared.csproj" Id="28b7c1c8-1b5c-40db-ab2d-b19e67fdaaca" />
     <Project Path="Shared/Shared.csproj" />
   </Folder>
-  <Folder Name="/Tools/">
+  <Folder Name="/20 - Tools/">
     <Project Path="AvaloniaProjectRelations/AvaloniaProjectRelations.csproj" Id="63be750d-d653-4c0d-808b-835621320425" />
     <Project Path="CreateRelationsDiagram/CreateRelationsDiagram.csproj" />
     <Project Path="ProjectRelations2026/ProjectRelations2026.csproj" />
     <Project Path="RunCustomTool/RunCustomTool.csproj" />
     <Project Path="UpdateVersion/UpdateVersion.csproj" />
   </Folder>
-  <Folder Name="/_Info/">
-    <File Path=".editorconfig" />
-    <File Path="changes.md" />
-    <File Path="Directory.Packages.props" />
-    <File Path="Directory.Build.props" />
-    <File Path="inverso.mmd" />
-    <File Path="LICENSE.txt" />
-    <File Path="README.md" />
-    <File Path="sample.mmd" />
+  <Folder Name="/99 - External/">
+    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver.Microsoft/Topelab.Core.Resolver.Microsoft.csproj" />
+    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver.Unity/Topelab.Core.Resolver.Unity.csproj" />
+    <Project Path="../Core.Resolver/src/Topelab.Core.Resolver/Topelab.Core.Resolver.csproj" />
   </Folder>
 </Solution>
