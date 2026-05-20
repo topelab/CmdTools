@@ -17,7 +17,9 @@
   <Folder Name="/20 - Tools/">
     <Project Path="AvaloniaProjectRelations/AvaloniaProjectRelations.csproj" Id="63be750d-d653-4c0d-808b-835621320425" />
     <Project Path="CreateRelationsDiagram/CreateRelationsDiagram.csproj" />
-    <Project Path="ProjectRelations2026/ProjectRelations2026.csproj" />
+    <Project Path="ProjectRelations2026/ProjectRelations2026.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
     <Project Path="RunCustomTool/RunCustomTool.csproj" />
     <Project Path="UpdateVersion/UpdateVersion.csproj" />
   </Folder>
