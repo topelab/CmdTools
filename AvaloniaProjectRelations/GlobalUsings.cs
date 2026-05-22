@@ -1,1 +1,0 @@
-global using static Topelab.Core.Resolver.Microsoft.ResolverFactory;

@@ -14,7 +14,6 @@ namespace RelationsShared
                 .AddSingleton<IJsonSettings, JsonSettings>()
                 .AddSingleton<IUserSettingsFactory, UserSettingsFactory>()
                 .AddTransient<IProjectReferences, ProjectReferences>()
-                .AddTransient<IElementRelationsGetterFactory, ElementRelationsGetterFactory>()
                 .AddTransient<IElementRelationsGetter, ProjectRelationsGetter>(nameof(FinderType.Projects))
                 .AddTransient<IElementRelationsGetter, ProjectRelationsGetter>(nameof(FinderType.ReverseProjects))
                 .AddTransient<IElementRelationsGetter, ClassRelationsGetter>(nameof(FinderType.Classes))
@@ -23,7 +22,6 @@ namespace RelationsShared
                 .AddTransient<IOutputRender, MermaidRender>(nameof(RenderType.Mermaid))
                 .AddTransient<IOutputRender, TextRender>(nameof(RenderType.Text))
                 .AddTransient<IOutputRenderFactory, OutputRenderFactory>()
-                .AddTransient<IProjectsServiceFactory, ProjectsServiceFactory>()
                 ;
         }
     }

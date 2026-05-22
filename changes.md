@@ -1,3 +1,8 @@
+## 1.1.6 (ProjectRelations2026), 1.1.28 (Tools)
+
+- Remove AvaloniaProjectRelations from solution and update version numbers in project files.
+
+
 ## 1.1.5 (ProjectRelations2026), 1.1.27 (Tools), 1.0.2 (AvaloniaProjectRelations)
 
 - Upgrade ReactiveUI.Avalonia to 12.0.1
