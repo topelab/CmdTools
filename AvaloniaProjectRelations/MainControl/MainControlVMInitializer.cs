@@ -1,7 +1,6 @@
 namespace AvaloniaProjectRelations.MainControl
 {
     using AvaloniaProjectRelations.Browser;
-    using CmdTools.Contracts;
     using CmdTools.Shared;
     using RelationsShared.DTO;
     using RelationsShared.Services;
@@ -11,14 +10,14 @@ namespace AvaloniaProjectRelations.MainControl
                                             IUserSettingsFactory userSettingsFactory,
                                             IOutputRenderFactory outputRenderFactory,
                                             IProjectsServiceFactory projectsServiceFactory,
-                                            IElementRelationsInitializer<ProjectRelationsContext> elementRelationsInitializer) : IMainControlVMInitializer
+                                            IProjectRelationsContextInitializer relationsContextInitializer) : IMainControlVMInitializer
     {
         private readonly IElementRelationsGetterFactory elementRelationsGetterFactory = elementRelationsGetterFactory;
         private readonly IHtmlViewerVMFactory htmlViewerVMFactory = htmlViewerVMFactory;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
         private readonly IOutputRenderFactory outputRenderFactory = outputRenderFactory;
         private readonly IProjectsServiceFactory projectsServiceFactory = projectsServiceFactory;
-        private readonly IElementRelationsInitializer<ProjectRelationsContext> elementRelationsInitializer = elementRelationsInitializer;
+        private readonly IProjectRelationsContextInitializer relationsContextInitializer = relationsContextInitializer;
 
         private UserSettings UserSettings => field ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
         private readonly ProjectRelationsContext context = new();
@@ -30,7 +29,7 @@ namespace AvaloniaProjectRelations.MainControl
 
             if (isFirstInitialization)
             {
-                elementRelationsInitializer.Initialize(context);
+                relationsContextInitializer.Initialize(context);
                 var htmlViewerVM = htmlViewerVMFactory.Create(string.Empty);
                 vm.HtmlViewerVM = htmlViewerVM;
                 vm.UserSettings = UserSettings;

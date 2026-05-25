@@ -8,9 +8,9 @@ namespace RelationsShared.Services
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
-    internal class ProjectReferences(IFileExecutor fileExecutor) : IProjectReferences
+    internal class ProjectReferences(IFileExecutorFactory fileExecutorFactory) : IProjectReferences
     {
-        private readonly IFileExecutor fileExecutor = fileExecutor;
+        private readonly IFileExecutorFactory fileExecutorFactory = fileExecutorFactory;
 
         private bool withPackages;
         private Regex excludeProjects;
@@ -27,14 +27,15 @@ namespace RelationsShared.Services
 
         public void Initialize(ProjectRelationsContext context)
         {
-            excludeProjects = context.ExcludeProjects;
+            excludeProjects = context.ExcludeElements;
             InitializePackages(context);
             InitializeProjectsRelations(context);
         }
 
         private void InitializePackages(ProjectRelationsContext context)
         {
-            withPackages = context.Options.WithPackages;
+            var options = context.Options as ProjectOptions;
+            withPackages = options.WithPackages;
             packageVersions.Clear();
             if (withPackages)
             {
@@ -45,11 +46,11 @@ namespace RelationsShared.Services
         private void InitializeProjectsRelations(ProjectRelationsContext context)
         {
             projectRelations.Clear();
-            context.ProjectRelations.Keys
+            context.ElementsRelations.Keys
                 .ToList()
                 .ForEach(r =>
                 {
-                    var relations = context.ProjectRelations[r]
+                    var relations = context.ElementsRelations[r]
                         .Where(pr => withPackages || pr.RelationType != ProjectRelationType.PackageReference)
                         .Select(pr => new ProjectRelation(r, pr));
 
@@ -60,7 +61,7 @@ namespace RelationsShared.Services
         private void InitializePackageVersions(string path)
         {
             packageVersions.Clear();
-            fileExecutor.Initialize(path, Constants.PackagesFilePattern);
+            var fileExecutor = fileExecutorFactory.Create(path, Constants.PackagesFilePattern);
             fileExecutor.RunOnFiles(file =>
             {
                 XDocument document = XDocument.Load(file);

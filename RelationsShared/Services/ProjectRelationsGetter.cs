@@ -10,11 +10,11 @@ namespace RelationsShared.Services
     using System.Text.RegularExpressions;
 
     internal class ProjectRelationsGetter(IProjectReferences projectReferences,
-                                          IFileExecutor fileExecutor,
+                                          IFileExecutorFactory fileExecutorFactory,
                                           IRelationGetterFactory relationGetterFactory) : IElementRelationsGetter
     {
         private readonly IProjectReferences projectReferences = projectReferences;
-        private readonly IFileExecutor fileExecutor = fileExecutor;
+        private readonly IFileExecutorFactory fileExecutorFactory = fileExecutorFactory;
         private readonly IRelationGetterFactory relationGetterFactory = relationGetterFactory;
 
         public IEnumerable<Relation> Get<T>(T args) where T : class
@@ -39,11 +39,12 @@ namespace RelationsShared.Services
             return relationsGetter.Get<Relation>(filteredReferences, projectFilter);
         }
 
-        public IEnumerable<Relation> GetFromContext(ProjectRelationsContext context)
+        public IEnumerable<Relation> GetFromContext(RelationsContext relationsContext)
         {
-            var options = context.Options;
+            var context = relationsContext as ProjectRelationsContext;
+            var options = context.Options as ProjectOptions;
             projectReferences.Initialize(context);
-            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Projects.ToHashSet());
+            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Elements.ToHashSet());
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
             return relationsGetter.Get<Relation>(filteredReferences, options.ProjectFilter);
         }
@@ -60,7 +61,7 @@ namespace RelationsShared.Services
 
         private HashSet<string> GetProjectFiles(string path, Regex excludeProjects)
         {
-            fileExecutor.Initialize(path, Constants.FilePattern, excludeProjects);
+            var fileExecutor = fileExecutorFactory.Create(path, Constants.FilePattern, excludeProjects);
 
             HashSet<string> projectFiles = [];
             fileExecutor.RunOnFiles(file =>

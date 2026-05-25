@@ -3,7 +3,6 @@ using RelationsShared.Services;
 namespace ProjectRelations2026.Services
 {
     using CmdTools.Shared;
-    using ProjectRelations2026.Views;
     using RelationsShared.DTO;
     using System.IO;
     using System.Text.RegularExpressions;
@@ -19,11 +18,11 @@ namespace ProjectRelations2026.Services
 
         private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
 
-        public async Task<RelationsContext> CreateAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
+        public async Task<Views.RelationsContext> CreateAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
         {
             var projectOptions = BuildOptions(solutionExplorerItem, relationType);
             var content = await RunAsync(projectOptions);
-            var relationsWindowsContext = new RelationsContext
+            var relationsWindowsContext = new Views.RelationsContext
             {
                 MermaidFile = projectOptions.OutputFile,
                 UserSettings = UserSettings,
@@ -46,21 +45,21 @@ namespace ProjectRelations2026.Services
             return solutionExplorerItem.Projects.Keys.Where(k => excludeProjects == null || !excludeProjects.IsMatch(k)).OrderBy(k => k);
         }
 
-        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsContext relationsWindowsContext)
+        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, Views.RelationsContext relationsWindowsContext)
         {
             _ = OnRelationsWindowsContextPropertyChangedAsync(sender, propertyName, solutionExplorerItem, relationsWindowsContext);
         }
 
-        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, RelationsContext relationsWindowsContext)
+        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, Views.RelationsContext relationsWindowsContext)
         {
-            if (sender is RelationsContext context)
+            if (sender is Views.RelationsContext context)
             {
                 switch (propertyName)
                 {
-                    case nameof(RelationsContext.RelationType):
-                    case nameof(RelationsContext.SelectedItem):
-                    case nameof(RelationsContext.IncludePackages):
-                    case nameof(RelationsContext.ShowListOnly):
+                    case nameof(Views.RelationsContext.RelationType):
+                    case nameof(Views.RelationsContext.SelectedItem):
+                    case nameof(Views.RelationsContext.IncludePackages):
+                    case nameof(Views.RelationsContext.ShowListOnly):
                         var relationType = context.RelationType;
                         var localSolutionExplorerItem = solutionExplorerItem with { Name = context.SelectedItem, Path = Path.GetDirectoryName(solutionExplorerItem.Projects[context.SelectedItem]) };
                         var projectOptions = BuildOptions(localSolutionExplorerItem, relationType);
@@ -102,7 +101,7 @@ namespace ProjectRelations2026.Services
             return await Task.Run(() => outputRender.Create(relations, options));
         }
 
-        public async Task GenerateAsync(RelationsContext relationsWindowsContext, string content)
+        public async Task GenerateAsync(Views.RelationsContext relationsWindowsContext, string content)
         {
             var outputRender = outputRenderFactory.Create(relationsWindowsContext.ShowListOnly ? RenderType.Text : RenderType.Mermaid);
             var html = outputRender.RenderToHtml(content, UserSettings);

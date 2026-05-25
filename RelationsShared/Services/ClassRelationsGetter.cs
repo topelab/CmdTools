@@ -152,7 +152,7 @@ namespace RelationsShared.Services
             return typeName;
         }
 
-        public IEnumerable<Relation> GetFromContext(ProjectRelationsContext context)
+        public IEnumerable<Relation> GetFromContext(RelationsContext relationsContext)
         {
             throw new NotImplementedException();
         }

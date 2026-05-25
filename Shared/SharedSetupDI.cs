@@ -8,6 +8,7 @@ namespace CmdTools.Shared
         public static ResolveInfoCollection Register()
         {
             return new ResolveInfoCollection()
+                .AddSingleton<IFileExecutorFactory, FileExecutorFactory>()
                 .AddTransient<IFileExecutor, FileExecutor>()
                 .AddTransient<IRelationGetterFactory, RelationGetterFactory>()
                 .AddTransient<IRelationsGetter, RelationsGetter>(nameof(FinderType.Projects))

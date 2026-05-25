@@ -1,6 +1,7 @@
 namespace AvaloniaProjectRelations.MainControl
 {
     using CmdTools.Shared;
+    using ReactiveUI;
     using RelationsShared.DTO;
     using RelationsShared.Services;
     using System;
@@ -33,7 +34,6 @@ namespace AvaloniaProjectRelations.MainControl
 
             var vm = new MainControlVM(options) { Title = App.MainTitle };
             mainControlVMInitializer.Initialize(vm, true);
-            mainControlVMChangeListener.Start(vm);
 
             if (args.Length > 2)
             {
@@ -42,6 +42,9 @@ namespace AvaloniaProjectRelations.MainControl
             }
 
             vm.SelectedItem ??= vm.Projects.FirstOrDefault();
+            vm.IsUsedBy = UserSettings.IsUsedBy;
+            mainControlVMChangeListener.Start(vm);
+            vm.RaisePropertyChanged(nameof(vm.SelectedItem));
 
             return vm;
         }

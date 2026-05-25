@@ -1,41 +1,39 @@
-namespace RelationsShared.Services
+namespace RelationsShared.DTO
 {
     using CmdTools.Contracts;
     using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
-    using RelationsShared.DTO;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using RelationsShared.Services;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
-    internal class ProjectRelationsInitializer : IRelationsContextInitializer
+    internal class ProjectRelationsContextInitializer(IFileExecutorFactory fileExecutorFactory) : IProjectRelationsContextInitializer
     {
-        private readonly IFileExecutorFactory fileExecutorFactory;
-
-        public ProjectRelationsInitializer(IFileExecutorFactory fileExecutorFactory)
-        {
-            this.fileExecutorFactory = fileExecutorFactory;
-        }
-
-        private ProjectRelationsContext context;
+        private readonly IFileExecutorFactory fileExecutorFactory = fileExecutorFactory;
 
         public void Initialize(RelationsContext relationsContext)
         {
-            this.context = relationsContext as ProjectRelationsContext;
+            ProjectRelationsContext context = relationsContext as ProjectRelationsContext;
             var options = context.Options as ProjectOptions;
+
+            context.ElementsRelations.Clear();
+            context.PackageVersions.Clear();
+            context.Elements.Clear();
+            context.ExcludeElements = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
+
             options.RootPath ??= Environment.ProcessPath;
             options.InitialPath ??= options.RootPath;
-
-            context.ExcludeElements = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
-            context.PackageSets.Clear();
-            context.PackageVersions = GetPackageVersions(options.InitialPath, context.PackageSets);
-
             options.OutputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
             options.PinnedElement = options.PinnedElement?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
 
-            var projectFiles = GetProjectFiles();
+            InitializeProjects(context);
+        }
+
+        private void InitializeProjects(ProjectRelationsContext context)
+        {
+            var options = context.Options as ProjectOptions;
+
+            var projectFiles = GetProjectFiles(context);
 
             HashSet<string> currentProjects = [];
             foreach (var project in projectFiles)
@@ -45,20 +43,48 @@ namespace RelationsShared.Services
                     continue;
                 }
                 currentProjects.Add(project);
-                SetRelations(context.ElementsRelations, project, currentProjects);
+                SetRelations(context, project, currentProjects);
             }
             context.Elements = [.. currentProjects.Distinct()];
             options.ProjectPaths.Clear();
             options.ProjectPaths.AddRange(context.Elements);
         }
 
-        public IEnumerable<ElementRelation> GetProjectRelations(string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        private HashSet<string> GetProjectFiles(ProjectRelationsContext context)
+        {
+            var options = context.Options as ProjectOptions;
+            var fileExecutor = fileExecutorFactory.Create(options.RootPath, Constants.FilePattern, context.ExcludeElements);
+
+            HashSet<string> projectFiles = [];
+            fileExecutor.RunOnFiles(file => projectFiles.Add(file));
+            return projectFiles;
+        }
+
+        private void SetRelations(ProjectRelationsContext context, string projectPath, HashSet<string> currentProjects = null, HashSet<string> currentPackages = null, string basePath = null)
+        {
+            currentPackages ??= [];
+            ElementsRelations elementRelations = context.ElementsRelations;
+            var references = GetProjectRelations(context, projectPath, currentPackages, currentProjects, basePath);
+            elementRelations.AddReferences(projectPath, references);
+            foreach (var reference in references)
+            {
+                if (reference is ProjectElement projectReference && !currentProjects.Contains(projectReference.Path))
+                {
+                    currentProjects.Add(projectReference.Path);
+                    SetRelations(context, projectReference.Path, currentProjects, currentPackages, Path.GetDirectoryName(GetFullPath(basePath, projectPath)));
+                }
+            }
+        }
+
+        private List<ElementRelation> GetProjectRelations(ProjectRelationsContext context, string projectPath, HashSet<string> currentPackages, HashSet<string> currentProjects = null, string basePath = null)
         {
             var options = context.Options as ProjectOptions;
             List<ElementRelation> currentProjectRelations = [];
             currentProjects ??= [];
             var localBasePath = GetFullPath(basePath, projectPath);
-            var localPackageVersions = GetPackageVersions(Path.GetDirectoryName(Path.GetDirectoryName(localBasePath)), context.PackageSets);
+
+            UpdatePackageVersions(context, localBasePath, currentPackages);
+
             var projectName = Path.GetFileNameWithoutExtension(projectPath);
             if (File.Exists(localBasePath))
             {
@@ -76,7 +102,7 @@ namespace RelationsShared.Services
                     ? document.Descendants()
                         .Where(node => node.Name.LocalName == "PackageReference")
                         .Where(node => node.Attribute("Include") != null)
-                        .Select(node => new { Name = node.Attribute("Include").Value, Version = GetPackageVersion(node) })
+                        .Select(node => new { Name = node.Attribute("Include").Value, Version = GetPackageVersion(context, node) })
                         .Where(e => e.Name != null)
                         .Select(e => new PackageElement(e.Name, e.Version, "📦"))
                         .ToList()
@@ -89,35 +115,30 @@ namespace RelationsShared.Services
             return currentProjectRelations;
         }
 
-        private void SetRelations(ElementsRelations elementRelations, string projectPath, HashSet<string> currentProjects = null, string basePath = null)
+        private void UpdatePackageVersions(ProjectRelationsContext context, string localBasePath, HashSet<string> currentPackages)
         {
-            var references = GetProjectRelations(projectPath, currentProjects, basePath);
-            elementRelations.AddReferences(projectPath, references);
-            foreach (var reference in references)
+            var localPackageVersions = GetPackageVersions(Path.GetDirectoryName(Path.GetDirectoryName(localBasePath)), currentPackages);
+            foreach (var packageName in localPackageVersions.Keys)
             {
-                if (reference is ProjectElement projectReference && !currentProjects.Contains(projectReference.Path))
+                if (context.PackageVersions.TryGetValue(packageName, out var packageVersion))
                 {
-                    currentProjects.Add(projectReference.Path);
-                    SetRelations(elementRelations, projectReference.Path, currentProjects, Path.GetDirectoryName(GetFullPath(basePath, projectPath)));
+                    if (!localPackageVersions[packageName].Contains(packageVersion))
+                    {
+                        context.PackageVersions[packageName] = $"{packageVersion},{localPackageVersions[packageName]}";
+                    }
+                }
+                else
+                {
+                    context.PackageVersions.Add(packageName, localPackageVersions[packageName]);
                 }
             }
         }
 
-        private HashSet<string> GetProjectFiles()
-        {
-            var options = context.Options as ProjectOptions;
-            var fileExecutor = fileExecutorFactory.Create(options.RootPath, Constants.FilePattern, context.ExcludeElements);
-
-            HashSet<string> projectFiles = [];
-            fileExecutor.RunOnFiles(file => projectFiles.Add(file));
-            return projectFiles;
-        }
-
-        private Dictionary<string, string> GetPackageVersions(string path, HashSet<string> packageSets)
+        private Dictionary<string, string> GetPackageVersions(string path, HashSet<string> currentPackages)
         {
             Dictionary<string, string> packageVersions = [];
 
-            if (!packageSets.Contains(path))
+            if (!currentPackages.Contains(path))
             {
                 var fileExecutor = fileExecutorFactory.Create(path, Constants.PackagesFilePattern);
                 fileExecutor.RunOnFiles(file =>
@@ -134,13 +155,13 @@ namespace RelationsShared.Services
                         packageVersions[package.Name] = package.Version;
                     }
                 });
-                packageSets.Add(path);
+                currentPackages.Add(path);
             }
 
             return packageVersions;
         }
 
-        private string GetPackageVersion(XElement node)
+        private string GetPackageVersion(ProjectRelationsContext context, XElement node)
         {
             string packageName = node.Attribute("Include").Value;
             string originalVersion = ExtractVersion(node);
@@ -173,6 +194,5 @@ namespace RelationsShared.Services
         {
             return Path.GetFullPath(basePath is null ? projectPath : Path.Combine(basePath, projectPath));
         }
-
     }
 }

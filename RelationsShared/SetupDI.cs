@@ -14,6 +14,9 @@ namespace RelationsShared
                 .AddCollection(SharedSetupDI.Register())
                 .AddSingleton<IJsonSettings, JsonSettings>()
                 .AddSingleton<IUserSettingsFactory, UserSettingsFactory>()
+                .AddTransient<IProjectRelationsContextInitializer, ProjectRelationsContextInitializer>()
+                .AddTransient<IRelationsContextInitializer, ProjectRelationsContextInitializer>(nameof(FinderType.Projects))
+                .AddTransient<IRelationsContextInitializer, ClassRelationsContextInitializer>(nameof(FinderType.Classes))
                 .AddTransient<IProjectReferences, ProjectReferences>()
                 .AddTransient<IElementRelationsGetterFactory, ElementRelationsGetterFactory>()
                 .AddTransient<IElementRelationsGetter, ProjectRelationsGetter>(nameof(FinderType.Projects))
@@ -25,7 +28,6 @@ namespace RelationsShared
                 .AddTransient<IOutputRender, TextRender>(nameof(RenderType.Text))
                 .AddTransient<IOutputRenderFactory, OutputRenderFactory>()
                 .AddTransient<IProjectsServiceFactory, ProjectsServiceFactory>()
-                .AddTransient<IElementRelationsInitializer<ProjectRelationsContext>, ProjectRelationsInitializer>()
                 ;
         }
     }

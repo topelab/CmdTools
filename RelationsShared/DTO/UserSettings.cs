@@ -6,6 +6,7 @@ namespace RelationsShared.DTO
     {
         public string CreateRelationsDiagramPath { get; set; }
         public bool ShowPackages { get; set; } = true;
+        public bool IsUsedBy {  get; set; } = true;
         public string Theme { get; set; } = "Dark";
         public string BackgroundColor { get; set; } = "black";
         public int MaxEdges { get; set; } = 500;

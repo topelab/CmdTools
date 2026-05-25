@@ -6,12 +6,12 @@ namespace UpdateVersion
     using System.IO;
     using System.Linq;
 
-    internal class ProjectExecutor(IFileExecutor fileExecutor,
+    internal class ProjectExecutor(IFileExecutorFactory fileExecutorFactory,
                                    IProjectUpdater projectUpdater,
                                    IVersionSplitter versionSplitter,
                                    IVersionBumper versionBumper) : IProjectExecutor
     {
-        private readonly IFileExecutor fileExecutor = fileExecutor ?? throw new ArgumentNullException(nameof(fileExecutor));
+        private readonly IFileExecutorFactory fileExecutorFactory = fileExecutorFactory ?? throw new ArgumentNullException(nameof(fileExecutorFactory));
         private readonly IProjectUpdater projectUpdater = projectUpdater ?? throw new ArgumentNullException(nameof(projectUpdater));
         private readonly IVersionSplitter versionSplitter = versionSplitter ?? throw new ArgumentNullException(nameof(versionSplitter));
         private readonly IVersionBumper versionBumper = versionBumper ?? throw new ArgumentNullException(nameof(versionBumper));
@@ -32,7 +32,7 @@ namespace UpdateVersion
             }
 
             var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
-            fileExecutor.Initialize(basePath, Constants.FilePattern);
+            var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
             if (options?.Update ?? false)
             {
                 fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
