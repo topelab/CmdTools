@@ -154,7 +154,9 @@ namespace RelationsShared.Services
 
         public IEnumerable<Relation> GetFromContext(RelationsContext relationsContext)
         {
-            throw new NotImplementedException();
+            var context = relationsContext as ClassRelationsContext;
+            var options = context.Options as ClassOptions;
+            return Get(options);
         }
     }
 }

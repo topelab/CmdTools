@@ -9,6 +9,7 @@ namespace RelationsShared.DTO
         {
             var context = relationsContext as ClassRelationsContext;
             var options = context.Options as ClassOptions;
+
         }
     }
 }
