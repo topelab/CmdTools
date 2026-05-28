@@ -7,7 +7,6 @@ namespace ProjectRelations2026.Services
     using System.IO;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using Topelab.Core.Resolver.Interfaces;
 
     internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory,
                                            IOutputRenderFactory outputRenderFactory,
@@ -75,7 +74,7 @@ namespace ProjectRelations2026.Services
                         {
                             var relationType = relationsWindowsContext.RelationType;
                             options.RootPath = GetRootPath(relationType, solutionExplorerItem);
-                            options.PinnedElement = GetPinnedProject(relationType, solutionExplorerItem);
+                            options.PinnedElement = GetPinnedProject(relationType, relationsWindowsContext.SelectedItem);
                             options.SelectedElement = relationsWindowsContext.SelectedItem;
                             options.WithPackages = relationsWindowsContext.IncludePackages;
                             options.RenderType = relationsWindowsContext.ShowListOnly ? RenderType.Text : RenderType.Mermaid;
@@ -90,8 +89,7 @@ namespace ProjectRelations2026.Services
 
         private ProjectOptions BuildOptions(SolutionExplorerItem solutionExplorerItem, RelationType relationType)
         {
-            var rootPath = GetRootPath(relationType, solutionExplorerItem);
-            var pinnedProject = GetPinnedProject(relationType, solutionExplorerItem);
+            var pinnedProject = GetPinnedProject(relationType, solutionExplorerItem.Name);
             var outputFile = GetOutputFile(relationType, solutionExplorerItem.Name);
 
             return new ProjectOptions
@@ -132,11 +130,11 @@ namespace ProjectRelations2026.Services
             };
         }
 
-        private string GetPinnedProject(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
+        private string GetPinnedProject(RelationType relationType, string selectedElement)
         {
             return relationType switch
             {
-                RelationType.Using => solutionExplorerItem.Name,
+                RelationType.Using => selectedElement,
                 RelationType.UsedBy => null,
                 _ => throw new NotImplementedException(),
             };
