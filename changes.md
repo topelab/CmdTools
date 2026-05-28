@@ -1,3 +1,7 @@
+## 1.2.0 (ProjectRelations2026), 1.1.30 (Tools), 1.1.0 (AvaloniaProjectRelations)
+
+- Optimized recovery of projects by implementing a more efficient search mechanism.
+
 ## 1.1.5 (ProjectRelations2026), 1.1.27 (Tools), 1.0.2 (AvaloniaProjectRelations)
 
 - Upgrade ReactiveUI.Avalonia to 12.0.1
