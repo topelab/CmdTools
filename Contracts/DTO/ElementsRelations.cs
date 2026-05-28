@@ -30,5 +30,13 @@ namespace CmdTools.Contracts.DTO
                 this[element] = [.. references];
             }
         }
+
+        public void AddRange(ElementsRelations newRelations)
+        {
+            foreach (var kvp in newRelations)
+            {
+                AddReferences(kvp.Key, kvp.Value);
+            }
+        }
     }
 }

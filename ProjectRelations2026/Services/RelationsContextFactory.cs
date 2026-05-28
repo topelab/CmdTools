@@ -9,19 +9,26 @@ namespace ProjectRelations2026.Services
     using System.Threading.Tasks;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory, IResolver resolver, IOutputRenderFactory outputRenderFactory) : IRelationsContextFactory
+    internal class RelationsContextFactory(IUserSettingsFactory userSettingsFactory,
+                                           IOutputRenderFactory outputRenderFactory,
+                                           IProjectRelationsContextInitializer projectRelationsContextInitializer,
+                                           IElementRelationsGetterFactory elementRelationsGetterFactory) : IRelationsContextFactory
     {
         private UserSettings userSettings;
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
-        private readonly IResolver resolver = resolver;
         private readonly IOutputRenderFactory outputRenderFactory = outputRenderFactory;
+        private readonly IProjectRelationsContextInitializer projectRelationsContextInitializer = projectRelationsContextInitializer;
+        private readonly IElementRelationsGetterFactory elementRelationsGetterFactory = elementRelationsGetterFactory;
+        private ProjectRelationsContext context;
 
         private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
 
         public async Task<Views.RelationsContext> CreateAsync(RelationType relationType, SolutionExplorerItem solutionExplorerItem)
         {
             var projectOptions = BuildOptions(solutionExplorerItem, relationType);
-            var content = await RunAsync(projectOptions);
+            context = new() { Options = projectOptions };
+            projectRelationsContextInitializer.Initialize(context);
+
             var relationsWindowsContext = new Views.RelationsContext
             {
                 MermaidFile = projectOptions.OutputFile,
@@ -34,8 +41,10 @@ namespace ProjectRelations2026.Services
                 IncludePackages = projectOptions.WithPackages,
                 ShowListOnly = projectOptions.RenderType == RenderType.Text,
             };
-            await GenerateAsync(relationsWindowsContext, content);
-            relationsWindowsContext.PropertyChanged += (s, e) => OnRelationsWindowsContextPropertyChanged(s, e.PropertyName, solutionExplorerItem, relationsWindowsContext);
+
+            relationsWindowsContext.PropertyChanged += (s, e) => OnRelationsWindowsContextPropertyChanged(s, e.PropertyName, solutionExplorerItem);
+            await GenerateAsync(relationsWindowsContext, projectOptions);
+
             return relationsWindowsContext;
         }
 
@@ -45,28 +54,35 @@ namespace ProjectRelations2026.Services
             return solutionExplorerItem.Projects.Keys.Where(k => excludeProjects == null || !excludeProjects.IsMatch(k)).OrderBy(k => k);
         }
 
-        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, Views.RelationsContext relationsWindowsContext)
+        private void OnRelationsWindowsContextPropertyChanged(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem)
         {
-            _ = OnRelationsWindowsContextPropertyChangedAsync(sender, propertyName, solutionExplorerItem, relationsWindowsContext);
+            _ = OnRelationsWindowsContextPropertyChangedAsync(sender, propertyName, solutionExplorerItem);
         }
 
-        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem, Views.RelationsContext relationsWindowsContext)
+        private async Task OnRelationsWindowsContextPropertyChangedAsync(object sender, string propertyName, SolutionExplorerItem solutionExplorerItem)
         {
-            if (sender is Views.RelationsContext context)
+            if (sender is Views.RelationsContext relationsWindowsContext)
             {
+                var options = context.Options as ProjectOptions;
+
                 switch (propertyName)
                 {
                     case nameof(Views.RelationsContext.RelationType):
                     case nameof(Views.RelationsContext.SelectedItem):
                     case nameof(Views.RelationsContext.IncludePackages):
                     case nameof(Views.RelationsContext.ShowListOnly):
-                        var relationType = context.RelationType;
-                        var localSolutionExplorerItem = solutionExplorerItem with { Name = context.SelectedItem, Path = Path.GetDirectoryName(solutionExplorerItem.Projects[context.SelectedItem]) };
-                        var projectOptions = BuildOptions(localSolutionExplorerItem, relationType);
-                        projectOptions.WithPackages = context.IncludePackages;
-                        projectOptions.RenderType = context.ShowListOnly ? RenderType.Text : RenderType.Mermaid;
-                        var content = await RunAsync(projectOptions);
-                        await GenerateAsync(context, content);
+                        if (relationsWindowsContext.SelectedItem != null)
+                        {
+                            var relationType = relationsWindowsContext.RelationType;
+                            options.RootPath = GetRootPath(relationType, solutionExplorerItem);
+                            options.PinnedElement = GetPinnedProject(relationType, solutionExplorerItem);
+                            options.SelectedElement = relationsWindowsContext.SelectedItem;
+                            options.WithPackages = relationsWindowsContext.IncludePackages;
+                            options.RenderType = relationsWindowsContext.ShowListOnly ? RenderType.Text : RenderType.Mermaid;
+
+                            await GenerateAsync(relationsWindowsContext, options);
+                        }
+
                         break;
                 }
             }
@@ -80,7 +96,8 @@ namespace ProjectRelations2026.Services
 
             return new ProjectOptions
             {
-                RootPath = rootPath,
+                InitialPath = solutionExplorerItem.SolutionPath,
+                RootPath = solutionExplorerItem.SolutionPath,
                 PinnedElement = pinnedProject,
                 OutputFile = outputFile,
                 WithPackages = UserSettings.ShowPackages,
@@ -93,17 +110,12 @@ namespace ProjectRelations2026.Services
             };
         }
 
-        private async Task<string> RunAsync(ProjectOptions options)
+        public async Task GenerateAsync(Views.RelationsContext relationsWindowsContext, ProjectOptions options)
         {
-            var elementRelationsGetter = resolver.Get<IElementRelationsGetter>(options.FinderType.ToString());
-            var relations = elementRelationsGetter.Get(options);
+            var elementRelationsGetter = elementRelationsGetterFactory.Create(options.FinderType);
+            var relations = elementRelationsGetter.GetFromContext(context);
             var outputRender = outputRenderFactory.Create(options.RenderType);
-            return await Task.Run(() => outputRender.Create(relations, options));
-        }
-
-        public async Task GenerateAsync(Views.RelationsContext relationsWindowsContext, string content)
-        {
-            var outputRender = outputRenderFactory.Create(relationsWindowsContext.ShowListOnly ? RenderType.Text : RenderType.Mermaid);
+            var content = outputRender.Create(relations, options);
             var html = outputRender.RenderToHtml(content, UserSettings);
             string fileName = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.html");
             await File.WriteAllTextAsync(fileName, html);

@@ -156,7 +156,10 @@ namespace RelationsShared.Services
         {
             var context = relationsContext as ClassRelationsContext;
             var options = context.Options as ClassOptions;
-            return Get(options);
+
+            var relationsGetter = relationGetterFactory.Create(options.FinderType);
+            List<Relation> relations = context.Elements.Select(e => new Relation { Element = e, Reference = e, Level = 0 }).ToList();
+            return relations;
         }
     }
 }

@@ -1,7 +1,12 @@
 namespace RelationsShared.DTO
 {
+    using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
+    using Microsoft.CSharp;
     using RelationsShared.Services;
+    using System.CodeDom;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
 
     internal class ClassRelationsContextInitializer : IRelationsContextInitializer
     {
@@ -10,6 +15,137 @@ namespace RelationsShared.DTO
             var context = relationsContext as ClassRelationsContext;
             var options = context.Options as ClassOptions;
 
+            context.ElementsRelations.Clear();
+            context.Elements.Clear();
+            context.ExcludeElements = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
+
+            InitializeClasses(context);
         }
+
+        private void InitializeClasses(ClassRelationsContext context)
+        {
+            var options = context.Options as ClassOptions;
+            var assembly = options.Assembly;
+            if (string.IsNullOrEmpty(assembly))
+            {
+                throw new InvalidOperationException("Assembly is mandatory when classes option is set");
+            }
+
+            var nameSpace = options.NameSpace;
+            var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);
+            var className = options.ClassName;
+            var excludeClasses = context.ExcludeElements;
+
+            var classes = GetClasses(assembly, nameSpace, nameSpaceToClean, excludeClasses);
+            context.ElementsRelations.AddRange(classes);
+        }
+
+        private ElementsRelations GetClasses(string assembly, string nameSpace, string nameSpaceToClean, Regex excludeClasses)
+        {
+            ElementsRelations result = new ElementsRelations();
+            try
+            {
+                var types = GetTypesFromAssembly(assembly, nameSpace);
+
+                foreach (var type in types)
+                {
+                    var typeName = GetFriendlyTypeName(type, nameSpaceToClean);
+                    if ((excludeClasses is null || !excludeClasses.IsMatch(typeName)) && !result.ContainsKey(typeName))
+                    {
+                        result[typeName] = GetProperties(nameSpaceToClean, type, excludeClasses);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading assembly: {ex.Message}");
+            }
+            return result;
+        }
+
+        private List<ElementRelation> GetProperties(string nameSpace, Type type, Regex excludeClasses)
+        {
+            List<ElementRelation> properties = new List<ElementRelation>();
+            foreach (var item in type.GetProperties().Where(p => CanGet(p.PropertyType)))
+            {
+                var propertyName = GetFriendlyTypeName(item.PropertyType, nameSpace);
+                if (excludeClasses is null || !excludeClasses.IsMatch(propertyName))
+                {
+                    properties.Add(new ElementRelation(propertyName, ProjectRelationType.PropertyReference));
+                }
+            }
+            return properties.ToList();
+        }
+
+
+        private IEnumerable<Type> GetTypesFromAssembly(string assemblyPath, string nameSpace = null)
+        {
+            var assembly = Assembly.LoadFrom(assemblyPath);
+            var types = assembly.GetTypes().Where(t => !t.Name.StartsWith('<') && (nameSpace == null || (t.Namespace != null && t.Namespace.StartsWith(nameSpace, StringComparison.CurrentCultureIgnoreCase))));
+            return types;
+        }
+
+        private bool CanGet(Type type)
+        {
+            var typeCode = Type.GetTypeCode(type);
+            return typeCode == TypeCode.Object
+                && (type.IsClass || type.IsInterface)
+                && !type.Name.StartsWith("Byte[")
+                && !type.Name.StartsWith("Func`")
+                && !type.Name.StartsWith("Action`")
+                && !type.Name.StartsWith("Expression`")
+                && type.Name != typeof(object).Name
+                && type.Name != typeof(Type).Name;
+        }
+
+        private string GetFriendlyTypeName(Type t, string nameSpace)
+        {
+            string typeName;
+            using (CSharpCodeProvider provider = new())
+            {
+                CodeTypeReference typeRef = new(t);
+                typeName = provider.GetTypeOutput(typeRef);
+                typeName = GetSimplifiedNameSpace(nameSpace, typeName);
+                typeName = TryEncode(typeName);
+            }
+            return typeName;
+        }
+
+        private string TryEncode(string typeName)
+        {
+            if (typeName.Contains('<') || typeName.Contains('>'))
+            {
+                var originalTypeName = typeName.Replace("<", "&lt;").Replace(">", "&gt");
+                typeName = typeName.Replace("<", "/")
+                    .Replace(">", "\\")
+                    .Replace(" ", string.Empty);
+
+                typeName = string.Concat(typeName, "[", originalTypeName, "]");
+            }
+
+            return typeName;
+        }
+
+        private string GetSimplifiedNameSpace(string nameSpace, string typeName)
+        {
+            typeName = typeName
+                .Replace("System.Collections.Generic.", string.Empty)
+                .Replace("System.Linq.Expressions.", string.Empty)
+                .Replace("System.Linq.", string.Empty)
+                .Replace("System.", string.Empty);
+
+            if (!string.IsNullOrEmpty(nameSpace))
+            {
+                var nameSpaceParts = nameSpace.Split('.');
+                for (var i = nameSpaceParts.Length; i > 0; i--)
+                {
+                    var restOfNameSpace = string.Concat(string.Join(".", nameSpaceParts.Take(i)), ".");
+                    typeName = typeName.Replace(restOfNameSpace, string.Empty);
+                }
+            }
+
+            return typeName;
+        }
+
     }
 }

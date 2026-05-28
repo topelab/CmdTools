@@ -78,7 +78,6 @@ namespace RelationsShared.DTO
 
         private List<ElementRelation> GetProjectRelations(ProjectRelationsContext context, string projectPath, HashSet<string> currentPackages, HashSet<string> currentProjects = null, string basePath = null)
         {
-            var options = context.Options as ProjectOptions;
             List<ElementRelation> currentProjectRelations = [];
             currentProjects ??= [];
             var localBasePath = GetFullPath(basePath, projectPath);
@@ -98,15 +97,13 @@ namespace RelationsShared.DTO
                     .Select(path => new ProjectElement(Path.GetFileNameWithoutExtension(path), path))
                     .ToList();
 
-                var packageReferences = options.WithPackages
-                    ? document.Descendants()
+                var packageReferences = document.Descendants()
                         .Where(node => node.Name.LocalName == "PackageReference")
                         .Where(node => node.Attribute("Include") != null)
                         .Select(node => new { Name = node.Attribute("Include").Value, Version = GetPackageVersion(context, node) })
                         .Where(e => e.Name != null)
                         .Select(e => new PackageElement(e.Name, e.Version, "📦"))
-                        .ToList()
-                    : [];
+                        .ToList();
 
                 currentProjectRelations.AddRange(projectReferences);
                 currentProjectRelations.AddRange(packageReferences);
