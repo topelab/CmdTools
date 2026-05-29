@@ -1,6 +1,5 @@
 namespace UpdateVersion
 {
-    using CmdTools.Contracts;
     using CmdTools.Shared;
     using Topelab.Core.Resolver.Entities;
 
@@ -10,7 +9,7 @@ namespace UpdateVersion
         {
             return new ResolveInfoCollection()
                 .AddCollection(SharedSetupDI.Register())
-                .AddTransient<IElementFinder, ProjectFinder>()
+                .AddTransient<IProjectExecutor, ProjectExecutor>()
                 .AddTransient<IProjectUpdater, ProjectUpdater>()
 
                 .AddSingleton<IVersionSplitter, VersionSplitter>()

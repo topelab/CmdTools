@@ -1,20 +1,16 @@
 namespace CreateRelationsDiagram
 {
-    using CmdTools.Contracts;
     using CmdTools.Shared;
+    using RelationsShared.Services;
     using Topelab.Core.Resolver.Entities;
 
-    internal class SetupDI
+    public class SetupDI
     {
-        internal static ResolveInfoCollection Register()
+        public static ResolveInfoCollection Register()
         {
             return new ResolveInfoCollection()
-                .AddCollection(SharedSetupDI.Register())
-                .AddTransient<IProjectReferences, ProjectReferences>()
-                .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.Projects))
-                .AddTransient<IElementFinder, ProjectFinder>(nameof(FinderType.ReverseProjects))
-                .AddTransient<IElementFinder, ClassesFinder>(nameof(FinderType.Classes))
-                .AddTransient<IElementFinder, ClassesFinder>(nameof(FinderType.ReverseClasses))
+                .AddCollection(RelationsShared.SetupDI.Register())
+                .AddTransient<IOutputRender, SimpleTextRender>(nameof(RenderType.Text))
                 ;
         }
     }

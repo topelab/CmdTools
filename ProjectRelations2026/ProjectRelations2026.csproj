@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>$(ProjectExtensionVersion)</Version>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Views\RelationsUserControl.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\RelationsUserControl.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />
+    <ProjectReference Include="..\RelationsShared\RelationsShared.csproj" />
+  </ItemGroup>
+</Project>

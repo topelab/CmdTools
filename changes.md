@@ -1,3 +1,46 @@
+## 1.2.0 (ProjectRelations2026), 1.1.30 (Tools), 1.1.0 (AvaloniaProjectRelations)
+
+- Optimized recovery of projects by implementing a more efficient search mechanism.
+
+## 1.1.5 (ProjectRelations2026), 1.1.27 (Tools), 1.0.2 (AvaloniaProjectRelations)
+
+- Upgrade ReactiveUI.Avalonia to 12.0.1
+- Upgrade Microsoft.Web.WebView2 to 1.0.3967.48
+- Upgrade NLog.Extensions.Logging to 6.1.3
+- Upgrade Avalonia.Desktop to 12.0.3
+- Upgrade System.CodeDom to 10.0.8
+- Upgrade Topelab.Core.Resolver to 2.0.7
+- Upgrade Avalonia.Controls.WebView to 12.0.1
+- Upgrade Topelab.Core.Adapters to 1.12.8
+- Upgrade Topelab.Core.Avalonia to 1.2.9
+
+
+## 1.1.25
+
+- Updating Microsoft.Web.WebView2 to 1.0.3800.47
+- Updating System.CodeDom to 10.0.3
+- Updating Topelab.Core.Resolver to 2.0.3
+
+## 1.1.24
+
+- Updating Topelab.Core.Resolver to 2.0.2
+- Updating Microsoft.Web.WebView2 to 1.0.3719.77
+- Updating System.CodeDom to 10.0.2
+
+
+## 1.1.23
+
+- Updating System.CodeDom to 10.0.1
+- Updating Microsoft.Web.WebView2 to 1.0.3650.58
+
+## 1.1.22
+
+- Added `--open` option to automatically open the generated diagram after creation.
+
+## 1.1.21
+
+- Updating System.CodeDom to 9.0.9
+
 ## 1.1.20
 
 - Changed solution type to `slnx`

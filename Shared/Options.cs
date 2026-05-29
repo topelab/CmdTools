@@ -1,0 +1,39 @@
+namespace CmdTools.Shared
+{
+    using CmdTools.Contracts;
+    using CommandLine;
+
+    public abstract class Options
+    {
+        [Option('p', "depends-on", Required = false, HelpText = "Get elements that depends on element")]
+        public string PinnedElement { get; set; }
+
+        [Option('o', "output", Required = false, HelpText = $"Output file name (default: output to console)")]
+        public string OutputFile { get; set; }
+
+        [Option('e', "exclude", Required = false, HelpText = "Exclude specific elements from processing (regular expression)")]
+        public string Exclude { get; set; }
+
+        [Option('r', "reverse", Required = false, Default = false, HelpText = "Reverse the direction of the relations in the diagram")]
+        public bool Reverse { get; set; }
+
+        [Option('d', "direction", Required = false, Default = Direction.TopToDown, HelpText = "Direction of the diagram (TopToDown or TD, LefToRight or LR, RightToLeft or RL, BottomToTop or BT; default: TopToDown)")]
+        public Direction Direction { get; set; }
+
+        [Option('t', "theme", Required = false, Default = Theme.NeoDark, HelpText = "Theme of the diagram (Default, Base, MermaidChart, Neo, NeoDark, Forest, Dark, Neutral; default: NeoDark)")]
+        public Theme Theme { get; set; }
+
+        [Option('l', "layout", Required = false, Default = Layout.Adaptive, HelpText = "Layout of the diagram (Hierarchical, Adaptative; default: Adaptative)")]
+        public Layout Layout { get; set; }
+
+        [Option("open", Required = false, Default = false, HelpText = "Open the output file after creation (default: false)")]
+        public bool OpenOutput { get; set; }
+
+        [Option("render", Required = false, Default = RenderType.Mermaid, HelpText = "Render type for the diagram (Mermaid, Text; default: Mermaid)")]
+        public RenderType RenderType { get; set; }
+
+        public abstract FinderType FinderType { get; }
+
+        public string SelectedElement { get; set; }
+    }
+}
