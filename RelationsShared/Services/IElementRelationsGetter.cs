@@ -6,7 +6,6 @@ namespace RelationsShared.Services
 
     public interface IElementRelationsGetter
     {
-        IEnumerable<Relation> Get<T>(T args) where T : class;
         IEnumerable<Relation> GetFromContext(RelationsContext relationsContext);
     }
 }

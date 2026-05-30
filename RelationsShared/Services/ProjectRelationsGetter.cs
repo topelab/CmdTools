@@ -7,71 +7,21 @@ namespace RelationsShared.Services
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
 
     internal class ProjectRelationsGetter(IProjectReferences projectReferences,
-                                          IFileExecutorFactory fileExecutorFactory,
                                           IRelationGetterFactory relationGetterFactory) : IElementRelationsGetter
     {
         private readonly IProjectReferences projectReferences = projectReferences;
-        private readonly IFileExecutorFactory fileExecutorFactory = fileExecutorFactory;
         private readonly IRelationGetterFactory relationGetterFactory = relationGetterFactory;
-
-        public IEnumerable<Relation> Get<T>(T args) where T : class
-        {
-            var options = GetOptions(args);
-            options.RootPath ??= Environment.ProcessPath;
-            options.InitialPath ??= options.RootPath;
-            var path = options.RootPath;
-            var excludeProjects = string.IsNullOrEmpty(options.Exclude) ? null : new Regex(options.Exclude, RegexOptions.IgnoreCase);
-            var projectFilter = options.ProjectFilter;
-            options.OutputFile = options.OutputFile?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
-            options.PinnedElement = options.PinnedElement?.Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
-
-            projectReferences.Initialize(options.WithPackages, excludeProjects, options.InitialPath);
-
-            var projectFiles = GetProjectFiles(path, excludeProjects);
-            options.ProjectPaths.Clear();
-            options.ProjectPaths.AddRange(projectFiles);
-            var filteredReferences = GetFilteredReferences(options.PinnedElement, projectFiles);
-
-            var relationsGetter = relationGetterFactory.Create(options.FinderType);
-            return relationsGetter.Get<Relation>(filteredReferences, projectFilter);
-        }
 
         public IEnumerable<Relation> GetFromContext(RelationsContext relationsContext)
         {
             var context = relationsContext as ProjectRelationsContext;
             var options = context.Options as ProjectOptions;
             projectReferences.Initialize(context);
-            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Elements.ToHashSet());
+            var filteredReferences = GetFilteredReferences(options.PinnedElement, context.Elements);
             var relationsGetter = relationGetterFactory.Create(options.FinderType);
             return relationsGetter.Get<Relation>(filteredReferences, options.ProjectFilter);
-        }
-
-        private ProjectOptions GetOptions<T>(T args) where T : class
-        {
-            if (args is not ProjectOptions options)
-            {
-                throw new ArgumentException("Invalid options type", nameof(args));
-            }
-
-            return options;
-        }
-
-        private HashSet<string> GetProjectFiles(string path, Regex excludeProjects)
-        {
-            var fileExecutor = fileExecutorFactory.Create(path, Constants.FilePattern, excludeProjects);
-
-            HashSet<string> projectFiles = [];
-            fileExecutor.RunOnFiles(file =>
-            {
-                projectFiles.Add(file);
-                projectReferences.GetProjectRelations(file, projectFiles)
-                    .OfType<ProjectElement>()
-                    .ToList().ForEach(p => projectFiles.Add(p.Path));
-            });
-            return projectFiles;
         }
 
         private ReferencesBag GetFilteredReferences(string pinnedElement, HashSet<string> projectFiles)
