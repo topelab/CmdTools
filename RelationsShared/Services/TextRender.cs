@@ -33,12 +33,8 @@ namespace RelationsShared.Services
             }
             else
             {
-                GetRelationsWithLevels(rootElement, relations)
-                    .OrderBy(r => r.Level)
-                    .ThenBy(r => r.Element)
-                    .ThenBy(r => r.Reference)
+                relations
                     .Select(r => new { r.Reference, r.Level })
-                    .Distinct()
                     .ToList()
                     .ForEach(r =>
                     {
@@ -50,32 +46,6 @@ namespace RelationsShared.Services
             }
 
             return contentBag.ToString();
-        }
-
-        private List<Relation> GetRelationsWithLevels(string element, IEnumerable<Relation> relations, HashSet<string> visitedElements = null, int level = 0) 
-        {
-            List<Relation> result = [];
-            visitedElements ??= [];
-            bool isNew = visitedElements.Add(element);
-
-            if (isNew)
-            {
-                result = relations
-                    .Where(r => r.Element == element)
-                    .Select(r => new Relation { Element = element, Reference = r.Reference, Level = level + 1 })
-                    .ToList();
-
-                List<Relation> newRelations = [];
-
-
-                foreach (Relation relation in result)
-                {
-                    newRelations.AddRange(GetRelationsWithLevels(relation.Reference, relations, visitedElements, level + 1));
-                }
-                result.AddRange(newRelations);
-            }
-
-            return result;
         }
 
         private static string GetClasses(bool isPinned, bool isPkg, int level = -1)
