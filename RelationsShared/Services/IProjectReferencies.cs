@@ -1,6 +1,5 @@
 namespace RelationsShared.Services
 {
-    using CmdTools.Contracts.DTO;
     using CmdTools.Shared;
     using RelationsShared.DTO;
 
