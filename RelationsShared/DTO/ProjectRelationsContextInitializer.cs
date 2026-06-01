@@ -119,7 +119,7 @@ namespace RelationsShared.DTO
             {
                 if (context.PackageVersions.TryGetValue(packageName, out var packageVersion))
                 {
-                    if (!localPackageVersions[packageName].Contains(packageVersion))
+                    if (!context.PackageVersions[packageName].Contains(packageVersion))
                     {
                         context.PackageVersions[packageName] = $"{packageVersion},{localPackageVersions[packageName]}";
                     }

@@ -13,12 +13,21 @@
 		<vm:MainControlVM/>
 	</Design.DataContext>
 
+	<UserControl.Styles>
+        <Style Selector="ListBox.Mine ListBoxItem">
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Margin" Value="5,0" />
+        </Style>
+    </UserControl.Styles>
+
+
 	<Grid x:Name="RootGrid">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="20*" MinWidth="200" />
 			<ColumnDefinition Width="80*" />
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
@@ -56,8 +65,16 @@
 				 VerticalAlignment="Top"
 				 ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
+		<ListBox Grid.Row="2"
+				 Margin="20"
+				 Classes="Mine"
+				 ItemsSource="{Binding Projects}"
+				 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+				 VerticalAlignment="Top"
+				 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+
 		<Grid Grid.Column="1"
-			  Grid.RowSpan="2">
+			  Grid.RowSpan="3">
 			<Border BorderBrush="{StaticResource SystemChromeMediumColor}" BorderThickness="2" Margin="10">
 				<wv:HtmlViewerUserControl DataContext="{Binding HtmlViewerVM}" Padding="5" />
 			</Border>

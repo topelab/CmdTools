@@ -17,11 +17,7 @@ namespace RelationsShared.Services
 
             if (!string.IsNullOrEmpty(pinnedElement))
             {
-                relations.Select(r => r.Element)
-                    .Union(relations.Select(r => r.Reference))
-                    .Distinct()
-                    .Where(e => e != pinnedElement)
-                    .OrderBy(e => e)
+                relations.Select(r => $"{GetLevelIcon(r.Level)} {r.Reference}")
                     .ToList()
                     .ForEach(r =>
                     {
@@ -33,49 +29,38 @@ namespace RelationsShared.Services
             }
             else
             {
-                GetRelationsWithLevels(rootElement, relations)
-                    .OrderBy(r => r.Level)
-                    .ThenBy(r => r.Element)
-                    .ThenBy(r => r.Reference)
+                relations
                     .Select(r => new { r.Reference, r.Level })
-                    .Distinct()
                     .ToList()
                     .ForEach(r =>
                     {
                         bool isPkg = r.Reference.EndsWith(":::pkg");
                         var reference = r.Reference.Replace(":::pkg", "");
                         var clasess = GetClasses(false, isPkg, r.Level);
-                        contentBag.AppendLine($"<li{clasess}>[{r.Level}] {reference}</li>");
+                        contentBag.AppendLine($"<li{clasess}>{GetLevelIcon(r.Level)} {reference}</li>");
                     });
             }
 
             return contentBag.ToString();
         }
 
-        private List<Relation> GetRelationsWithLevels(string element, IEnumerable<Relation> relations, HashSet<string> visitedElements = null, int level = 0) 
+        private string GetLevelIcon(int level)
         {
-            List<Relation> result = [];
-            visitedElements ??= [];
-            bool isNew = visitedElements.Add(element);
-
-            if (isNew)
+            return level switch
             {
-                result = relations
-                    .Where(r => r.Element == element)
-                    .Select(r => new Relation { Element = element, Reference = r.Reference, Level = level + 1 })
-                    .ToList();
-
-                List<Relation> newRelations = [];
-
-
-                foreach (Relation relation in result)
-                {
-                    newRelations.AddRange(GetRelationsWithLevels(relation.Reference, relations, visitedElements, level + 1));
-                }
-                result.AddRange(newRelations);
-            }
-
-            return result;
+                0 => "",
+                1 => "\u0031\uFE0F\u20E3",
+                2 => "\u0032\uFE0F\u20E3",
+                3 => "\u0033\uFE0F\u20E3",
+                4 => "\u0034\uFE0F\u20E3",
+                5 => "\u0035\uFE0F\u20E3",
+                6 => "\u0036\uFE0F\u20E3",
+                7 => "\u0037\uFE0F\u20E3",
+                8 => "\u0038\uFE0F\u20E3",
+                9 => "\u0039\uFE0F\u20E3",
+                10 => "🔟",
+                _ => $"[{level}]"
+            };
         }
 
         private static string GetClasses(bool isPinned, bool isPkg, int level = -1)
