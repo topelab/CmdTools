@@ -5,6 +5,7 @@ namespace ProjectRelations2026.Services
     using CmdTools.Shared;
     using RelationsShared.DTO;
     using System.IO;
+    using System.Reflection;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace ProjectRelations2026.Services
             {
                 MermaidFile = projectOptions.OutputFile,
                 UserSettings = UserSettings,
-                Title = "Project relations",
+                Title = $"Project relations (v. {GetVersion()})",
                 Items = [.. GetFilteredProjects(solutionExplorerItem, projectOptions.Exclude)],
                 SelectedItem = solutionExplorerItem.Name,
                 IsUsing = relationType == RelationType.Using,
@@ -144,6 +145,12 @@ namespace ProjectRelations2026.Services
         {
             var prefix = relationType.GetDescription().ToLower().Replace(" ", "-");
             return Path.Combine(Path.GetTempPath(), $"{prefix}-{projectName.ToLower()}-{Guid.NewGuid()}.mmd");
+        }
+
+        private static string GetVersion()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}";
         }
     }
 }
