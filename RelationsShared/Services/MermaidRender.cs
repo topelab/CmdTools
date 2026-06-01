@@ -20,53 +20,18 @@ namespace RelationsShared.Services
 
             if (!string.IsNullOrEmpty(pinnedElement))
             {
-                relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} "));
+                relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Reference} -->\t{r.Element} "));
                 content = contentBag.ToString();
                 content = content.Replace($"\t{pinnedElement} ", $"\t{pinnedElement}:::pinned");
                 content = content.Replace($":::pkg:::pinned", $":::pinnedpkg");
             }
             else
             {
-                GetRelationsWithLevels(rootElement, relations)
-                    .OrderBy(r => r.Level)
-                    .ThenBy(r => r.Element)
-                    .ThenBy(r => r.Reference)
-                    .Distinct()
-                    .ToList()
-                    .ForEach(r =>
-                    {
-                        contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} ");
-                    });
+                relations.ToList().ForEach(r => contentBag.AppendLine($"\t{r.Element} -->\t{r.Reference} "));
                 content = contentBag.ToString();
             }
 
             return GetComposition(content, options.Theme, options.Layout, options.Direction);
-        }
-
-        private List<Relation> GetRelationsWithLevels(string element, IEnumerable<Relation> relations, HashSet<string> visitedElements = null, int level = 0)
-        {
-            List<Relation> result = [];
-            visitedElements ??= [];
-            bool isNew = visitedElements.Add(element);
-
-            if (isNew)
-            {
-                result = relations
-                    .Where(r => r.Element == element)
-                    .Select(r => new Relation { Element = element, Reference = r.Reference, Level = level + 1 })
-                    .ToList();
-
-                List<Relation> newRelations = [];
-
-
-                foreach (Relation relation in result)
-                {
-                    newRelations.AddRange(GetRelationsWithLevels(relation.Reference, relations, visitedElements, level + 1));
-                }
-                result.AddRange(newRelations);
-            }
-
-            return result;
         }
 
 

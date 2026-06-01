@@ -33,7 +33,6 @@ namespace RelationsShared.DTO
 
             var nameSpace = options.NameSpace;
             var nameSpaceToClean = Path.GetFileNameWithoutExtension(options.Assembly);
-            var className = options.ClassName;
             var excludeClasses = context.ExcludeElements;
 
             var classes = GetClasses(assembly, nameSpace, nameSpaceToClean, excludeClasses);
@@ -42,7 +41,7 @@ namespace RelationsShared.DTO
 
         private ElementsRelations GetClasses(string assembly, string nameSpace, string nameSpaceToClean, Regex excludeClasses)
         {
-            ElementsRelations result = new ElementsRelations();
+            ElementsRelations result = [];
             try
             {
                 var types = GetTypesFromAssembly(assembly, nameSpace);
@@ -65,7 +64,7 @@ namespace RelationsShared.DTO
 
         private List<ElementRelation> GetProperties(string nameSpace, Type type, Regex excludeClasses)
         {
-            List<ElementRelation> properties = new List<ElementRelation>();
+            List<ElementRelation> properties = [];
             foreach (var item in type.GetProperties().Where(p => CanGet(p.PropertyType)))
             {
                 var propertyName = GetFriendlyTypeName(item.PropertyType, nameSpace);
@@ -74,7 +73,7 @@ namespace RelationsShared.DTO
                     properties.Add(new ElementRelation(propertyName, ProjectRelationType.PropertyReference));
                 }
             }
-            return properties.ToList();
+            return properties;
         }
 
 
