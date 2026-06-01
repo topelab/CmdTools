@@ -31,10 +31,7 @@ namespace RelationsShared.Services
                 .SelectMany(er => relationGetters[options.FinderType](options.WithPackages, Path.GetFileNameWithoutExtension(er), context.ElementsRelations[er]));
 
             var relationsWithLevels = GetRelationsWithLevels(options.SelectedElement, relations)
-                    .DistinctBy(r => $"{r.Element}-{r.Reference}-{r.Level}")
-                    .OrderBy(r => r.Level)
-                    .ThenBy(r => r.Element)
-                    .ThenBy(r => r.Reference);
+                    .DistinctBy(r => $"{r.Element}-{r.Reference}-{r.Level}");
 
             return relationsWithLevels;
         }
