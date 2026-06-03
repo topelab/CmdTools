@@ -36,8 +36,8 @@ namespace ProjectRelations2026.Services
                 Title = $"Project relations (v. {GetVersion()})",
                 Items = [.. GetFilteredProjects(solutionExplorerItem, projectOptions.Exclude)],
                 SelectedItem = solutionExplorerItem.Name,
-                IsUsing = relationType == RelationType.Using,
-                IsUsedBy = relationType == RelationType.UsedBy,
+                UsingMe = relationType == RelationType.Using,
+                UsedByMe = relationType == RelationType.UsedBy,
                 IncludePackages = projectOptions.WithPackages,
                 ShowListOnly = projectOptions.RenderType == RenderType.Text,
             };

@@ -17,7 +17,7 @@ namespace AvaloniaProjectRelations.MainControl
         public bool? WithPackages { get; set; }
 
         [Option('u', "is-used-by", Required = false, Default = false, HelpText = "Show projects that are used by the selected project, otherwise show projects that use the selected project")]
-        public bool IsUsedBy { get; set; }
+        public bool UsedByMe { get; set; }
 
         [Option('d', "show-diagram", Required = false, Default = false, HelpText = "Show diagram only")]
         public bool ShowDiagram { get; set; }

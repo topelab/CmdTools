@@ -19,19 +19,19 @@ namespace AvaloniaProjectRelations.MainControl
                 case nameof(MainControlVM.IncludePackages):
                     model.WithPackages = vm.IncludePackages;
                     break;
-                case nameof(MainControlVM.IsUsedBy):
+                case nameof(MainControlVM.UsedByMe):
                 case nameof(MainControlVM.SelectedItem):
                     if (vm.Projects.Contains(vm.SelectedItem))
                     {
-                        model.RootPath = vm.IsUsing ? vm.SolutionPath : vm.ProjectData.GetProjectPath(vm.SelectedItem);
-                        model.PinnedElement = vm.IsUsing ? vm.SelectedItem : null;
+                        model.RootPath = vm.UsingMe ? vm.SolutionPath : vm.ProjectData.GetProjectPath(vm.SelectedItem);
+                        model.PinnedElement = vm.UsingMe ? vm.SelectedItem : null;
                         model.SelectedElement = vm.SelectedItem;
                     } else
                     {
                         isUpdated = false;
                     }
                     break;
-                case nameof(MainControlVM.IsUsing):
+                case nameof(MainControlVM.UsingMe):
                 default:
                     isUpdated = false;
                     break;

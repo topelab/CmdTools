@@ -33,8 +33,8 @@ namespace AvaloniaProjectRelations.MainControl
                 var htmlViewerVM = htmlViewerVMFactory.Create(string.Empty);
                 vm.HtmlViewerVM = htmlViewerVM;
                 vm.UserSettings = UserSettings;
-                vm.IsUsedBy = true;
-                vm.IsUsing = !vm.IsUsedBy;
+                vm.UsedByMe = true;
+                vm.UsingMe = !vm.UsedByMe;
                 vm.ShowListOnly = options.RenderType == RenderType.Text;
                 vm.IncludePackages = options.WithPackages;
                 InitializeProjects(vm, options);

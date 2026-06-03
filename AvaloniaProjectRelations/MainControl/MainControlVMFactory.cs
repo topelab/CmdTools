@@ -27,7 +27,7 @@ namespace AvaloniaProjectRelations.MainControl
                 Layout = Layout.Adaptive,
             };
 
-            bool isUsedBy = UserSettings.IsUsedBy;
+            bool usedByMe = UserSettings.UsedByMe;
             var result = Parser.Default.ParseArguments<MainControlArguments>(args)
                 .WithParsed(o =>
                 {
@@ -36,7 +36,7 @@ namespace AvaloniaProjectRelations.MainControl
                     options.SelectedElement = o.SelectedProject ?? GetArgument(args, 2);
                     options.Exclude = o.Exclude ?? UserSettings.ExcludeProjects;
                     options.RenderType = o.ShowDiagram ? RenderType.Mermaid : RenderType.Text;
-                    isUsedBy = o.IsUsedBy;
+                    usedByMe = o.UsedByMe;
                 });
 
             options.InitialPath = TryFindInitialPath(options.RootPath);
@@ -51,7 +51,7 @@ namespace AvaloniaProjectRelations.MainControl
             }
 
             vm.SelectedItem ??= vm.Projects.FirstOrDefault();
-            vm.IsUsedBy = isUsedBy;
+            vm.UsedByMe = usedByMe;
             mainControlVMChangeListener.Start(vm);
             vm.RaisePropertyChanged(nameof(vm.SelectedItem));
 

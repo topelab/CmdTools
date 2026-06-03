@@ -12,8 +12,8 @@ namespace AvaloniaProjectRelations.MainControl
     {
         private string url;
         private string selectedItem;
-        private bool isUsedBy;
-        private bool isUsing;
+        private bool usedByMe;
+        private bool usingMe;
         private bool includePackages;
         private bool showListOnly;
         private HtmlViewerVM htmlViewerVM;
@@ -64,13 +64,13 @@ namespace AvaloniaProjectRelations.MainControl
         public bool IncludePackagesVisibility => true;
 
 
-        public bool IsUsedBy
+        public bool UsedByMe
         {
-            get { return isUsedBy; }
+            get { return usedByMe; }
             set
             {
-                isUsing = !value;
-                if (this.RaiseAndSetIfChanged(ref isUsedBy, value))
+                usingMe = !value;
+                if (this.RaiseAndSetIfChanged(ref usedByMe, value))
                 {
                     this.RaisePropertyChanged(nameof(IncludePackagesVisibility));
                     this.RaisePropertyChanged(nameof(RelationType));
@@ -78,12 +78,12 @@ namespace AvaloniaProjectRelations.MainControl
             }
         }
 
-        public bool IsUsing
+        public bool UsingMe
         {
-            get { return isUsing; }
+            get { return usingMe; }
             set
             {
-                if (this.RaiseAndSetIfChanged(ref isUsing, value))
+                if (this.RaiseAndSetIfChanged(ref usingMe, value))
                 {
                     this.RaisePropertyChanged(nameof(IncludePackagesVisibility));
                     this.RaisePropertyChanged(nameof(RelationType));
@@ -103,6 +103,6 @@ namespace AvaloniaProjectRelations.MainControl
             set => this.RaiseAndSetIfChanged(ref solutionPath, value);
         }
 
-        public RelationType RelationType => IsUsedBy ? RelationType.UsedBy : RelationType.Using;
+        public RelationType RelationType => UsedByMe ? RelationType.UsedBy : RelationType.Using;
     }
 }

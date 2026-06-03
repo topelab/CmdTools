@@ -10,8 +10,8 @@ namespace ProjectRelations2026.Views
     public class RelationsContext : NotifyPropertyChangedObject
     {
         private string selectedItem;
-        private bool isUsedBy;
-        private bool isUsing;
+        private bool usedByMe;
+        private bool usingMe;
         private bool includePackages;
         private string url;
         private bool showListOnly;
@@ -63,16 +63,16 @@ namespace ProjectRelations2026.Views
         }
 
         [DataMember]    
-        public bool IncludePackagesVisibility => IsUsedBy;
+        public bool IncludePackagesVisibility => UsedByMe;
 
 
         [DataMember]
-        public bool IsUsedBy
+        public bool UsedByMe
         {
-            get { return isUsedBy; }
+            get { return usedByMe; }
             set
             {
-                if (SetProperty(ref isUsedBy, value))
+                if (SetProperty(ref usedByMe, value))
                 {
                     RaiseNotifyPropertyChangedEvent(nameof(IncludePackagesVisibility));
                     RaiseNotifyPropertyChangedEvent(nameof(RelationType));
@@ -81,14 +81,14 @@ namespace ProjectRelations2026.Views
         }
 
         [DataMember]
-        public bool IsUsing
+        public bool UsingMe
         {
-            get { return isUsing; }
-            set { SetProperty(ref isUsing, value); }
+            get { return usingMe; }
+            set { SetProperty(ref usingMe, value); }
         }
 
         [DataMember]
-        public RelationType RelationType => IsUsedBy ? RelationType.UsedBy : RelationType.Using;
+        public RelationType RelationType => UsedByMe ? RelationType.UsedBy : RelationType.Using;
 
         /// <summary>
         /// Ancho de la ventana del diálogo.
