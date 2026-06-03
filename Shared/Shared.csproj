@@ -9,7 +9,7 @@
     <PackageReference Include="CommandLineParser" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />
+    <ProjectReference Include="..\..\Core.Resolver\src\Topelab.Core.Resolver\Topelab.Core.Resolver.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
   </ItemGroup>
 </Project>

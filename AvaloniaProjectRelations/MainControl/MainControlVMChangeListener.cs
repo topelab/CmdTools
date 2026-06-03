@@ -3,14 +3,9 @@ namespace AvaloniaProjectRelations.MainControl
     using CmdTools.Shared;
     using Topelab.Core.Avalonia.Base;
 
-    internal class MainControlVMChangeListener : BaseVMChangeListener<MainControlVM, ProjectOptions>, IMainControlVMChangeListener
+    internal class MainControlVMChangeListener(IMainControlVMInitializer mainControlVMInitializer) : BaseVMChangeListener<MainControlVM, ProjectOptions>(null), IMainControlVMChangeListener
     {
-        private readonly IMainControlVMInitializer mainControlVMInitializer;
-
-        public MainControlVMChangeListener(IMainControlVMInitializer mainControlVMInitializer) : base(null)
-        {
-            this.mainControlVMInitializer = mainControlVMInitializer;
-        }
+        private readonly IMainControlVMInitializer mainControlVMInitializer = mainControlVMInitializer;
 
         protected override bool UpdateModelPropertyWithVMValue(string propertyName, MainControlVM vm, ProjectOptions model)
         {

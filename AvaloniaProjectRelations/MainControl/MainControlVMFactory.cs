@@ -1,6 +1,7 @@
 namespace AvaloniaProjectRelations.MainControl
 {
     using CmdTools.Shared;
+    using CommandLine;
     using ReactiveUI;
     using RelationsShared.DTO;
     using RelationsShared.Services;
@@ -21,28 +22,36 @@ namespace AvaloniaProjectRelations.MainControl
         {
             var options = new ProjectOptions
             {
-                RootPath = args.Length > 1 ? args[1] : Environment.CurrentDirectory,
-                WithPackages = UserSettings.ShowPackages,
                 Direction = Direction.LeftToRight,
                 Theme = UserSettings.HasTheme ? Enum.Parse<Theme>(UserSettings.Theme) : Theme.Dark,
                 Layout = Layout.Adaptive,
-                Exclude = UserSettings.ExcludeProjects,
-                RenderType = RenderType.Text,
             };
+
+            bool isUsedBy = UserSettings.IsUsedBy;
+            var result = Parser.Default.ParseArguments<MainControlArguments>(args)
+                .WithParsed(o =>
+                {
+                    options.RootPath = o.RootPath ?? GetArgument(args, 1) ?? Environment.CurrentDirectory;
+                    options.WithPackages = o.WithPackages ?? UserSettings.ShowPackages;
+                    options.SelectedElement = o.SelectedProject ?? GetArgument(args, 2);
+                    options.Exclude = o.Exclude ?? UserSettings.ExcludeProjects;
+                    options.RenderType = o.ShowDiagram ? RenderType.Mermaid : RenderType.Text;
+                    isUsedBy = o.IsUsedBy;
+                });
 
             options.InitialPath = TryFindInitialPath(options.RootPath);
 
             var vm = new MainControlVM(options) { Title = App.MainTitle };
             mainControlVMInitializer.Initialize(vm, true);
 
-            if (args.Length > 2)
+            if (options.SelectedElement != null)
             {
-                var selectedProject = Path.GetFileName(args[2]).Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
+                var selectedProject = Path.GetFileName(options.SelectedElement).Replace(".csproj", string.Empty, StringComparison.CurrentCultureIgnoreCase);
                 vm.SelectedItem = vm.Projects.FirstOrDefault(p => p.Equals(selectedProject, StringComparison.CurrentCultureIgnoreCase));
             }
 
             vm.SelectedItem ??= vm.Projects.FirstOrDefault();
-            vm.IsUsedBy = UserSettings.IsUsedBy;
+            vm.IsUsedBy = isUsedBy;
             mainControlVMChangeListener.Start(vm);
             vm.RaisePropertyChanged(nameof(vm.SelectedItem));
 
@@ -74,6 +83,15 @@ namespace AvaloniaProjectRelations.MainControl
         {
             var solutionPaths = Directory.EnumerateFiles(path, "*.sln*");
             return solutionPaths.Any();
+        }
+
+        private string GetArgument(string[] args, int index)
+        {
+            if (index >= 0 && index < args.Length)
+            {
+                return args[index];
+            }
+            return null;
         }
     }
 }

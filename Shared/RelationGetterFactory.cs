@@ -3,14 +3,9 @@ namespace CmdTools.Shared
     using CmdTools.Contracts;
     using Topelab.Core.Resolver.Interfaces;
 
-    internal class RelationGetterFactory : IRelationGetterFactory
+    internal class RelationGetterFactory(IResolver resolver) : IRelationGetterFactory
     {
-        private readonly IResolver resolver;
-
-        public RelationGetterFactory(IResolver resolver)
-        {
-            this.resolver = resolver;
-        }
+        private readonly IResolver resolver = resolver;
 
         public IRelationsGetter Create(FinderType finderType)
         {
