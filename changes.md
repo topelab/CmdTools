@@ -1,3 +1,9 @@
+## 1.2.1 (ProjectRelations2026), 1.1.31 (Tools), 1.1.2 (AvaloniaProjectRelations)
+
+- Upgrade Avalonia.Desktop to 12.0.4
+- Upgrade Topelab.Core.Adapters to 1.12.9
+- Upgrade Topelab.Core.Avalonia to 1.2.10
+
 ## 1.2.0 (ProjectRelations2026), 1.1.30 (Tools), 1.1.0 (AvaloniaProjectRelations)
 
 - Optimized recovery of projects by implementing a more efficient search mechanism.
