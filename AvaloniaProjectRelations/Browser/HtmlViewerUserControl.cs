@@ -5,10 +5,18 @@ namespace AvaloniaProjectRelations.Browser;
 public partial class HtmlViewerUserControl : UserControl
 {
     private HtmlViewerVM oldVM;
+    private readonly NativeWebView webViewPanel;
 
     public HtmlViewerUserControl()
     {
-        InitializeComponent();
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
+        var scrollViewer = new ScrollViewer();
+        webViewPanel = new NativeWebView();
+        scrollViewer.Content = webViewPanel;
+        Content = scrollViewer;
         DataContextChanged += HtmlViewerUserControl_DataContextChanged;
     }
 
@@ -21,7 +29,7 @@ public partial class HtmlViewerUserControl : UserControl
     {
         if (DataContext is HtmlViewerVM vm)
         {
-            WebViewPanel.NavigateToString(vm.Content ?? "");
+            webViewPanel.NavigateToString(vm.Content ?? "");
             oldVM?.PropertyChanged -= Vm_PropertyChanged;
             vm.PropertyChanged += Vm_PropertyChanged;
             oldVM = vm;
@@ -32,7 +40,7 @@ public partial class HtmlViewerUserControl : UserControl
     {
         if (sender is HtmlViewerVM vm && e.PropertyName == nameof(HtmlViewerVM.Content))
         {
-            WebViewPanel.NavigateToString(vm.Content ?? "");
+            webViewPanel.NavigateToString(vm.Content ?? "");
         }
     }
 }
