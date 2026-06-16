@@ -10,9 +10,8 @@ namespace UpdateVersion
             return new ResolveInfoCollection()
                 .AddCollection(SharedSetupDI.Register())
                 .AddTransient<IProjectExecutor, ProjectExecutor>()
-                .AddTransient<IProjectUpdater, ProjectUpdater>()
-
                 .AddSingleton<IVersionSplitter, VersionSplitter>()
+                .AddSingleton<IProjectUpdaterFactory, ProjectUpdaterFactory>()
                 .AddSingleton<IVersionBumper, VersionBumper>()
                 ;
         }

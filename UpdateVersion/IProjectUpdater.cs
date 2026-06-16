@@ -1,7 +1,7 @@
-﻿namespace UpdateVersion
+namespace UpdateVersion
 {
     internal interface IProjectUpdater
     {
-        void Update(string file, string version);
+        void Update<T>(string file, T context) where T : class;
     }
 }

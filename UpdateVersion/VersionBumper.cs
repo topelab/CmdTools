@@ -48,6 +48,38 @@ namespace UpdateVersion
             }
         }
 
+        public bool TryBump(IEnumerable<string> versionsToBump, Dictionary<string, string> versionsMap)
+        {
+            bool modified = false;
+
+            if (versionsToBump.Any())
+            {
+                string pattern;
+                string versionLevel;
+                string globalVersionPrefix = $"{Constants.BumpAllProjects}{Constants.ProjectVersionSeparator}";
+
+                var globalBump = versionsToBump.FirstOrDefault(v => v.StartsWith(globalVersionPrefix));
+                if (globalBump != null)
+                {
+                    (pattern, versionLevel) = versionSplitter.Split(globalBump, Constants.BumpAllProjects);
+                    foreach (var key in versionsMap.Keys)
+                    {
+                        modified = BumpVersionMapWithPatern(versionsMap, key, versionLevel) || modified;
+                    }
+                }
+                else
+                {
+                    foreach (var item in versionsToBump)
+                    {
+                        (pattern, versionLevel) = versionSplitter.Split(item, Constants.AnyProjectSelector);
+                        modified = BumpVersionMapWithPatern(versionsMap, pattern, versionLevel) || modified;
+                    }
+                }
+            }
+
+            return modified;
+        }
+
         private static bool BumpVersionMapWithPatern(Dictionary<string, string> versionsMap, string pattern, string versionLevel)
         {
             bool modified = false;
