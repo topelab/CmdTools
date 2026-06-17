@@ -39,7 +39,8 @@ namespace UpdateVersion
         {
             get
             {
-                yield return new Example("Normal scenario", new Options { Versions = new List<string>() { "1.0.0", "SecondProject: 2.0.0" } });
+                yield return new Example("Bump all projects patch version", new Options { BasePath = AppContext.BaseDirectory, BumpPatchVersion = true });
+                yield return new Example("Manual scenario", new Options { Versions = new List<string>() { "1.0.0", "SecondProject: 2.0.0" } });
             }
         }
 

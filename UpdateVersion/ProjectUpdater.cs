@@ -11,8 +11,13 @@ namespace UpdateVersion
         private const string UseMaui = "UseMaui";
         private const string MauiVersionNodeName = "ApplicationDisplayVersion";
 
-        public void Update(string file, string version)
+        public void Update<T>(string file, T context) where T : class
         {
+            if (context is not string version)
+            {
+                throw new ArgumentException("Invalid context type", nameof(context));
+            }
+
             XDocument document = XDocument.Load(file);
 
             var versionNodeName = GetVersionNodeName(document);

@@ -5,15 +5,16 @@ namespace UpdateVersion
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml.Linq;
 
     internal class ProjectExecutor(IFileExecutorFactory fileExecutorFactory,
-                                   IProjectUpdater projectUpdater,
                                    IVersionSplitter versionSplitter,
+                                   IProjectUpdaterFactory projectUpdaterFactory,
                                    IVersionBumper versionBumper) : IProjectExecutor
     {
         private readonly IFileExecutorFactory fileExecutorFactory = fileExecutorFactory ?? throw new ArgumentNullException(nameof(fileExecutorFactory));
-        private readonly IProjectUpdater projectUpdater = projectUpdater ?? throw new ArgumentNullException(nameof(projectUpdater));
         private readonly IVersionSplitter versionSplitter = versionSplitter ?? throw new ArgumentNullException(nameof(versionSplitter));
+        private readonly IProjectUpdaterFactory projectUpdaterFactory = projectUpdaterFactory ?? throw new ArgumentNullException(nameof(projectUpdaterFactory));
         private readonly IVersionBumper versionBumper = versionBumper ?? throw new ArgumentNullException(nameof(versionBumper));
 
         public void Run<T>(T args) where T : class
@@ -23,20 +24,93 @@ namespace UpdateVersion
                 throw new ArgumentException("Invalid options type", nameof(args));
             }
 
-            string basePath = options.BasePath ?? AppContext.BaseDirectory;
-            IEnumerable<string> versions = options.Versions;
-            if (ExistDirectoryBuildProps(basePath))
+            var directoryBuildPropertiesFileName = GetDirectoryBuildPropertiesFileName(options.BasePath ?? AppContext.BaseDirectory);
+
+            if (File.Exists(directoryBuildPropertiesFileName))
             {
-                Console.WriteLine("Directory.Build.props found. Please, update versions there.");
-                return;
+                TryUpdateDirectoryBuildProperties(directoryBuildPropertiesFileName, options);
+            }
+            else
+            {
+                TryUpdateProjects(options);
             }
 
-            var versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
+        }
+
+        private void TryUpdateDirectoryBuildProperties(string directoryBuildPropertiesFileName, Options options)
+        {
+            var projectUpdaterType = ProjectUpdaterType.DirectoryBuildProperties;
+            string basePath = options.BasePath ?? AppContext.BaseDirectory;
+
+            Dictionary<string, string> versionsMap = TryGetDirectoryBuildPropertyVersions(directoryBuildPropertiesFileName);
+            if (options?.Update ?? false && versionBumper.TryBump(options.VersionsToBump, versionsMap))
+            {
+                IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
+                projectUpdater.Update(directoryBuildPropertiesFileName, versionsMap);
+                var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
+                fileExecutor.RunOnFiles(file => TryShowVersionUpdated(file, versionsMap));
+            }
+        }
+
+        private void TryShowVersionUpdated(string file, Dictionary<string, string> versionsMap)
+        {
+            var fileContent = File.ReadAllText(file);
+            foreach (var projectPattern in versionsMap.Keys)
+            {
+                var version = versionsMap[projectPattern];
+                var projectName = $"$({projectPattern})";
+                if (fileContent.Contains(projectName))
+                {
+                    Console.WriteLine($"{Path.GetFileNameWithoutExtension(file)} to {version}");
+                    break;
+                }
+            }
+        }
+
+        private void TryUpdateProjects(Options options)
+        {
+            Dictionary<string, string> versionsMap = [];
+            IEnumerable<string> versions = options.Versions;
+            string basePath = options.BasePath ?? AppContext.BaseDirectory;
+
+            versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
             var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
+
             if (options?.Update ?? false)
             {
-                fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap));
+                fileExecutor.RunOnFiles(file => TryUpdateProject(file, versionsMap));
             }
+        }
+
+        private void TryUpdateProject(string file, Dictionary<string, string> versionsMap)
+        {
+            IProjectUpdater projectUpdater = projectUpdaterFactory.Create(ProjectUpdaterType.Projects);
+
+            string projectName = Path.GetFileNameWithoutExtension(file);
+            var version = GetMatchVersion(projectName, versionsMap);
+            if (version != null)
+            {
+                projectUpdater.Update(file, version);
+                Console.WriteLine($"{Path.GetFileNameWithoutExtension(file)} to {version}");
+            }
+        }
+
+        private Dictionary<string, string> TryGetDirectoryBuildPropertyVersions(string directoryBuildPropertiesFileName)
+        {
+            const string PropertyGroupNodeName = "PropertyGroup";
+            Dictionary<string, string> versionsMap = [];
+
+            XDocument document = XDocument.Load(directoryBuildPropertiesFileName);
+
+            document.Descendants().Where(d => d.Name.LocalName == PropertyGroupNodeName)
+                .Descendants()
+                .Select(d => new { Name = d.Name.LocalName, Version = d.Value })
+                .Where(x => x.Version.Count(c => c == '.') >= 2)
+                .ToDictionary(x => x.Name, x => x.Version)
+                .ToList()
+                .ForEach(x => versionsMap.Add(x.Key, x.Value));
+
+            return versionsMap;
         }
 
         public string Get<T>(T args) where T : class
@@ -44,10 +118,9 @@ namespace UpdateVersion
             throw new NotImplementedException();
         }
 
-        private bool ExistDirectoryBuildProps(string basePath)
+        private static string GetDirectoryBuildPropertiesFileName(string basePath)
         {
-            var file = Path.Combine(basePath, "Directory.Build.props");
-            return File.Exists(file);
+            return Path.Combine(basePath, "Directory.Build.props");
         }
 
         private Dictionary<string, string> TryGetVersions(IEnumerable<string> versions)
@@ -96,22 +169,11 @@ namespace UpdateVersion
             }
         }
 
-        private void TryUpdate(string file, Dictionary<string, string> versionsMap)
-        {
-            string projectName = Path.GetFileNameWithoutExtension(file);
-            var version = GetMatchVersion(projectName, versionsMap);
-            if (version != null)
-            {
-                projectUpdater.Update(file, version);
-                Console.WriteLine($"{file} to {GetMatchVersion(projectName, versionsMap)}");
-            }
-        }
-
         private static string GetMatchVersion(string file, Dictionary<string, string> versionsMap)
         {
             var globalVersion = versionsMap.TryGetValue(Constants.AnyProjectSelector, out var value) ? value : null;
             var version = globalVersion;
-            foreach(var projectPattern in versionsMap.Keys.Where(k => k != Constants.AnyProjectSelector))
+            foreach (var projectPattern in versionsMap.Keys.Where(k => k != Constants.AnyProjectSelector))
             {
                 var partialName = projectPattern.Trim('*');
                 bool matched = file.Equals(projectPattern, StringComparison.CurrentCultureIgnoreCase)
@@ -119,8 +181,8 @@ namespace UpdateVersion
                     || (projectPattern.EndsWith(Constants.AnyProjectSelector) && file.StartsWith(partialName, StringComparison.CurrentCultureIgnoreCase))
                     || (projectPattern.StartsWith(Constants.AnyProjectSelector) && projectPattern.EndsWith(Constants.AnyProjectSelector) && file.Contains(partialName, StringComparison.CurrentCultureIgnoreCase));
 
-                if (matched) 
-                { 
+                if (matched)
+                {
                     version = versionsMap[projectPattern];
                 }
             }
