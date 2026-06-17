@@ -1,3 +1,7 @@
+## 1.1.32 (Tools)
+
+- Updated `UpdateVersion` command to support Directory.Build.props files for version updates.
+
 ## 1.2.1 (ProjectRelations2026), 1.1.31 (Tools), 1.1.2 (AvaloniaProjectRelations)
 
 - Upgrade Avalonia.Desktop to 12.0.4
