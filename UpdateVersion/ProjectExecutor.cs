@@ -24,34 +24,75 @@ namespace UpdateVersion
                 throw new ArgumentException("Invalid options type", nameof(args));
             }
 
-            string basePath = options.BasePath ?? AppContext.BaseDirectory;
-            var directoryBuildPropertiesFileName = GetDirectoryBuildPropertiesFileName(basePath);
-            Dictionary<string, string> versionsMap = [];
-
-            IEnumerable<string> versions = options.Versions;
-            ProjectUpdaterType projectUpdaterType = ProjectUpdaterType.Projects;
+            var directoryBuildPropertiesFileName = GetDirectoryBuildPropertiesFileName(options.BasePath ?? AppContext.BaseDirectory);
 
             if (File.Exists(directoryBuildPropertiesFileName))
             {
-                versionsMap = TryGetDirectoryBuildPropertyVersions(directoryBuildPropertiesFileName);
-                projectUpdaterType = ProjectUpdaterType.DirectoryBuildProperties;
-                if (versionBumper.TryBump(options.VersionsToBump, versionsMap))
-                {
-                    IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
-                    projectUpdater.Update(directoryBuildPropertiesFileName, versionsMap);
-                }
+                TryUpdateDirectoryBuildProperties(directoryBuildPropertiesFileName, options);
             }
             else
             {
-                versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
-                var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
-
-                if (options?.Update ?? false)
-                {
-                    fileExecutor.RunOnFiles(file => TryUpdate(file, versionsMap, projectUpdaterType));
-                }
+                TryUpdateProjects(options);
             }
 
+        }
+
+        private void TryUpdateDirectoryBuildProperties(string directoryBuildPropertiesFileName, Options options)
+        {
+            var projectUpdaterType = ProjectUpdaterType.DirectoryBuildProperties;
+            string basePath = options.BasePath ?? AppContext.BaseDirectory;
+
+            Dictionary<string, string> versionsMap = TryGetDirectoryBuildPropertyVersions(directoryBuildPropertiesFileName);
+            if (options?.Update ?? false && versionBumper.TryBump(options.VersionsToBump, versionsMap))
+            {
+                IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
+                projectUpdater.Update(directoryBuildPropertiesFileName, versionsMap);
+                var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
+                fileExecutor.RunOnFiles(file => TryShowVersionUpdated(file, versionsMap));
+            }
+        }
+
+        private void TryShowVersionUpdated(string file, Dictionary<string, string> versionsMap)
+        {
+            var fileContent = File.ReadAllText(file);
+            foreach (var projectPattern in versionsMap.Keys)
+            {
+                var version = versionsMap[projectPattern];
+                var projectName = $"$({projectPattern})";
+                if (fileContent.Contains(projectName))
+                {
+                    Console.WriteLine($"{Path.GetFileNameWithoutExtension(file)} to {version}");
+                    break;
+                }
+            }
+        }
+
+        private void TryUpdateProjects(Options options)
+        {
+            Dictionary<string, string> versionsMap = [];
+            IEnumerable<string> versions = options.Versions;
+            string basePath = options.BasePath ?? AppContext.BaseDirectory;
+
+            versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
+            var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
+
+            if (options?.Update ?? false)
+            {
+                fileExecutor.RunOnFiles(file => TryUpdateProject(file, versionsMap));
+            }
+        }
+
+        private void TryUpdateProject(string file, Dictionary<string, string> versionsMap)
+        {
+            IProjectUpdater projectUpdater = projectUpdaterFactory.Create(ProjectUpdaterType.Projects);
+
+            string projectName = Path.GetFileNameWithoutExtension(file);
+            var version = GetMatchVersion(projectName, versionsMap);
+            if (version != null)
+            {
+                projectUpdater.Update(file, version);
+                Console.WriteLine($"{Path.GetFileNameWithoutExtension(file)} to {version}");
+            }
         }
 
         private Dictionary<string, string> TryGetDirectoryBuildPropertyVersions(string directoryBuildPropertiesFileName)
@@ -128,43 +169,11 @@ namespace UpdateVersion
             }
         }
 
-        private void TryUpdate(string file, Dictionary<string, string> versionsMap, ProjectUpdaterType projectUpdaterType)
-        {
-            IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
-
-            string projectName = Path.GetFileNameWithoutExtension(file);
-            var version = GetMatchVersion(projectName, versionsMap);
-            if (version != null)
-            {
-                projectUpdater.Update(file, version);
-                Console.WriteLine($"{file} to {GetMatchVersion(projectName, versionsMap)}");
-            }
-        }
-
-
-        private void TryUpdateProperties(string file, Dictionary<string, string> versionsMap, ProjectUpdaterType projectUpdaterType)
-        {
-            IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
-
-            versionsMap.Where(r => r.Value.Count(c => c == '.') >= 3).ToList().ForEach(r =>
-            {
-                projectUpdater.Update(r.Key, r.Value);
-            });
-
-            string projectName = Path.GetFileNameWithoutExtension(file);
-            var version = GetMatchVersion(projectName, versionsMap);
-            if (version != null)
-            {
-                projectUpdater.Update(file, version);
-                Console.WriteLine($"{file} to {GetMatchVersion(projectName, versionsMap)}");
-            }
-        }
-
         private static string GetMatchVersion(string file, Dictionary<string, string> versionsMap)
         {
             var globalVersion = versionsMap.TryGetValue(Constants.AnyProjectSelector, out var value) ? value : null;
             var version = globalVersion;
-            foreach(var projectPattern in versionsMap.Keys.Where(k => k != Constants.AnyProjectSelector))
+            foreach (var projectPattern in versionsMap.Keys.Where(k => k != Constants.AnyProjectSelector))
             {
                 var partialName = projectPattern.Trim('*');
                 bool matched = file.Equals(projectPattern, StringComparison.CurrentCultureIgnoreCase)
@@ -172,8 +181,8 @@ namespace UpdateVersion
                     || (projectPattern.EndsWith(Constants.AnyProjectSelector) && file.StartsWith(partialName, StringComparison.CurrentCultureIgnoreCase))
                     || (projectPattern.StartsWith(Constants.AnyProjectSelector) && projectPattern.EndsWith(Constants.AnyProjectSelector) && file.Contains(partialName, StringComparison.CurrentCultureIgnoreCase));
 
-                if (matched) 
-                { 
+                if (matched)
+                {
                     version = versionsMap[projectPattern];
                 }
             }
