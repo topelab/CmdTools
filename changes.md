@@ -1,3 +1,7 @@
+## 1.1.33 (Tools)
+
+- Fix `UpdateVersion` command to correctly update version numbers in `Directory.Build.props` files.
+
 ## 1.1.32 (Tools)
 
 - Updated `UpdateVersion` command to support Directory.Build.props files for version updates.

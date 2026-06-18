@@ -10,7 +10,7 @@
 
     <!-- Versiones de proyectos -->
     <ProjectExtensionVersion>1.2.2</ProjectExtensionVersion>
-    <ToolsVersion>1.1.32</ToolsVersion>
+    <ToolsVersion>1.1.33</ToolsVersion>
     <AvaloniaProjectRelations>1.1.2</AvaloniaProjectRelations>
     
   </PropertyGroup>

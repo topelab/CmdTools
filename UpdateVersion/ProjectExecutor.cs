@@ -43,16 +43,21 @@ namespace UpdateVersion
             string basePath = options.BasePath ?? AppContext.BaseDirectory;
 
             Dictionary<string, string> versionsMap = TryGetDirectoryBuildPropertyVersions(directoryBuildPropertiesFileName);
-            if (options?.Update ?? false && versionBumper.TryBump(options.VersionsToBump, versionsMap))
+            if (versionBumper.TryBump(options.VersionsToBump, versionsMap) && options.Update is true)
             {
                 IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
                 projectUpdater.Update(directoryBuildPropertiesFileName, versionsMap);
+                List<string> versionList = [];
                 var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
-                fileExecutor.RunOnFiles(file => TryShowVersionUpdated(file, versionsMap));
+                fileExecutor.RunOnFiles(file => TryShowVersionUpdated(file, versionsMap, versionList));
+                if (versionList.Count != 0)
+                {
+                    Console.WriteLine($"Version {string.Join(", ", versionList)}");
+                }
             }
         }
 
-        private void TryShowVersionUpdated(string file, Dictionary<string, string> versionsMap)
+        private void TryShowVersionUpdated(string file, Dictionary<string, string> versionsMap, List<string> versionList)
         {
             var fileContent = File.ReadAllText(file);
             foreach (var projectPattern in versionsMap.Keys)
@@ -61,7 +66,7 @@ namespace UpdateVersion
                 var projectName = $"$({projectPattern})";
                 if (fileContent.Contains(projectName))
                 {
-                    Console.WriteLine($"{Path.GetFileNameWithoutExtension(file)} to {version}");
+                    versionList.Add($"{version} ({Path.GetFileNameWithoutExtension(file)})");
                     break;
                 }
             }
@@ -74,15 +79,20 @@ namespace UpdateVersion
             string basePath = options.BasePath ?? AppContext.BaseDirectory;
 
             versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
+            List<string> versionList = [];
             var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
 
-            if (options?.Update ?? false)
+            if (options.Update is true)
             {
-                fileExecutor.RunOnFiles(file => TryUpdateProject(file, versionsMap));
+                fileExecutor.RunOnFiles(file => TryUpdateProject(file, versionsMap, versionList));
+                if (versionList.Count != 0)
+                {
+                    Console.WriteLine($"Version {string.Join(", ", versionList)}");
+                }
             }
         }
 
-        private void TryUpdateProject(string file, Dictionary<string, string> versionsMap)
+        private void TryUpdateProject(string file, Dictionary<string, string> versionsMap, List<string> versionList)
         {
             IProjectUpdater projectUpdater = projectUpdaterFactory.Create(ProjectUpdaterType.Projects);
 
@@ -91,7 +101,7 @@ namespace UpdateVersion
             if (version != null)
             {
                 projectUpdater.Update(file, version);
-                Console.WriteLine($"{Path.GetFileNameWithoutExtension(file)} to {version}");
+                versionList.Add($"{version} ({projectName})");
             }
         }
 
