@@ -1,3 +1,11 @@
+## Version 1.1.3 (AvaloniaProjectRelations), 1.1.34 (Contracts), 1.1.34 (CreateRelationsDiagram), 1.2.3 (ProjectRelations2026), 1.1.34 (RunCustomTool), 1.1.34 (Shared), 1.1.34 (UpdateVersion)
+
+- Updating Microsoft.Web.WebView2 to 1.0.4022.49
+- Updating AngleSharp to 1.5.1
+- Updating System.CodeDom to 10.0.9
+- Updating Topelab.Core.Adapters to 1.12.12
+- Updating Topelab.Core.Avalonia to 1.2.11
+
 ## 1.1.33 (Tools)
 
 - Fix `UpdateVersion` command to correctly update version numbers in `Directory.Build.props` files.

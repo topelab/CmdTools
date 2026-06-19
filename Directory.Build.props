@@ -4,14 +4,11 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-
     <!-- Asegura que se usen referencias de paquete en proyectos SDK-style -->
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-
     <!-- Versiones de proyectos -->
-    <ProjectExtensionVersion>1.2.2</ProjectExtensionVersion>
-    <ToolsVersion>1.1.33</ToolsVersion>
-    <AvaloniaProjectRelations>1.1.2</AvaloniaProjectRelations>
-    
+    <ProjectExtensionVersion>1.2.3</ProjectExtensionVersion>
+    <ToolsVersion>1.1.34</ToolsVersion>
+    <AvaloniaProjectRelations>1.1.3</AvaloniaProjectRelations>
   </PropertyGroup>
 </Project>
