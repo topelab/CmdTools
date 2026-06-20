@@ -1,6 +1,7 @@
 namespace UpdateVersion
 {
     using CmdTools.Contracts;
+    using CmdTools.Shared;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -47,17 +48,29 @@ namespace UpdateVersion
             {
                 IProjectUpdater projectUpdater = projectUpdaterFactory.Create(projectUpdaterType);
                 projectUpdater.Update(directoryBuildPropertiesFileName, versionsMap);
-                List<string> versionList = [];
+                var referencesBag = new ReferencesBag();
                 var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
-                fileExecutor.RunOnFiles(file => TryShowVersionUpdated(file, versionsMap, versionList));
-                if (versionList.Count != 0)
+                fileExecutor.RunOnFiles(file => TryShowVersionUpdated(file, versionsMap, referencesBag));
+                ShowVersions(versionsMap, referencesBag);
+            }
+        }
+
+        private static void ShowVersions(Dictionary<string, string> versionsMap, ReferencesBag referencesBag)
+        {
+            if (referencesBag.Count != 0)
+            {
+                if (referencesBag.Count == 1)
                 {
-                    Console.WriteLine($"Version {string.Join(", ", versionList)}");
+                    Console.WriteLine($"Version {referencesBag.Keys.First()}");
+                }
+                else
+                {
+                    Console.WriteLine($"Versions {string.Join(", ", referencesBag.Select(r => $"{r.Key} ({string.Join(", ", r.Value)})"))}");
                 }
             }
         }
 
-        private void TryShowVersionUpdated(string file, Dictionary<string, string> versionsMap, List<string> versionList)
+        private void TryShowVersionUpdated(string file, Dictionary<string, string> versionsMap, ReferencesBag referencesBag)
         {
             var fileContent = File.ReadAllText(file);
             foreach (var projectPattern in versionsMap.Keys)
@@ -66,7 +79,7 @@ namespace UpdateVersion
                 var projectName = $"$({projectPattern})";
                 if (fileContent.Contains(projectName))
                 {
-                    versionList.Add($"{version} ({Path.GetFileNameWithoutExtension(file)})");
+                    referencesBag.AddReference(version, Path.GetFileNameWithoutExtension(file));
                     break;
                 }
             }
@@ -79,20 +92,17 @@ namespace UpdateVersion
             string basePath = options.BasePath ?? AppContext.BaseDirectory;
 
             versionsMap = versions.Any() ? TryGetVersions(versions) : TryGetVersions(basePath, options.VersionsFile, options.VersionsToBump);
-            List<string> versionList = [];
+            var referencesBag = new ReferencesBag();
             var fileExecutor = fileExecutorFactory.Create(basePath, Constants.FilePattern);
 
             if (options.Update is true)
             {
-                fileExecutor.RunOnFiles(file => TryUpdateProject(file, versionsMap, versionList));
-                if (versionList.Count != 0)
-                {
-                    Console.WriteLine($"Version {string.Join(", ", versionList)}");
-                }
+                fileExecutor.RunOnFiles(file => TryUpdateProject(file, versionsMap, referencesBag));
+                ShowVersions(versionsMap, referencesBag);
             }
         }
 
-        private void TryUpdateProject(string file, Dictionary<string, string> versionsMap, List<string> versionList)
+        private void TryUpdateProject(string file, Dictionary<string, string> versionsMap, ReferencesBag referencesBag)
         {
             IProjectUpdater projectUpdater = projectUpdaterFactory.Create(ProjectUpdaterType.Projects);
 
@@ -101,7 +111,7 @@ namespace UpdateVersion
             if (version != null)
             {
                 projectUpdater.Update(file, version);
-                versionList.Add($"{version} ({projectName})");
+                referencesBag.AddReference(version, projectName);
             }
         }
 
