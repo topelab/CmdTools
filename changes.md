@@ -1,3 +1,12 @@
+## Versions 1.1.6 (AvaloniaProjectRelations), 1.1.37 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.6 (ProjectRelations2026)
+
+- Updating Microsoft.Web.WebView2 to 1.0.4078.44
+- Updating Avalonia.Controls.DataGrid to 12.1.0
+- Updating Avalonia.Desktop to 12.1.0
+- Updating Topelab.Core.Adapters to 1.12.16
+- Updating AngleSharp to 1.5.2
+- Updating Topelab.Core.Avalonia to 1.2.15
+
 ## Versions 1.1.5 (AvaloniaProjectRelations), 1.1.36 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.5 (ProjectRelations2026)
 
 - Updating Avalonia.Controls.DataGrid to 12.0.1
