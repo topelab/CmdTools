@@ -7,14 +7,14 @@
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="System.CodeDom" Version="10.0.9" />
+    <PackageVersion Include="System.CodeDom" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.4078.44" />
     <PackageVersion Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" />
     <PackageVersion Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" />
     <PackageVersion Include="AngleSharp" Version="1.5.2" />
-    <PackageVersion Include="Topelab.Core.Adapters" Version="1.12.16" />
+    <PackageVersion Include="Topelab.Core.Adapters" Version="1.12.17" />
     <!-- AvaloniaUI-->
-    <PackageVersion Include="Topelab.Core.Avalonia" Version="1.2.15" />
+    <PackageVersion Include="Topelab.Core.Avalonia" Version="1.2.16" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Desktop" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />

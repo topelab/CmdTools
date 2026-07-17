@@ -1,3 +1,9 @@
+## Versions 1.1.7 (AvaloniaProjectRelations), 1.1.38 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.7 (ProjectRelations2026)
+
+- Updating System.CodeDom to 10.0.10
+- Updating Topelab.Core.Adapters to 1.12.17
+- Updating Topelab.Core.Avalonia to 1.2.16
+
 ## Versions 1.1.6 (AvaloniaProjectRelations), 1.1.37 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.6 (ProjectRelations2026)
 
 - Updating Microsoft.Web.WebView2 to 1.0.4078.44
