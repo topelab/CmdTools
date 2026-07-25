@@ -7,8 +7,8 @@
     <!-- Asegura que se usen referencias de paquete en proyectos SDK-style -->
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <!-- Versiones de proyectos -->
-    <ProjectExtensionVersion>1.2.7</ProjectExtensionVersion>
-    <ToolsVersion>1.1.38</ToolsVersion>
-    <AvaloniaProjectRelations>1.1.7</AvaloniaProjectRelations>
+    <ProjectExtensionVersion>1.2.8</ProjectExtensionVersion>
+    <ToolsVersion>1.1.39</ToolsVersion>
+    <AvaloniaProjectRelations>1.1.8</AvaloniaProjectRelations>
   </PropertyGroup>
 </Project>

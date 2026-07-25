@@ -14,7 +14,7 @@
     <PackageVersion Include="AngleSharp" Version="1.5.2" />
     <PackageVersion Include="Topelab.Core.Adapters" Version="1.12.17" />
     <!-- AvaloniaUI-->
-    <PackageVersion Include="Topelab.Core.Avalonia" Version="1.2.16" />
+    <PackageVersion Include="Topelab.Core.Avalonia" Version="1.2.17" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Desktop" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />

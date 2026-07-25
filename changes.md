@@ -1,3 +1,7 @@
+## Versions 1.1.8 (AvaloniaProjectRelations), 1.1.39 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.8 (ProjectRelations2026)
+
+- Updated Topelab.Core.Avalonia  1.2.16 -> 1.2.17
+
 ## Versions 1.1.7 (AvaloniaProjectRelations), 1.1.38 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.7 (ProjectRelations2026)
 
 - Updating System.CodeDom to 10.0.10
