@@ -10,7 +10,8 @@ namespace AvaloniaProjectRelations.MainControl
                                             IUserSettingsFactory userSettingsFactory,
                                             IOutputRenderFactory outputRenderFactory,
                                             IProjectsServiceFactory projectsServiceFactory,
-                                            IProjectRelationsContextInitializer relationsContextInitializer) : IMainControlVMInitializer
+                                            IProjectRelationsContextInitializer relationsContextInitializer,
+                                            IEmbededWebServer embededWebServer) : IMainControlVMInitializer
     {
         private readonly IElementRelationsGetterFactory elementRelationsGetterFactory = elementRelationsGetterFactory;
         private readonly IHtmlViewerVMFactory htmlViewerVMFactory = htmlViewerVMFactory;
@@ -18,6 +19,7 @@ namespace AvaloniaProjectRelations.MainControl
         private readonly IOutputRenderFactory outputRenderFactory = outputRenderFactory;
         private readonly IProjectsServiceFactory projectsServiceFactory = projectsServiceFactory;
         private readonly IProjectRelationsContextInitializer relationsContextInitializer = relationsContextInitializer;
+        private readonly IEmbededWebServer embededWebServer = embededWebServer;
 
         private UserSettings UserSettings => field ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
         private readonly ProjectRelationsContext context = new();
@@ -29,6 +31,9 @@ namespace AvaloniaProjectRelations.MainControl
 
             if (isFirstInitialization)
             {
+                embededWebServer.Start(Path.Combine(AppContext.BaseDirectory, "webcontent"));
+                UserSettings.BaseUrl = embededWebServer.BaseUrl;
+
                 relationsContextInitializer.Initialize(context);
                 var htmlViewerVM = htmlViewerVMFactory.Create(string.Empty);
                 vm.HtmlViewerVM = htmlViewerVM;
@@ -46,7 +51,8 @@ namespace AvaloniaProjectRelations.MainControl
                 var outputRender = outputRenderFactory.Create(options.RenderType);
                 var content = outputRender.Create(relations, options);
                 var html = outputRender.RenderToHtml(content, UserSettings);
-                vm.HtmlViewerVM.Content = html;
+                embededWebServer.SetContent(html);
+                vm.HtmlViewerVM.Uri = new Uri($"{embededWebServer.BaseUrl}/index-{Guid.NewGuid()}.html");
             }
         }
 

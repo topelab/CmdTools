@@ -70,10 +70,10 @@ namespace RelationsShared.Services
                 <html>
                 <head>
                 	<meta charset="utf-8">
-                	<script src="https://unpkg.com/@panzoom/panzoom@4.6.1/dist/panzoom.min.js"></script>
+                	<script src="{{userSettings.BaseUrl}}scripts/panzoom.min.js"></script>
                     <script type="module">
-                		import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";
-                		import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@latest/dist/mermaid-layout-elk.esm.min.mjs";
+                		import mermaid from "{{userSettings.BaseUrl}}scripts/mermaid.esm.min.mjs";
+                		import elkLayouts from "{{userSettings.BaseUrl}}scripts/mermaid-layout-elk.esm.min.mjs";
 
                 		// Registra el motor ELK con Mermaid
                 		mermaid.registerLayoutLoaders(elkLayouts);

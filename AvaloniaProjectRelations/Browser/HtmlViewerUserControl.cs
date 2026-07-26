@@ -18,6 +18,11 @@ public partial class HtmlViewerUserControl : UserControl
         scrollViewer.Content = webViewPanel;
         Content = scrollViewer;
         DataContextChanged += HtmlViewerUserControl_DataContextChanged;
+
+        webViewPanel.EnvironmentRequested += (s, e) =>
+        {
+            e.EnableDevTools = true;
+        };
     }
 
     private void HtmlViewerUserControl_DataContextChanged(object sender, EventArgs e)
@@ -29,18 +34,39 @@ public partial class HtmlViewerUserControl : UserControl
     {
         if (DataContext is HtmlViewerVM vm)
         {
-            webViewPanel.NavigateToString(vm.Content ?? "");
-            oldVM?.PropertyChanged -= Vm_PropertyChanged;
-            vm.PropertyChanged += Vm_PropertyChanged;
+            if (vm.Uri == null)
+            {
+                webViewPanel.NavigateToString(vm.Content ?? "");
+
+            }
+            else
+            {
+                webViewPanel.Navigate(vm.Uri);
+            }
+            oldVM?.PropertyChanged -= OnHtmlViewerVMPropertyChanged;
+            vm.PropertyChanged += OnHtmlViewerVMPropertyChanged;
             oldVM = vm;
         }
     }
 
-    private void Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnHtmlViewerVMPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (sender is HtmlViewerVM vm && e.PropertyName == nameof(HtmlViewerVM.Content))
+        if (sender is HtmlViewerVM vm)
         {
-            webViewPanel.NavigateToString(vm.Content ?? "");
+            switch (e.PropertyName)
+            {
+                case nameof(HtmlViewerVM.Content):
+                    webViewPanel.NavigateToString(vm.Content ?? "");
+                    break;
+                case nameof(HtmlViewerVM.Uri):
+                    if (vm.Uri != null)
+                    {
+                        webViewPanel.Navigate(vm.Uri);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using Avalonia.VisualTree;
 using AvaloniaProjectRelations.Main;
 using AvaloniaProjectRelations.Resources;
 using Microsoft.EntityFrameworkCore;
+using RelationsShared.Services;
 using System.Globalization;
 using System.Reflection;
 using Topelab.Core.Avalonia.Base;
@@ -33,8 +34,6 @@ namespace AvaloniaProjectRelations
             {
                 Thread.CurrentThread.CurrentUICulture = new CultureInfo(uiCulture);
             }
-            //var logService = Resolve<ILogService>();
-            //logService.Info("Loading...");
 
             AvaloniaXamlLoader.Load(this);
         }
@@ -68,6 +67,10 @@ namespace AvaloniaProjectRelations
             {
                 e.Cancel = true;
                 viewModel.ContentViewModel.CancelCommand.Execute(null);
+            }
+            else
+            {
+                Resolve<IEmbededWebServer>()?.Stop();
             }
         }
 

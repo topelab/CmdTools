@@ -3,10 +3,7 @@ using AvaloniaProjectRelations.Browser;
 using AvaloniaProjectRelations.Commands;
 using AvaloniaProjectRelations.Main;
 using AvaloniaProjectRelations.MainControl;
-using RelationsShared.Services;
-using Topelab.Core.Avalonia.Services;
 using Topelab.Core.Resolver.Entities;
-using Topelab.Core.Resolver.Interfaces;
 
 namespace AvaloniaProjectRelations
 {

@@ -2,7 +2,6 @@ namespace AvaloniaProjectRelations.MainControl
 {
     using CmdTools.Shared;
     using CommandLine;
-    using ReactiveUI;
     using RelationsShared.DTO;
     using RelationsShared.Services;
     using System;

@@ -19,5 +19,8 @@ namespace RelationsShared.DTO
         public bool HasTheme => !string.IsNullOrEmpty(Theme);
         [JsonIgnore]
         public bool HasBackgroundColor => !string.IsNullOrEmpty(BackgroundColor);
+
+        [JsonIgnore]
+        public string BaseUrl { get; set; }
     }
 }

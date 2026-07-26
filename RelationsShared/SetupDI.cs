@@ -14,6 +14,7 @@ namespace RelationsShared
                 .AddCollection(SharedSetupDI.Register())
                 .AddSingleton<IJsonSettings, JsonSettings>()
                 .AddSingleton<IUserSettingsFactory, UserSettingsFactory>()
+                .AddSingleton<IEmbededWebServer, EmbededWebServer>()
                 .AddTransient<IProjectRelationsContextInitializer, ProjectRelationsContextInitializer>()
                 .AddTransient<IRelationsContextInitializer, ProjectRelationsContextInitializer>(nameof(FinderType.Projects))
                 .AddTransient<IRelationsContextInitializer, ClassRelationsContextInitializer>(nameof(FinderType.Classes))
