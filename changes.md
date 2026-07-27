@@ -1,3 +1,8 @@
+## Versions 1.1.10 (AvaloniaProjectRelations), 1.1.41 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.10 (ProjectRelations2026)
+
+- Remove WebView2 dependency, now using Avalonia WebView for rendering.
+- Included embedded local web server for rendering diagrams, eliminating the need for external scripts.
+
 ## Versions 1.1.8 (AvaloniaProjectRelations), 1.1.39 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.8 (ProjectRelations2026)
 
 - Updated Topelab.Core.Avalonia  1.2.16 -> 1.2.17

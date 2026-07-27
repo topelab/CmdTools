@@ -71,22 +71,18 @@ namespace RelationsShared.Services
                             response.ContentLength64 = buffer.Length;
                             var extension = Path.GetExtension(filePath).ToLowerInvariant();
 
-                            switch (extension)
+                            response.ContentType = extension switch
                             {
-                                case ".js":
-                                case ".mjs":
-                                    response.ContentType = "text/javascript";
-                                    break;
-                                case ".html":
-                                    response.ContentType = "text/html";
-                                    break;
-                                case ".css":
-                                    response.ContentType = "text/css";
-                                    break;
-                                default:
-                                    response.ContentType = "text/plain";
-                                    break;
-                            }
+                                ".js" or ".mjs" => "text/javascript",
+                                ".html" => "text/html",
+                                ".css" => "text/css",
+                                ".png" => "image/png",
+                                ".jpg" or ".jpeg" => "image/jpeg",
+                                ".gif" => "image/gif",
+                                ".svg" => "image/svg+xml",
+                                ".ico" => "image/x-icon",
+                                _ => "text/plain",
+                            };
 
                             await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
                         }
