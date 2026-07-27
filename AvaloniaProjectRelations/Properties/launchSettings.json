@@ -2,7 +2,7 @@
   "profiles": {
     "AvaloniaProjectRelations": {
       "commandName": "Project",
-      "commandLineArgs": "-s \"C:\\arc\\src\\github\\topelab\\cmdtools\" -p shared -u -d"
+      "commandLineArgs": "-s \"C:\\arc\\src\\github\\topelab\\cmdtools\" -p shared -u -d -w true"
     }
   }
 }
