@@ -2,17 +2,21 @@ namespace AvaloniaProjectRelations.MainControl
 {
     using CmdTools.Shared;
     using CommandLine;
+    using CommandLine.Text;
     using RelationsShared.DTO;
     using RelationsShared.Services;
     using System;
+    using Topelab.Core.Avalonia.Services;
 
     internal class MainControlVMFactory(IUserSettingsFactory userSettingsFactory,
                                         IMainControlVMInitializer mainControlVMInitializer,
-                                        IMainControlVMChangeListener mainControlVMChangeListener) : IMainControlVMFactory
+                                        IMainControlVMChangeListener mainControlVMChangeListener,
+                                        IMessageService messageService) : IMainControlVMFactory
     {
         private readonly IUserSettingsFactory userSettingsFactory = userSettingsFactory;
         private readonly IMainControlVMInitializer mainControlVMInitializer = mainControlVMInitializer;
         private readonly IMainControlVMChangeListener mainControlVMChangeListener = mainControlVMChangeListener;
+        private readonly IMessageService messageService = messageService;
         private UserSettings userSettings;
 
         private UserSettings UserSettings => userSettings ??= userSettingsFactory.Create(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
@@ -27,10 +31,11 @@ namespace AvaloniaProjectRelations.MainControl
             };
 
             bool usedByMe = UserSettings.UsedByMe;
+
             var result = Parser.Default.ParseArguments<MainControlArguments>(args)
                 .WithParsed(o =>
                 {
-                    options.RootPath = o.RootPath ?? GetArgument(args, 1) ?? Environment.CurrentDirectory;
+                    options.RootPath = o.RootPath ?? GetArgument(args, 1);
                     options.WithPackages = o.WithPackages ?? UserSettings.ShowPackages;
                     options.SelectedElement = o.SelectedProject ?? GetArgument(args, 2);
                     options.Exclude = o.Exclude ?? UserSettings.ExcludeProjects;
@@ -38,7 +43,15 @@ namespace AvaloniaProjectRelations.MainControl
                     usedByMe = o.UsedByMe;
                 });
 
+            options.RootPath ??=  Environment.CurrentDirectory;
             options.InitialPath = TryFindInitialPath(options.RootPath);
+
+            if (args.Contains("--help") || args.Length == 1)
+            {
+                var parseResult = Parser.Default.ParseArguments<MainControlArguments>(args);
+                var helpText = HelpText.AutoBuild(parseResult, h => h, e => e);
+                options.HelpText = helpText.ToString();
+            }
 
             var vm = new MainControlVM(options) { Title = App.MainTitle };
             mainControlVMInitializer.Initialize(vm, true);
@@ -59,8 +72,8 @@ namespace AvaloniaProjectRelations.MainControl
 
         private string TryFindInitialPath(string rootPath)
         {
-            string currentPath = rootPath;
-            string solutionPath = rootPath;
+            string currentPath = rootPath ?? Environment.CurrentDirectory;
+            string solutionPath = rootPath ?? Environment.CurrentDirectory;
 
             if (!IsSolutionPath(currentPath))
             {

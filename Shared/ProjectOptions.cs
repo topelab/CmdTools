@@ -21,5 +21,6 @@ namespace CmdTools.Shared
 
         public List<string> ProjectPaths { get; init; } = [];
         public string InitialPath { get; set; }
+        public string HelpText { get; set; }
     }
 }

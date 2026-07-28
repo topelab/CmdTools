@@ -1,3 +1,7 @@
+## Versions 1.1.11 (AvaloniaProjectRelations), 1.1.42 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.11 (ProjectRelations2026)
+
+- Added help text for AvaloniaProjectRelations (--help).
+
 ## Versions 1.1.10 (AvaloniaProjectRelations), 1.1.41 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.10 (ProjectRelations2026)
 
 - Remove WebView2 dependency, now using Avalonia WebView for rendering.

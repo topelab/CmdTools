@@ -43,6 +43,15 @@ namespace AvaloniaProjectRelations.MainControl
                 vm.ShowListOnly = options.RenderType == RenderType.Text;
                 vm.IncludePackages = options.WithPackages;
                 InitializeProjects(vm, options);
+
+                if (options.HelpText != null)
+                {
+                    var outputRender = outputRenderFactory.Create(RenderType.Text);
+                    var html = outputRender.RenderToHtml(options.HelpText.ReplaceLineEndings("<br/>"), UserSettings);
+                    embededWebServer.SetContent(html);
+                    vm.HtmlViewerVM.Uri = new Uri($"{embededWebServer.BaseUrl}/index-{Guid.NewGuid()}.html");
+                    vm.IsContextLocked = true;
+                }
             }
             else
             {

@@ -37,18 +37,22 @@
 					Margin="5">
 			<RadioButton Content="Used By this project"
 						 IsChecked="{Binding UsedByMe, Mode=TwoWay}"
+						 IsEnabled="{Binding !IsContextLocked}"
 						 GroupName="RelationsGroup"
 						 Margin="5" />
 			<RadioButton Content="Using this project"
 						 IsChecked="{Binding UsingMe, Mode=TwoWay}"
+						 IsEnabled="{Binding !IsContextLocked}"
 						 GroupName="RelationsGroup"
 						 Margin="5" />
 			<CheckBox Content="Include packages"
 					  IsVisible="{Binding IncludePackagesVisibility}"
 					  IsChecked="{Binding IncludePackages, Mode=TwoWay}"
+	  				  IsEnabled="{Binding !IsContextLocked}"
 					  Margin="5" />
 			<CheckBox Content="Show list only"
 					  IsChecked="{Binding ShowListOnly, Mode=TwoWay}"
+					  IsEnabled="{Binding !IsContextLocked}"
 					  Margin="5" />
 			<TextBlock Text="Projects"
 					   FontWeight="Bold"
@@ -59,6 +63,7 @@
 				 Margin="5"
 				 ItemsSource="{Binding Projects}"
 				 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+				 IsEnabled="{Binding !IsContextLocked}"
 				 FilterMode="Contains"
 				 MinimumPrefixLength="0"
 				 MaxHeight="600"
@@ -70,6 +75,7 @@
 				 Classes="Mine"
 				 ItemsSource="{Binding Projects}"
 				 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+				 IsEnabled="{Binding !IsContextLocked}"
 				 VerticalAlignment="Top"
 				 ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
