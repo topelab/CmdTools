@@ -1,3 +1,8 @@
+## Versions 1.1.12 (AvaloniaProjectRelations), 1.1.43 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.12 (ProjectRelations2026)
+
+- Updated Avalonia.Desktop       12.1.0 -> 12.1.1
+- Updated Topelab.Core.Avalonia  1.2.17 -> 1.2.18
+
 ## Versions 1.1.11 (AvaloniaProjectRelations), 1.1.42 (Contracts, CreateRelationsDiagram, RunCustomTool, Shared, UpdateVersion), 1.2.11 (ProjectRelations2026)
 
 - Added help text for AvaloniaProjectRelations (--help).
