@@ -59,7 +59,7 @@ namespace RelationsShared.Services
                         byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
                         response.ContentLength64 = buffer.Length;
                         response.ContentType = "text/html";
-                        await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                        await response.OutputStream.WriteAsync(buffer);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace RelationsShared.Services
                                 _ => "text/plain",
                             };
 
-                            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                            await response.OutputStream.WriteAsync(buffer);
                         }
                         else
                         {
